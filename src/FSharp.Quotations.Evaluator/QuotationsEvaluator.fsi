@@ -1,6 +1,6 @@
 ﻿// (c) Microsoft Corporation 2005-2009.
 
-namespace Microsoft.FSharp.Linq
+namespace FSharp.Quotations.Evaluator
 
     open System
     open System.Linq.Expressions

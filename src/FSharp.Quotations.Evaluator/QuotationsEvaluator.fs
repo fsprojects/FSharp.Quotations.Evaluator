@@ -5,7 +5,7 @@
 //
 
 
-namespace Microsoft.FSharp.Linq
+namespace FSharp.Quotations.Evaluator
 
 open System
 open System.Linq
