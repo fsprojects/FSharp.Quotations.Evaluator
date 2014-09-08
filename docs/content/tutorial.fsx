@@ -4,16 +4,15 @@
 #I "../../bin"
 
 (**
-Introducing your project
+F# Quotations Evaluator Tutorial
 ========================
 
-Say more
+To reference the library:
 
 *)
-#r "FSharp.ProjectTemplate.dll"
-open FSharp.ProjectTemplate
+#r "FSharp.Quotations.Evaluator.dll"
+open FSharp.Quotations.Evaluator
 
-Library.hello 0
 (**
-Some more info
+To evaluate:
 *)

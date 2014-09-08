@@ -8,7 +8,8 @@ module FSharp.Quotations.Evaluator.Unittests
 
 open NUnit.Framework
 open Microsoft.FSharp.Quotations
-open FSharp.Quotations.Evaluator.QuotationEvaluation
+open FSharp.Quotations.Evaluator
+open FSharp.Quotations.Evaluator.QuotationEvaluationExtensions
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Quotations.DerivedPatterns
@@ -67,8 +68,7 @@ module Extensions =
 [<AutoOpen>]
 module ModuleDefinitions = 
     let eval (q: Expr<_>) = 
-        q.ToLinqExpression() |> ignore 
-        q.Compile() |> ignore  
+        q.ToLinqExpressionUntyped() |> ignore 
         q.Eval()
 
     let x22<[<Measure>] 'a>() = <@ typeof<float<'a>> @> |> eval
@@ -1210,7 +1210,7 @@ let TestUnionInequality() =
 
 module QuotationCompilation =
     let eval (q: Expr<_>) = 
-        q.ToLinqExpression() |> ignore 
+        q.ToLinqExpressionUntyped() |> ignore 
         q.Compile() |> ignore  
         q.Eval()
         

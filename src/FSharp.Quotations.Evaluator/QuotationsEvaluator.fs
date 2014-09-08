@@ -23,7 +23,7 @@ module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
 
-module QuotationEvaluation = 
+module QuotationEvaluationTypes = 
     
     type This = 
         static member Assembly = typeof<This>.Assembly
@@ -847,27 +847,32 @@ module QuotationEvaluation =
 
     let Eval e = Compile e ()
 
+module QuotationEvaluationExtensions =
+
+    open QuotationEvaluationTypes
 
     type Microsoft.FSharp.Quotations.Expr with 
-        member x.ToLinqExpression() = Conv(x, false)
-        member x.CompileUntyped() = Compile(x)
+        member x.ToLinqExpressionUntyped() = Conv(x, false)
+        member x.CompileUntyped() = 
+            let f = Compile(x)  
+            f() 
         member x.EvalUntyped() = Eval(x)
 
     type Microsoft.FSharp.Quotations.Expr<'T> with 
         member x.Compile() = 
             let f = Compile(x)  
-            (fun () -> (f()) :?> 'T)
+            f() :?> 'T
         member x.Eval() = (Eval(x) :?> 'T)
 
   
-open QuotationEvaluation
+open QuotationEvaluationTypes
+open QuotationEvaluationExtensions
   
 [<Sealed>]
 type QuotationEvaluator() = 
 
-    static member ToLinqExpression (e: Microsoft.FSharp.Quotations.Expr) = e.ToLinqExpression()
+    static member ToLinqExpression (e: Microsoft.FSharp.Quotations.Expr) = e.ToLinqExpressionUntyped()
 
-   
     static member CompileUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.CompileUntyped()
 
     static member EvaluateUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.EvalUntyped()

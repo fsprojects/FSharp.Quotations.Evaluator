@@ -4,7 +4,7 @@
 #I "../../bin"
 
 (**
-F# Project Scaffold
+F# Quotations Evaluator
 ===================
 
 Documentation
@@ -13,8 +13,8 @@ Documentation
   <div class="span1"></div>
   <div class="span6">
     <div class="well well-small" id="nuget">
-      The F# ProjectTemplate library can be <a href="https://nuget.org/packages/FSharp.ProjectTemplate">installed from NuGet</a>:
-      <pre>PM> Install-Package FSharp.ProjectTemplate</pre>
+      The F# Quotations Evaluator library can be <a href="https://nuget.org/packages/FSharp.Quotations.Evaluator">installed from NuGet</a>:
+      <pre>PM> Install-Package FSharp.Quotations.Evaluator</pre>
     </div>
   </div>
   <div class="span1"></div>
@@ -26,10 +26,15 @@ Example
 This example demonstrates using a function defined in this sample library.
 
 *)
-#r "FSharp.ProjectTemplate.dll"
-open FSharp.ProjectTemplate
+#r "FSharp.Quotations.Evaluator.dll"
+open FSharp.Quotations.Evaluator
 
-printfn "hello = %i" <| Library.hello 0
+QuotationEvaluator.Evaluate <@ 1 + 1 @>
+
+let add = QuotationEvaluator.Compile <@ fun x -> x + x + 1 @> ()
+
+add 3 
+
 
 (**
 Some more info
@@ -59,9 +64,9 @@ The library is available under Public Domain license, which allows modification 
 redistribution for both commercial and non-commercial purposes. For more information see the 
 [License file][license] in the GitHub repository. 
 
-  [content]: https://github.com/fsprojects/FSharp.ProjectScaffold/tree/master/docs/content
-  [gh]: https://github.com/fsprojects/FSharp.ProjectScaffold
-  [issues]: https://github.com/fsprojects/FSharp.ProjectScaffold/issues
-  [readme]: https://github.com/fsprojects/FSharp.ProjectScaffold/blob/master/README.md
-  [license]: https://github.com/fsprojects/FSharp.ProjectScaffold/blob/master/LICENSE.txt
+  [content]: https://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/docs/content
+  [gh]: https://github.com/fsprojects/FSharp.Quotations.Evaluator
+  [issues]: https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues
+  [readme]: https://github.com/fsprojects/FSharp.Quotations.Evaluator/blob/master/README.md
+  [license]: https://github.com/fsprojects/FSharp.Quotations.Evaluator/blob/master/LICENSE.txt
 *)

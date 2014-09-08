@@ -21,10 +21,11 @@ namespace FSharp.Quotations.Evaluator
         static member ToLinqExpression : Microsoft.FSharp.Quotations.Expr -> System.Linq.Expressions.Expression
 
         /// Compile the quotation expression by first converting to LINQ expression trees
+        /// The expression is currently always compiled.
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
-        static member CompileUntyped : Microsoft.FSharp.Quotations.Expr -> (unit -> obj)
+        static member CompileUntyped : Microsoft.FSharp.Quotations.Expr -> obj
 
         /// Compile the quotation expression by first converting to LINQ expression trees
         ///
@@ -35,10 +36,11 @@ namespace FSharp.Quotations.Evaluator
         static member internal EvaluateUntypedUsingQueryApproximations : Microsoft.FSharp.Quotations.Expr -> obj
     
         /// Compile the quotation expression by first converting to LINQ expression trees
+        /// The expression is currently always compiled.
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
-        static member Compile : Microsoft.FSharp.Quotations.Expr<'T> -> (unit -> 'T)
+        static member Compile : Microsoft.FSharp.Quotations.Expr<'T> -> 'T
 
         /// Evaluate the quotation expression by first converting to LINQ expression trees
         ///
@@ -49,42 +51,48 @@ namespace FSharp.Quotations.Evaluator
     /// This module provides Compile and Eval extension members
     /// for F# quotation values, implemented by translating to LINQ
     /// expression trees and using the LINQ dynamic compiler.
-    module QuotationEvaluation =
+    [<AutoOpen>]
+    module QuotationEvaluationExtensions =
 
         type Microsoft.FSharp.Quotations.Expr with 
-              /// Convert the quotation expression to LINQ expression trees
-              ///
-              /// This operation will only succeed for a subset of quotation expressions.
+              /// Convert the quotation expression to a LINQ expression tree.
               ///
               /// Exceptions: InvalidArgumentException will be raised if the input expression is
               /// not in the subset that can be converted to a LINQ expression tree
-              member ToLinqExpression : unit -> System.Linq.Expressions.Expression
-
-              /// Compile the quotation expression by first converting to LINQ expression trees
-              ///
-              /// Exceptions: InvalidArgumentException will be raised if the input expression is
-              /// not in the subset that can be converted to a LINQ expression tree
-              member CompileUntyped : unit -> (unit -> obj)
-
-              /// Compile the quotation expression by first converting to LINQ expression trees
-              ///
-              /// Exceptions: InvalidArgumentException will be raised if the input expression is
-              /// not in the subset that can be converted to a LINQ expression tree
-              member EvalUntyped : unit -> obj
+              member ToLinqExpressionUntyped : unit -> Expression
 
         type Microsoft.FSharp.Quotations.Expr<'T> with 
-              /// Compile the quotation expression by first converting to LINQ expression trees
+
+              /// Compile and evaluate the quotation expression by first converting to LINQ expression trees.
+              /// The expression is currently always compiled.
               ///
               /// Exceptions: InvalidArgumentException will be raised if the input expression is
               /// not in the subset that can be converted to a LINQ expression tree
-              member Compile : unit -> (unit -> 'T)
+              member Compile : unit -> 'T
 
-              /// Evaluate the quotation expression by first converting to LINQ expression trees
+              /// Evaluate the quotation expression by first converting to LINQ expression trees.
+              /// The expression is currently always compiled.
               ///
               /// Exceptions: InvalidArgumentException will be raised if the input expression is
               /// not in the subset that can be converted to a LINQ expression tree
               member Eval : unit -> 'T
 
+        type Microsoft.FSharp.Quotations.Expr with 
+
+              /// Compile and evaluate the quotation expression by first converting to LINQ expression trees.
+              ///
+              /// Exceptions: InvalidArgumentException will be raised if the input expression is
+              /// not in the subset that can be converted to a LINQ expression tree
+              member CompileUntyped : unit -> obj
+
+              /// Evaluate the quotation expression by first converting to LINQ expression trees.
+              /// The expression is currently always compiled.
+              ///
+              /// Exceptions: InvalidArgumentException will be raised if the input expression is
+              /// not in the subset that can be converted to a LINQ expression tree
+              member EvalUntyped : unit -> obj
+
+    module QuotationEvaluationTypes =
         /// This function should not be called directly. 
         //
         // NOTE: when an F# expression tree is converted to a Linq expression tree using ToLinqExpression 
