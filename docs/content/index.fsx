@@ -25,13 +25,20 @@ Ovverview
 
 This component is an F# quotations evaluator, implemented by compiling to LINQ expression trees.
 
-There are some limitations in the quotations accepted - it is possible these can be lifted by using more
-recent statement-tree functionality available in .NET.
+For simple expression-based scenarios you may be able to simply use the method
+```Microsoft.FSharp.Linq.RuntimeHelpers.LeafExpressionConverter.EvaluateQuotation``` from ```FSharp.Core.dll``.
 
-Performance of generatefd code is not as good as F# compiled code, expecially for recursive functions.  
-However it is still good enough for many purposes of dynamic code generation.
+However that component has restrictions in the quotations accepted - for example, statements such as
+while-loops are not accepted.  This component accepts more quotations (including those involving statements), 
+though some restrictions remain. Please help by contributing additional
+functionality to lift remaining restrictions.
 
-The component requires .NET 4.x.  It is not useful on mobile devices where code generation APIs are not available.
+Performance of generated code is generally OK though not as good as F# compiled code, expecially for recursive functions.  
+However it is still good enough for many purposes of dynamic code generation.  Contributions to improve performance
+are welcome.
+
+The component requires .NET 4.x.  It is not usable on mobile devices or portable profiles, 
+where code generation APIs are not available.
 
 Example
 -------
