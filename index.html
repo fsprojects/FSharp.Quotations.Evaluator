@@ -69,9 +69,9 @@
 
 <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">QuotationEvaluator</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">Evaluate</span> &lt;@ <span class="n">1</span> <span class="o">+</span> <span class="n">1</span> @&gt;
 
-<span class="k">let</span> <span class="i">add</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="i">QuotationEvaluator</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="i">Compile</span> &lt;@ <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs7', 10)" onmouseover="showTip(event, 'fs7', 10)" class="i">x</span> <span class="o">+</span> <span class="n">1</span> @&gt; ()
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="i">addPlusOne</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="i">QuotationEvaluator</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 8)" onmouseover="showTip(event, 'fs7', 8)" class="i">Compile</span> &lt;@ <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs8', 9)" onmouseover="showTip(event, 'fs8', 9)" class="i">x</span> <span onmouseout="hideTip(event, 'fs9', 10)" onmouseover="showTip(event, 'fs9', 10)" class="i">y</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs8', 11)" onmouseover="showTip(event, 'fs8', 11)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs9', 12)" onmouseover="showTip(event, 'fs9', 12)" class="i">y</span> <span class="o">+</span> <span class="n">1</span> @&gt; 
 
-<span class="i">add</span> <span class="n">3</span> </pre>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 13)" onmouseover="showTip(event, 'fs10', 13)" class="i">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 14)" onmouseover="showTip(event, 'fs6', 14)" class="i">addPlusOne</span> <span class="n">3</span> <span class="n">5</span></pre>
 </td>
 </tr>
 </table>
@@ -107,8 +107,11 @@ redistribution for both commercial and non-commercial purposes. For more informa
 <div class="tip" id="fs3">namespace FSharp.Quotations.Evaluator</div>
 <div class="tip" id="fs4">type QuotationEvaluator<br />static member Compile : Expr&lt;&#39;T&gt; -&gt; &#39;T<br />static member CompileUntyped : Expr -&gt; obj<br />static member Evaluate : Expr&lt;&#39;T&gt; -&gt; &#39;T<br />static member EvaluateUntyped : Expr -&gt; obj<br />static member private EvaluateUntypedUsingQueryApproximations : Expr -&gt; obj<br />static member ToLinqExpression : Expr -&gt; Expression<br /><br />Full name: FSharp.Quotations.Evaluator.QuotationEvaluator</div>
 <div class="tip" id="fs5">static member QuotationEvaluator.Evaluate : Quotations.Expr&lt;&#39;T&gt; -&gt; &#39;T</div>
-<div class="tip" id="fs6">static member QuotationEvaluator.Compile : Quotations.Expr&lt;&#39;T&gt; -&gt; &#39;T</div>
-<div class="tip" id="fs7">val x : unit</div>
+<div class="tip" id="fs6">val addPlusOne : (int -&gt; int -&gt; int)<br /><br />Full name: Index.addPlusOne</div>
+<div class="tip" id="fs7">static member QuotationEvaluator.Compile : Quotations.Expr&lt;&#39;T&gt; -&gt; &#39;T</div>
+<div class="tip" id="fs8">val x : int</div>
+<div class="tip" id="fs9">val y : int</div>
+<div class="tip" id="fs10">val v : int<br /><br />Full name: Index.v</div>
 
         </div>
         <div class="span3">
