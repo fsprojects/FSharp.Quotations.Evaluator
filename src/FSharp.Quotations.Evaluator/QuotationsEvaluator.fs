@@ -29,7 +29,7 @@ module QuotationEvaluation =
         static member Assembly = typeof<This>.Assembly
 
     let hashCompareType = typeof<list<_>>.Assembly.GetType("Microsoft.FSharp.Core.LanguagePrimitives+HashCompare")
-    let extraHashCompareType = This.Assembly.GetType("Microsoft.FSharp.Linq.ExtraHashCompare")
+    let extraHashCompareType = This.Assembly.GetType("FSharp.Quotations.Evaluator.ExtraHashCompare")
     let genericEqualityIntrinsic = "GenericEqualityIntrinsic" |> hashCompareType.GetMethod
     let genericNotEqualIntrinsic = "GenericNotEqualIntrinsic" |> extraHashCompareType.GetMethod
     let genericLessThanIntrinsic = "GenericLessThanIntrinsic" |> hashCompareType.GetMethod

@@ -1,14 +1,19 @@
-namespace FSharp.PowerPack.Unittests
+
+#if INTERACTIVE
+#r @"..\..\bin\FSharp.Quotations.Evaluator.dll"
+#r @"..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll"
+#else
+module FSharp.Quotations.Evaluator.Unittests
+#endif
+
 open NUnit.Framework
 open Microsoft.FSharp.Quotations
-open Microsoft.FSharp.Linq.QuotationEvaluation
+open FSharp.Quotations.Evaluator.QuotationEvaluation
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Quotations.ExprShape
 
-open Microsoft.FSharp.Linq.QuotationEvaluation
-open Microsoft.FSharp.Linq.Query
 
 #nowarn "40"
 #nowarn "57"
@@ -22,9 +27,17 @@ open Microsoft.FSharp.Linq.Query
 [<Measure>] type sqrm = m ^ 2
 type area = float<m ^ 2>
 
+let check nm (v1:'T) (v2:'T) = 
+    if v1 <> v2 then 
+        Assert.Fail("test failed: " + nm + sprintf "expected %A but got %A" v2 v1)
+
+let test nm b = 
+    if not b then 
+        Assert.Fail("test failed: " + nm)
 
 [<AutoOpen>]
 module Extensions = 
+
     type System.Object with 
         member x.ExtensionMethod0()  = 3
         member x.ExtensionMethod1()  = ()
@@ -124,11 +137,8 @@ type GUnion10<'a> = Case1 of 'a | Case2
 
 type PointRecord = { field1 : int; field2 : int }
 
-[<TestFixture>]
-type public QuotationEvalTests() =
-  
-    [<Test>]
-    member this.FloatTests() = 
+[<Test>]
+let FloatTests() = 
 
      // set up bindings
      let x1 = <@ 2.0<kg> + 4.0<kg> @> |> eval
@@ -212,8 +222,8 @@ type public QuotationEvalTests() =
      test "x22" (x22<m>() = typeof<float>)
       
 
-    [<Test>]
-    member this.Float32Tests() = 
+[<Test>]
+let Float32Tests() = 
 
      let y1 = <@ 2.0f<kg> + 4.0f<kg>  @> |> eval
      let y2 = <@ 2.0f<s> - 4.0f<s>  @> |> eval
@@ -279,8 +289,8 @@ type public QuotationEvalTests() =
      test "y13a" (y13a = 6.5f<m^4>)
       
 
-    [<Test>]
-    member this.DecimalTests() = 
+[<Test>]
+let DecimalTests() = 
 
      let z1 = <@ 2.0M<kg> + 4.0M<kg>  @> |> eval
      let z2 = <@ 2.0M<s> - 4.0M<s>  @> |> eval
@@ -341,8 +351,8 @@ type public QuotationEvalTests() =
 
 
 
-    [<Test>]
-    member this.EvaluationTests() = 
+[<Test>]
+let EvaluationTests() = 
 
         let f () = () 
 
@@ -513,11 +523,12 @@ type public QuotationEvalTests() =
         checkEval "2ver9ewrn" (<@ Checked.(+) 1 1 @>) 2
         checkEval "2ver9ewrm" (<@ Checked.(-) 1 1 @>) 0
         checkEval "2ver9ewrw" (<@ Checked.( * ) 1 1 @>) 1
-        // TODO (let) : let v2 = (3,4) in eval <@ match v2 with (x,y) -> x + y @>
-        // TODO: eval <@ "1" = "2" @>
+        let v2 = (3,4) in 
+        checkEval "2ver9ewr43" <@ match v2 with (x,y) -> x + y @> 7
+        checkEval "2ver9ewr44" <@ "1" = "2" @> false
 
-    [<Test>]
-    member this.NonGenericRecdTests() = 
+[<Test>]
+let NonGenericRecdTests() = 
         let c1 = { Name="Don"; Data=6 }
         let c2 = { Name="Peter"; Data=7 }
         let c3 = { Name="Freddy"; Data=8 }
@@ -527,8 +538,8 @@ type public QuotationEvalTests() =
         checkEval "2ver9e7rw4" (<@ { Name = "Don"; Data = 6 } @>) { Name="Don"; Data=6 }
         checkEval "2ver9e7rw5" (<@ { Name = "Don"; Data = 6 } @>) { Name="Don"; Data=6 }
 
-    [<Test>]
-    member this.GenericRecdTests() = 
+[<Test>]
+let GenericRecdTests() = 
         let c1 : CustomerG<int> = { Name="Don"; Data=6 }
         let c2 : CustomerG<int> = { Name="Peter"; Data=7 }
         let c3 : CustomerG<string> = { Name="Freddy"; Data="8" }
@@ -540,16 +551,16 @@ type public QuotationEvalTests() =
         checkEval "2ver9e7rwW" (<@ c1.Name <- "Ali Baba" @>) ()
         checkEval "2ver9e7rwE" (<@ c1.Name  @>) "Ali Baba"
 
-    [<Test>]
-    member this.ArrayTests() = 
+[<Test>]
+let ArrayTests() = 
         checkEval "2ver9e8rwR1" (<@ [| |]  @>) ([| |] : int array)
         checkEval "2ver9e8rwR2" (<@ [| 0 |]  @>) ([| 0 |] : int array)
         checkEval "2ver9e8rwR3" (<@ [| 0  |].[0]  @>) 0
         checkEval "2ver9e8rwR4" (<@ [| 1; 2  |].[0]  @>) 1
         checkEval "2ver9e8rwR5" (<@ [| 1; 2  |].[1]  @>) 2
 
-    [<Test>]
-    member this.Array2DTests() = 
+[<Test>]
+let Array2DTests() = 
         checkEval "2ver9e8rwR6" (<@ (Array2D.init 3 4 (fun i j -> i + j)).[0,0] @>) 0
         checkEval "2ver9e8rwR7" (<@ (Array2D.init 3 4 (fun i j -> i + j)).[1,2] @>) 3
         checkEval "2ver9e8rwR8" (<@ (Array2D.init 3 4 (fun i j -> i + j)) |> Array2D.base1 @>) 0
@@ -558,16 +569,16 @@ type public QuotationEvalTests() =
         checkEval "2ver9e8rwRW" (<@ (Array2D.init 3 4 (fun i j -> i + j)) |> Array2D.length2 @>) 4
 
 
-    [<Test>]
-    member this.Array3DTests() = 
+[<Test>]
+let Array3DTests() = 
         checkEval "2ver9e8rwRE" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)).[0,0,0] @>) 0
         checkEval "2ver9e8rwRR" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j + k)).[1,2,3] @>) 6
         checkEval "2ver9e8rwRT" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)) |> Array3D.length1 @>) 3
         checkEval "2ver9e8rwRY" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)) |> Array3D.length2 @>) 4
         checkEval "2ver9e8rwRU" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)) |> Array3D.length3 @>) 5
 
-    [<Test>]
-    member this.ExceptionTests() = 
+[<Test>]
+let ExceptionTests() = 
         let c1 = E0
         let c2 = E1 "1"
         let c3 = E1 "2"
@@ -598,8 +609,8 @@ type public QuotationEvalTests() =
         checkEval "2ver9eQrwG" (<@ try raise c2 with E0 -> 2 | E1 "1" -> 3 @>) 3
         checkEval "2ver9eQrwH" (<@ try raise c2 with E1 "1" -> 3 | E0 -> 2  @>) 3
 
-    [<Test>]
-    member this.TypeTests() = 
+[<Test>]
+let TypeTests() = 
         let c1 = C0()
         let c2 = C1 "1"
         let c3 = C1 "2"
@@ -612,8 +623,8 @@ type public QuotationEvalTests() =
         checkEval "2ver9eQrwV" (<@ match box c2 with :? C1  -> 2 | :? C0 -> 1 | _ -> 3  @>) 2
         checkEval "2ver9eQrwN" (<@ match box c3 with :? C1  as c1 when c1.P = "2"  -> 2 | :? C0 -> 1 | _ -> 3  @>) 2
 
-    [<Test>]
-    member this.NonGenericUnionTests0() = 
+[<Test>]
+let NonGenericUnionTests0() = 
         let c1 = Union10.Case1 "meow"
         let c2 = Union10.Case2
         checkEval "2ver9e8rw11" (<@ Union10.Case1 "sss" @>) (Union10.Case1 "sss")
@@ -622,15 +633,15 @@ type public QuotationEvalTests() =
         checkEval "2ver9eWrw14" (<@ match c1 with Union10.Case1 s -> s | Union10.Case2 -> "woof" @>) "meow"
         checkEval "2ver9eErw15" (<@ match c2 with Union10.Case1 s -> s | Union10.Case2 -> "woof" @>) "woof"
 
-    [<Test>]
-    member this.NonGenericUnionTests1() = 
+[<Test>]
+let NonGenericUnionTests1() = 
         let c1 = Union1.Case1 "meow"
         checkEval "2ver9e8rw16" (<@ Union1.Case1 "sss" @>) (Union1.Case1 "sss")
         checkEval "2ver9eQrw17" (<@ match c1 with Union1.Case1 _ -> 2  @>) 2
         checkEval "2ver9eWrw18" (<@ match c1 with Union1.Case1 s -> s  @>) "meow"
 
-    [<Test>]
-    member this.NonGenericUnionTests2() = 
+[<Test>]
+let NonGenericUnionTests2() = 
         let c1 = Union11.Case1 "meow"
         let c2 = Union11.Case2 "woof"
         checkEval "2ver9e8rw19" (<@ Union11.Case1 "sss" @>) (Union11.Case1 "sss")
@@ -639,8 +650,8 @@ type public QuotationEvalTests() =
         checkEval "2ver9eWrw22" (<@ match c1 with Union11.Case1 s -> s | Union11.Case2 s -> s @>) "meow"
         checkEval "2ver9eErw23" (<@ match c2 with Union11.Case1 s -> s | Union11.Case2 s -> s @>) "woof"
 
-    [<Test>]
-    member this.NonGenericUnionTests3() = 
+[<Test>]
+let NonGenericUnionTests3() = 
         let c1 = Union1111.Case1 "meow"
         let c2 = Union1111.Case2 "woof"
         checkEval "2ver9e8rw24" (<@ Union1111.Case1 "sss" @>) (Union1111.Case1 "sss")
@@ -650,8 +661,8 @@ type public QuotationEvalTests() =
         checkEval "2ver9eErw28" (<@ match c2 with Union1111.Case1 s -> s | Union1111.Case2 s -> s | _ -> "bark" @>) "woof"
 
 
-    [<Test>]
-    member this.GenericUnionTests() = 
+[<Test>]
+let GenericUnionTests() = 
         let c1 = GUnion10.Case1 "meow"
         let c2 = GUnion10<string>.Case2
         checkEval "2ver9e8rw29" (<@ GUnion10.Case1 "sss" @>) (GUnion10.Case1 "sss")
@@ -660,8 +671,8 @@ type public QuotationEvalTests() =
         checkEval "2ver9eWrw32" (<@ match c1 with GUnion10.Case1 s -> s | GUnion10.Case2 -> "woof" @>) "meow"
         checkEval "2ver9eErw33" (<@ match c2 with GUnion10.Case1 s -> s | GUnion10.Case2 -> "woof" @>) "woof"
 
-    [<Test>]
-    member this.InlinedOperationsStillDynamicallyAvailableTests() = 
+[<Test>]
+let InlinedOperationsStillDynamicallyAvailableTests() = 
 
         checkEval "vroievr093" (<@ LanguagePrimitives.GenericZero<sbyte> @>)  0y
         checkEval "vroievr091" (<@ LanguagePrimitives.GenericZero<int16> @>)  0s
@@ -938,8 +949,6 @@ type public QuotationEvalTests() =
         checkEval "vrewoinrv09AA" (<@ [ 0us .. 10us ] @>) [ 0us .. 10us ]
         checkEval "vrewoinrv09SS" (<@ [ 0UL .. 10UL ] @>) [ 0UL .. 10UL ]
         
-        // op_Range dynamic disptach
-        checkEval "vrewoinrv09DD" (<@ [ 0N .. 10N ] @>) [ 0N .. 10N ]
 
 #if FX_NO_DEFAULT_DECIMAL_ROUND
 #else        
@@ -958,8 +967,8 @@ type public QuotationEvalTests() =
 
         eval <@ Array.average [| 0.0 .. 1.0 .. 10000.0 |] @> |> ignore 
 
-    [<Test>]
-    member this.LanguagePrimitiveCastingUnitsOfMeasure() = 
+[<Test>]
+let LanguagePrimitiveCastingUnitsOfMeasure() = 
 
         checkEval "castingunits1" (<@ 2.5 |> LanguagePrimitives.FloatWithMeasure<m> |> float @>) 2.5
         checkEval "castingunits2" (<@ 2.5f |> LanguagePrimitives.Float32WithMeasure<m> |> float32 @>) 2.5f
@@ -969,8 +978,8 @@ type public QuotationEvalTests() =
         checkEval "castingunits6" (<@ 2s |> LanguagePrimitives.Int16WithMeasure<m> |> int16 @>) 2s
         checkEval "castingunits7" (<@ 2y |> LanguagePrimitives.SByteWithMeasure<m> |> sbyte @>) 2y
 
-    [<Test>]
-    member this.QuotationTests() = 
+[<Test>]
+let QuotationTests() = 
         let (|Seq|_|) = function SpecificCall <@ seq @>(_, [_],[e]) -> Some e | _ -> None
         let (|Append|_|) = function SpecificCall <@ Seq.append @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
         let (|Delay|_|) = function SpecificCall <@ Seq.delay @>(_, [_],[Lambda(_,e)]) -> Some e | _ -> None
@@ -1062,8 +1071,8 @@ type public QuotationEvalTests() =
 *)
 
 
-    [<Test>]
-    member this.LargerAutomaticDiferentiationTest_FSharp_1_0_Bug_3498() = 
+[<Test>]
+let LargerAutomaticDiferentiationTest_FSharp_1_0_Bug_3498() = 
 
           let q = 
               <@ (fun (x1:double) -> 
@@ -1091,8 +1100,8 @@ type public QuotationEvalTests() =
           test "vrknlwerwe90" (r = 17.0)
           test "cew90jkml0rv" (rd 0.1 = 0.8)
 
-    [<Test>]
-    member this.FunkyMethodRepresentations() = 
+[<Test>]
+let FunkyMethodRepresentations() = 
         // The IsSome and IsNone properties are represented as static methods because
         // option uses 'null' as a representation
         checkEval "clkedw0" (<@ let x : int option = None in x.IsSome @>) false
@@ -1100,8 +1109,8 @@ type public QuotationEvalTests() =
         checkEval "clkedw2" (<@ let x : int option = Some 1 in x.Value @>) 1
         //checkEval "clkedw3" (<@ let x : int option = Some 1 in x.ToString() @> |> eval  ) "Some(1)"
 
-    [<Test>]
-    member this.Extensions() = 
+[<Test>]
+let Extensions() = 
 
         let v = new obj()
         checkEval "ecnowe0" (<@ v.ExtensionMethod0() @>)  3
@@ -1136,65 +1145,64 @@ type public QuotationEvalTests() =
         checkEval "ecnweh8" (<@ v2b.ExtensionProperty3 <- 4 @>)  ()
         checkEval "ecnweh9" (<@ v2.ExtensionIndexer1(3) @>) 3
         checkEval "ecnweha" (<@ v2b.ExtensionIndexer2(3) <- 4 @>)  ()
-[<TestFixture>]
-type QuotationOfComparisonTest() =
-    let testComparisonOnEqualValues v1 =
-        <@ v1 = v1 @>.Eval() |> Assert.IsTrue
-        <@ v1 <> v1 @>.Eval() |> Assert.IsFalse
-        <@ v1 < v1 @>.Eval() |> Assert.IsFalse
-        <@ v1 > v1 @>.Eval() |> Assert.IsFalse
-        <@ v1 <= v1 @>.Eval() |> Assert.IsTrue
-        <@ v1 >= v1 @>.Eval() |> Assert.IsTrue
 
-    let testComparisonOnOrderedValues v1 v2 =
-        <@ v1 = v2 @>.Eval() |> Assert.IsFalse
-        <@ v1 <> v2 @>.Eval() |> Assert.IsTrue
-        <@ v1 < v2 @>.Eval() |> Assert.IsTrue
-        <@ v1 > v2 @>.Eval() |> Assert.IsFalse
-        <@ v1 <= v2 @>.Eval() |> Assert.IsTrue
-        <@ v1 >= v2 @>.Eval() |> Assert.IsFalse
+let testComparisonOnEqualValues v1 =
+    <@ v1 = v1 @>.Eval() |> Assert.IsTrue
+    <@ v1 <> v1 @>.Eval() |> Assert.IsFalse
+    <@ v1 < v1 @>.Eval() |> Assert.IsFalse
+    <@ v1 > v1 @>.Eval() |> Assert.IsFalse
+    <@ v1 <= v1 @>.Eval() |> Assert.IsTrue
+    <@ v1 >= v1 @>.Eval() |> Assert.IsTrue
+
+let testComparisonOnOrderedValues v1 v2 =
+    <@ v1 = v2 @>.Eval() |> Assert.IsFalse
+    <@ v1 <> v2 @>.Eval() |> Assert.IsTrue
+    <@ v1 < v2 @>.Eval() |> Assert.IsTrue
+    <@ v1 > v2 @>.Eval() |> Assert.IsFalse
+    <@ v1 <= v2 @>.Eval() |> Assert.IsTrue
+    <@ v1 >= v2 @>.Eval() |> Assert.IsFalse
 
     
-    [<Test>]
-    member this.TestRecordEquality() =
+[<Test>]
+let TestRecordEquality() =
         let value1 = { field1 = 1; field2 = 1; }
         testComparisonOnEqualValues value1
 
-    [<Test>]
-    member this.TestRecordInequality() =
+[<Test>]
+let TestRecordInequality() =
         let value1 = { field1 = 1; field2 = 1; }
         let value2 = { field1 = 1; field2 = 2; }
         testComparisonOnOrderedValues value1 value2
 
-    [<Test>]
-    member this.TestStringEquality() =
+[<Test>]
+let TestStringEquality() =
         let value1 = "ABC"
         testComparisonOnEqualValues value1
 
-    [<Test>]
-    member this.TestStringInequality() =
+[<Test>]
+let TestStringInequality() =
         let value1 = "ABC"
         let value2 = "ABD"
         testComparisonOnOrderedValues value1 value2
 
-    [<Test>]
-    member this.TestValueTypeEquality() =
+[<Test>]
+let TestValueTypeEquality() =
         let value1 = 1
         testComparisonOnEqualValues value1
 
-    [<Test>]
-    member this.TestValueTypeInequality() =
+[<Test>]
+let TestValueTypeInequality() =
         let value1 = 1
         let value2 = 2
         testComparisonOnOrderedValues value1 value2
 
-    [<Test>]
-    member this.TestUnionEquality() =
+[<Test>]
+let TestUnionEquality() =
         let value1 = Union1111.Case1 "ABC"
         testComparisonOnEqualValues value1
 
-    [<Test>]
-    member this.TestUnionInequality() =
+[<Test>]
+let TestUnionInequality() =
         let value1 = Union1111.Case1 "ABC"
         let value2 = Union1111.Case1 "XYZ"
         testComparisonOnOrderedValues value1 value2
@@ -1221,122 +1229,11 @@ module QuotationCompilation =
 
 
     
-module IQueryableTests =
-    
-    type Customer = { mutable Name:string; Data: int; Cost:float; Sizes: int list }
-    let c1 = { Name="Don"; Data=6; Cost=6.2; Sizes=[1;2;3;4] }
-    let c2 = { Name="Peter"; Data=7; Cost=4.2; Sizes=[10;20;30;40] }
-    let c3 = { Name="Freddy"; Data=8; Cost=9.2; Sizes=[11;12;13;14] }
-    let c4 = { Name="Freddi"; Data=8; Cost=1.0; Sizes=[21;22;23;24] }
-    
-    let data = [c1;c2;c3;c4]
-    let db = System.Linq.Queryable.AsQueryable<Customer>(data |> List.toSeq)
-
-    //printfn "db = %A" (Reflection.FSharpType.GetRecordFields (typeof<Customer>, System.Reflection.BindingFlags.Public ||| System.Reflection.BindingFlags.NonPublic))
-    let q1 = <@ seq { for i in db -> i.Name } @>
-    let q2 = <@ c1.Name @>
-    //printfn "q2 = %A" q2
-    
-    //printfn "db = %A" db.Expression
-
-    let checkCommuteSeq s q =
-        check s (query q |> Seq.toList) (q.Eval() |> Seq.toList)
-
-    let checkCommuteVal s q =
-        check s (query q) (q.Eval())
-
-    let q = <@ System.DateTime.Now - System.DateTime.Now @>
-    q.Eval() |> ignore
-    
-    checkCommuteSeq "cnewnc01" <@ db @>
-    //debug <- true
-    checkCommuteSeq "cnewnc02" <@ seq { for i in db -> i }  @>
-    checkCommuteSeq "cnewnc03" <@ seq { for i in db -> i.Name }  @>
-    checkCommuteSeq "cnewnc04" <@ [ for i in db -> i.Name ]  @>
-    checkCommuteSeq "cnewnc05" <@ [ for i in db do yield i.Name ]  @>
-    checkCommuteSeq "cnewnc06" <@ [ for i in db do 
-                                      for j in db do 
-                                          yield (i.Name,j.Name) ] @>
-
-    checkCommuteSeq "cnewnc07" <@ [ for i in db do 
-                                      for j in db do 
-                                          if i.Data = j.Data then 
-                                              yield (i.Data,i.Name,j.Name) ] @>
-
-    checkCommuteSeq "cnewnc08"  <@ [ for i in db do 
-                                      if i.Data = 8 then 
-                                          for j in db do 
-                                              if i.Data = j.Data then 
-                                                  yield (i.Data,i.Name,j.Name) ] @>
-
-    checkCommuteSeq "cnewnc08"  <@ [ for i in db do 
-                                      match i.Data with 
-                                      | 8 -> 
-                                          for j in db do 
-                                              if i.Data = j.Data then 
-                                                  yield (i.Data,i.Name,j.Name) 
-                                      | _ -> 
-                                          () ] @>
-
-
-
-    // EXPECT PASS
-    checkCommuteSeq "cnewnc08"  <@  seq { for i in db do for j in db do yield (i.Data) }  @>
-    checkCommuteSeq "cnewnc08"  <@  db |> Seq.take 3 @>
-    checkCommuteVal "cnewnc08"  <@  db |> Seq.take 3 |> Seq.length @>
-    checkCommuteVal "cnewnc08"  <@  Seq.length (seq { for i in db do for j in db do yield (i.Data) })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.length (seq { for i in db do for j in db do yield (i.Data) })   @> 
-    checkCommuteVal "cnewnc08"  <@  (seq { for i in db do for j in db do yield (i.Data) })  |> Seq.length  @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.max (seq { for i in db do for j in db do yield (i.Data) })   @> 
-    checkCommuteVal "cnewnc08"  <@  seq { for i in db do for j in db do yield (i.Data) } |> Seq.max   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.min (seq { for i in db do for j in db do yield (i.Data) })   @> 
-    checkCommuteVal "cnewnc08"  <@  seq { for i in db do for j in db do yield (i.Data) } |> Seq.min  @> 
-    checkCommuteSeq "cnewnc08"  <@ Seq.distinct (seq { for i in db do for j in db do yield i }) @>
-    checkCommuteSeq "cnewnc08"  <@ seq { for i in db do for j in db do yield i } |> Seq.distinct @>
-    checkCommuteVal "cnewnc08"  <@  Seq.max (seq { for i in db do for j in db do yield float i.Data })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.max (seq { for i in db do for j in db do yield float32 i.Data })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.max (seq { for i in db do for j in db do yield decimal i.Data })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.min (seq { for i in db do for j in db do yield float i.Data })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.min (seq { for i in db do for j in db do yield float32 i.Data })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.min (seq { for i in db do for j in db do yield decimal i.Data })   @> 
-    checkCommuteVal "cnewnc08"  <@  Seq.average (seq { for i in db do for j in db do yield i.Cost })   @> 
-    checkCommuteVal "cnewnc08"  <@   (seq { for i in db do for j in db do yield i.Cost })  |> Seq.average @> 
-
-    checkCommuteSeq "cnewnc08"  (<@ Microsoft.FSharp.Linq.Query.groupBy
-                                        (fun x -> x) 
-                                        (seq { for i in db do yield i.Data })  |> Seq.map Seq.toList |> Seq.toList @> ) 
-
-
-    checkCommuteSeq "cnewnc08"  (<@ Microsoft.FSharp.Linq.Query.join 
-                                        (seq { for i in db do yield i.Data }) 
-                                        (seq { for i in db do yield i.Data })  
-                                        (fun x -> x) 
-                                        (fun x -> x) 
-                                        (fun x y -> x + y) @> ) 
-
-    checkCommuteSeq "cnewnc08"  (<@ Microsoft.FSharp.Linq.Query.groupJoin 
-                                        (seq { for i in db do yield i.Data }) 
-                                        (seq { for i in db do yield i.Data }) 
-                                        (fun x -> x) 
-                                        (fun x -> x) 
-                                        (fun x y -> x + Seq.length y)  @> ) 
-
-    check "cnewnc08"  (query <@  Seq.average (seq { for i in db do for j in db do yield (i.Cost) })   @>  - 5.15 <= 0.0000001) true
-
-    // By design: no 'distinctBy', "maxBy", "minBy", "groupBy" support in queries
-    check "lcvkneio" (try let _ = query <@ Seq.distinctBy (fun x -> x) (seq { for i in db do for j in db do yield i })  @> in  false with _ -> true) true
-    check "lcvkneio" (try let _ = query <@ Seq.maxBy (fun x -> x) (seq { for i in db do for j in db do yield i })  @> in  false with _ -> true) true
-    check "lcvkneio" (try let _ = query <@ Seq.minBy (fun x -> x) (seq { for i in db do for j in db do yield i })  @> in  false with _ -> true) true
-    check "lcvkneio" (try let _ = query <@ Seq.groupBy (fun x -> x) (seq { for i in db do for j in db do yield i })  @> in  false with _ -> true) true
-
 module CheckedTests = 
     open Microsoft.FSharp.Core.Operators.Checked
           
-    [<TestFixture>]
-    type public QuotationEvalCheckedTests() =
-      
-        [<Test>]
-        member this.FloatCheckedTests() = 
+    [<Test>]
+    let FloatCheckedTests() = 
 
          // set up bindings
          let x1 = <@ 2.0<kg> + 4.0<kg>  @> |> eval
@@ -1385,8 +1282,8 @@ module CheckedTests =
          test "x13a" (x13a = 6.5<m^2>)
           
 
-        [<Test>]
-        member this.Float32CheckedTests() = 
+    [<Test>]
+    let Float32CheckedTests() = 
 
 
          let y1 = <@ 2.0f<kg> + 4.0f<kg>  @> |> eval
@@ -1434,8 +1331,8 @@ module CheckedTests =
          test "y13a" (y13a = 6.5f<m^4>)
           
 
-        [<Test>]
-        member this.DecimalCheckedTests() = 
+    [<Test>]
+    let DecimalCheckedTests() = 
 
          let z1 = <@ 2.0M<kg> + 4.0M<kg>  @> |> eval
          let z2 = <@ 2.0M<s> - 4.0M<s>  @> |> eval
