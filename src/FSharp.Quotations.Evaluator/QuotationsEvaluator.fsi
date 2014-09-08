@@ -75,7 +75,7 @@ namespace FSharp.Quotations.Evaluator
               ///
               /// Exceptions: InvalidArgumentException will be raised if the input expression is
               /// not in the subset that can be converted to a LINQ expression tree
-              member Eval : unit -> 'T
+              member Evaluate : unit -> 'T
 
         type Microsoft.FSharp.Quotations.Expr with 
 
@@ -90,7 +90,7 @@ namespace FSharp.Quotations.Evaluator
               ///
               /// Exceptions: InvalidArgumentException will be raised if the input expression is
               /// not in the subset that can be converted to a LINQ expression tree
-              member EvalUntyped : unit -> obj
+              member EvaluateUntyped : unit -> obj
 
     module QuotationEvaluationTypes =
         /// This function should not be called directly. 

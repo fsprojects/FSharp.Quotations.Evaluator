@@ -20,6 +20,19 @@ Documentation
   <div class="span1"></div>
 </div>
 
+Ovverview
+-------
+
+This component is an F# quotations evaluator, implemented by compiling to LINQ expression trees.
+
+There are some limitations in the quotations accepted - it is possible these can be lifted by using more
+recent statement-tree functionality available in .NET.
+
+Performance of generatefd code is not as good as F# compiled code, expecially for recursive functions.  
+However it is still good enough for many purposes of dynamic code generation.
+
+The component requires .NET 4.x.  It is not useful on mobile devices where code generation APIs are not available.
+
 Example
 -------
 
@@ -31,13 +44,12 @@ open FSharp.Quotations.Evaluator
 
 QuotationEvaluator.Evaluate <@ 1 + 1 @>
 
-let add = QuotationEvaluator.Compile <@ fun x -> x + x + 1 @> ()
+let addPlusOne = QuotationEvaluator.Compile <@ fun x y -> x + y + 1 @> 
 
-add 3 
+let nine = addPlusOne 3 5  // gives 9
 
 
 (**
-Some more info
 
 Samples & documentation
 -----------------------

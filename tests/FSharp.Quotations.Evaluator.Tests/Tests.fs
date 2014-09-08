@@ -69,7 +69,7 @@ module Extensions =
 module ModuleDefinitions = 
     let eval (q: Expr<_>) = 
         q.ToLinqExpressionUntyped() |> ignore 
-        q.Eval()
+        q.Evaluate()
 
     let x22<[<Measure>] 'a>() = <@ typeof<float<'a>> @> |> eval
 
@@ -1096,7 +1096,7 @@ let LargerAutomaticDiferentiationTest_FSharp_1_0_Bug_3498() =
                                 let x1b1 = x1b1 + dxs7 
                                 x1b1))) @>
 
-          let r,rd = (q.Eval()) 4.0
+          let r,rd = (q.Evaluate()) 4.0
           test "vrknlwerwe90" (r = 17.0)
           test "cew90jkml0rv" (rd 0.1 = 0.8)
 
@@ -1147,20 +1147,20 @@ let Extensions() =
         checkEval "ecnweha" (<@ v2b.ExtensionIndexer2(3) <- 4 @>)  ()
 
 let testComparisonOnEqualValues v1 =
-    <@ v1 = v1 @>.Eval() |> Assert.IsTrue
-    <@ v1 <> v1 @>.Eval() |> Assert.IsFalse
-    <@ v1 < v1 @>.Eval() |> Assert.IsFalse
-    <@ v1 > v1 @>.Eval() |> Assert.IsFalse
-    <@ v1 <= v1 @>.Eval() |> Assert.IsTrue
-    <@ v1 >= v1 @>.Eval() |> Assert.IsTrue
+    <@ v1 = v1 @>.Evaluate() |> Assert.IsTrue
+    <@ v1 <> v1 @>.Evaluate() |> Assert.IsFalse
+    <@ v1 < v1 @>.Evaluate() |> Assert.IsFalse
+    <@ v1 > v1 @>.Evaluate() |> Assert.IsFalse
+    <@ v1 <= v1 @>.Evaluate() |> Assert.IsTrue
+    <@ v1 >= v1 @>.Evaluate() |> Assert.IsTrue
 
 let testComparisonOnOrderedValues v1 v2 =
-    <@ v1 = v2 @>.Eval() |> Assert.IsFalse
-    <@ v1 <> v2 @>.Eval() |> Assert.IsTrue
-    <@ v1 < v2 @>.Eval() |> Assert.IsTrue
-    <@ v1 > v2 @>.Eval() |> Assert.IsFalse
-    <@ v1 <= v2 @>.Eval() |> Assert.IsTrue
-    <@ v1 >= v2 @>.Eval() |> Assert.IsFalse
+    <@ v1 = v2 @>.Evaluate() |> Assert.IsFalse
+    <@ v1 <> v2 @>.Evaluate() |> Assert.IsTrue
+    <@ v1 < v2 @>.Evaluate() |> Assert.IsTrue
+    <@ v1 > v2 @>.Evaluate() |> Assert.IsFalse
+    <@ v1 <= v2 @>.Evaluate() |> Assert.IsTrue
+    <@ v1 >= v2 @>.Evaluate() |> Assert.IsFalse
 
     
 [<Test>]
@@ -1212,7 +1212,7 @@ module QuotationCompilation =
     let eval (q: Expr<_>) = 
         q.ToLinqExpressionUntyped() |> ignore 
         q.Compile() |> ignore  
-        q.Eval()
+        q.Evaluate()
         
     // This tried to use non-existent 'Action' delegate with 5 type arguments
     let q =

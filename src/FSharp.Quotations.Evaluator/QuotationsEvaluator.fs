@@ -856,13 +856,13 @@ module QuotationEvaluationExtensions =
         member x.CompileUntyped() = 
             let f = Compile(x)  
             f() 
-        member x.EvalUntyped() = Eval(x)
+        member x.EvaluateUntyped() = Eval(x)
 
     type Microsoft.FSharp.Quotations.Expr<'T> with 
         member x.Compile() = 
             let f = Compile(x)  
             f() :?> 'T
-        member x.Eval() = (Eval(x) :?> 'T)
+        member x.Evaluate() = (Eval(x) :?> 'T)
 
   
 open QuotationEvaluationTypes
@@ -875,12 +875,12 @@ type QuotationEvaluator() =
 
     static member CompileUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.CompileUntyped()
 
-    static member EvaluateUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.EvalUntyped()
+    static member EvaluateUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.EvaluateUntyped()
 
     static member internal EvaluateUntypedUsingQueryApproximations (e: Microsoft.FSharp.Quotations.Expr) = CompileImpl(e, true) ()
 
     static member Compile (e : Microsoft.FSharp.Quotations.Expr<'T>) = e.Compile()
 
-    static member Evaluate (e : Microsoft.FSharp.Quotations.Expr<'T>) = e.Eval()
+    static member Evaluate (e : Microsoft.FSharp.Quotations.Expr<'T>) = e.Evaluate()
 
     

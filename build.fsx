@@ -186,8 +186,9 @@ Target "GenerateDocs" (fun _ ->
 
 Target "ReleaseDocs" (fun _ ->
     let tempDocsDir = "temp/gh-pages"
-    CleanDir tempDocsDir
-    Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
+    //CleanDir tempDocsDir
+    if not (System.IO.Directory.Exists tempDocsDir) then 
+        Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
 
     fullclean tempDocsDir
     CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
