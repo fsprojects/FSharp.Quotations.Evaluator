@@ -694,18 +694,22 @@ module QuotationEvaluationTypes =
         | Patterns.Sequential (e1,e2) -> 
             let e1P = ConvExpr env e1
             let e2P = ConvExpr env e2
-            let minfo = match <@@ SequentialHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
-            let minfo = minfo.GetGenericMethodDefinition().MakeGenericMethod [| e1.Type; e2.Type |]
-            Expression.Call(minfo,[| e1P; e2P |]) |> asExpr
+            Expression.Block(e1P, e2P) |> asExpr
 
         | Patterns.Let (v,e,b) -> 
-            let vP = ConvVar v
-            let envinner = { env with varEnv = Map.add v (vP |> asExpr) env.varEnv } 
-            let bodyP = ConvExpr envinner b 
+            let vP = Expression.Variable (v.Type, v.Name)
             let eP = ConvExpr env e
-            let ty = GetFuncType [| v.Type; b.Type |] 
-            let lam = Expression.Lambda(ty,bodyP,[| vP |]) |> asExpr
-            Expression.Call(lam,ty.GetMethod("Invoke",instanceBindingFlags),[| eP |]) |> asExpr
+            let assign = Expression.Assign (vP, eP) |> asExpr
+
+            let envInner = { env with varEnv = Map.add v (vP |> asExpr) env.varEnv } 
+            let bodyP = ConvExpr envInner b 
+
+            Expression.Block ([vP], [assign; bodyP]) |> asExpr
+
+        | Patterns.VarSet (variable, value) ->
+            let linqVariable = Map.find variable env.varEnv
+            let linqValue = ConvExpr env value
+            Expression.Assign (linqVariable, linqValue)|> asExpr
 
         | Patterns.Lambda(v,body) -> 
             let vP = ConvVar v

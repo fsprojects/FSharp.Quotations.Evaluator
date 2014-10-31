@@ -1225,8 +1225,14 @@ module QuotationCompilation =
                 a := b + c + d + e ) @>
     check "qceva0" ((eval q) ()) ()
 
+[<Test>]
+let MutableLetTests() = 
+    let ml1 = 
+        <@  let mutable x = 1
+            x <- x + 1
+            x @>
 
-
+    checkEval "ml1" ml1 2
 
     
 module CheckedTests = 
@@ -1367,4 +1373,4 @@ module CheckedTests =
          test "z7" (z7 = 2.0M<m>)
          test "z10" (z10 = 1)
           
- 
+        
