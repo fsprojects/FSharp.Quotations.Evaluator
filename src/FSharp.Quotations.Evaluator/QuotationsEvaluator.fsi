@@ -106,30 +106,6 @@ namespace FSharp.Quotations.Evaluator
         /// These are public only because targets of Linq Lambda expressions require them to be so
         module HelperTypes = 
             [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 -> unit
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
             type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 -> unit
             [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
             type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 -> unit
@@ -138,30 +114,6 @@ namespace FSharp.Quotations.Evaluator
             [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
             type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18, 'T19, 'T20> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 * 'T19 * 'T20 -> unit
 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 -> 'T6
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 -> 'T7 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 -> 'T8 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 -> 'T9 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 -> 'T10 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 -> 'T11 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 -> 'T12 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 -> 'T13 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 -> 'T14 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 -> 'T15 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 -> 'T16 
-            [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
-            type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 -> 'T17 
             [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]
             type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 -> 'T18 
             [<System.Obsolete("This type is for use by the quotation to LINQ expression tree converter and is not for direct use from user code")>]

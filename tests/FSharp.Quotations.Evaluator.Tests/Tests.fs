@@ -1225,9 +1225,42 @@ module QuotationCompilation =
                 a := b + c + d + e ) @>
     check "qceva0" ((eval q) ()) ()
 
+[<Test>]
+let MutableLetTests() = 
+    let ml1 = 
+        <@  let mutable x = 1
+            x <- x + 1
+            x @>
 
+    checkEval "ml1" ml1 2
 
+[<Test>]
+let WhileLoopTests() = 
+    let wl1 = 
+        <@  let mutable x = 1
+            while x < 10 do
+                x <- x + 1
+            x @>
 
+    checkEval "ml1" wl1 10
+    
+[<Test>]
+let ForLoopTests() = 
+    let fl1 = 
+        <@  let mutable x = 0
+            for i = 0 to 10 do
+                x <- x + i
+            x @>
+
+    checkEval "fl1" fl1 (Seq.sum [0..10])
+
+    let fl2 = 
+        <@  let mutable x = 0
+            for i in [0..10] do
+                x <- x + i
+            x @>
+
+    checkEval "fl2" fl2 (Seq.sum [0..10])
     
 module CheckedTests = 
     open Microsoft.FSharp.Core.Operators.Checked
@@ -1367,4 +1400,4 @@ module CheckedTests =
          test "z7" (z7 = 2.0M<m>)
          test "z10" (z10 = 1)
           
- 
+        
