@@ -667,7 +667,13 @@ module QuotationEvaluationTypes =
         | Patterns.NewDelegate(dty,vs,b) -> 
             let vsP = List.map ConvVar vs 
             let env = {env with varEnv = List.foldBack2 (fun (v:Var) vP -> Map.add v (vP |> asExpr)) vs vsP env.varEnv }
-            let bodyP = ConvExpr env b 
+            let bodyP = ConvExpr env b
+            
+            let bodyP =
+                if IsVoidType bodyP.Type
+                    then Expression.Block(bodyP, ConvExpr env <@ () @>) |> asExpr
+                    else bodyP
+
             Expression.Lambda(dty, bodyP, vsP) |> asExpr 
 
         | Patterns.NewTuple(args) -> 
