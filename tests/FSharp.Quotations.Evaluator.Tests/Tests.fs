@@ -1253,6 +1253,14 @@ let ForLoopTests() =
             x @>
 
     checkEval "fl1" fl1 (Seq.sum [0..10])
+
+    let fl2 = 
+        <@  let mutable x = 0
+            for i in [0..10] do
+                x <- x + i
+            x @>
+
+    checkEval "fl2" fl2 (Seq.sum [0..10])
     
 module CheckedTests = 
     open Microsoft.FSharp.Core.Operators.Checked
