@@ -60,10 +60,6 @@ module QuotationEvaluationTypes =
         let tyargs = typ.GetGenericArguments()
         tyargs.[0], tyargs.[1]
     
-    let WhileHelper gd b : 'T = 
-        let rec loop () = if gd() then (b(); loop())
-        loop();
-        unbox (box ())
 
     let ArrayAssignHelper (arr : 'T[]) (idx:int) (elem:'T) : 'unt = 
         arr.[idx] <- elem;
@@ -78,7 +74,6 @@ module QuotationEvaluationTypes =
         try e() 
         with e when (filter e <> 0) -> handler e
 
-    let WhileMethod = match <@@ WhileHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
     let ArrayAssignMethod = match <@@ ArrayAssignHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
     let TryFinallyMethod = match <@@ TryFinallyHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
     let TryWithMethod = match <@@ TryWithHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
@@ -340,8 +335,6 @@ module QuotationEvaluationTypes =
 
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
-    let SequentialHelper (x:'T) (y:'U) = y
- 
     let LinqExpressionHelper (x:'T) : Expression<'T> = failwith ""
     
     let MakeFakeExpression (x:Expr) = 
@@ -720,11 +713,21 @@ module QuotationEvaluationTypes =
             let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpr
             Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
     
-        | Patterns.WhileLoop(gd,b) -> 
-            let gdP = ConvExpr env <@@ (fun () -> (%%gd:bool)) @@>
-            let bP = ConvExpr env <@@ (fun () -> (%%b:unit)) @@>
-            let minfo = WhileMethod.GetGenericMethodDefinition().MakeGenericMethod [| typeof<unit> |]
-            Expression.Call(minfo,[| gdP; bP |]) |> asExpr
+        | Patterns.WhileLoop(condition, iteration) -> 
+            let linqCondition = ConvExpr env condition
+            let linqIteration = ConvExpr env iteration
+
+            let breakLabel = Expression.Label ()
+            let linqLoop =
+                Expression.Loop (
+                    Expression.Block (
+                        Expression.IfThenElse (
+                            linqCondition,
+                            linqIteration,
+                            Expression.Break breakLabel)),
+                    breakLabel)
+
+            linqLoop |> asExpr
         
         | Patterns.TryFinally(e,h) -> 
             let eP = ConvExpr env (Expr.Lambda(new Var("unitVar",typeof<unit>), e))

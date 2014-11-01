@@ -1234,6 +1234,15 @@ let MutableLetTests() =
 
     checkEval "ml1" ml1 2
 
+[<Test>]
+let WhileLoopTests() = 
+    let wl1 = 
+        <@  let mutable x = 1
+            while x < 10 do
+                x <- x + 1
+            x @>
+
+    checkEval "ml1" wl1 10
     
 module CheckedTests = 
     open Microsoft.FSharp.Core.Operators.Checked
