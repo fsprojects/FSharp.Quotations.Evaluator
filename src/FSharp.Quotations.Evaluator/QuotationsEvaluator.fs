@@ -79,35 +79,11 @@ module QuotationEvaluationTypes =
     let TryWithMethod = match <@@ TryWithHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
 
     module HelperTypes = 
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 -> unit
-        type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 -> unit
         type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 -> unit
         type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 -> unit
         type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18, 'T19> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 * 'T19 -> unit
         type ActionHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18, 'T19, 'T20> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 * 'T19 * 'T20 -> unit
 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 -> 'T6
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 -> 'T7 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 -> 'T8 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 -> 'T9 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 -> 'T10 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 -> 'T11 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 -> 'T12 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 -> 'T13 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 -> 'T14 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 -> 'T15 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 -> 'T16 
-        type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 -> 'T17 
         type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 -> 'T18 
         type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18, 'T19> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 -> 'T19 
         type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18, 'T19, 'T20> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 * 'T19 -> 'T20 
@@ -116,22 +92,10 @@ module QuotationEvaluationTypes =
     open HelperTypes
     
     let GetActionType (args:Type[])  = 
-        if args.Length <= 4 then 
+        if args.Length <= 16 then 
             Expression.GetActionType args
         else
             match args.Length with 
-            | 5 -> typedefof<ActionHelper<_,_,_,_,_>>.MakeGenericType args
-            | 6 -> typedefof<ActionHelper<_,_,_,_,_,_>>.MakeGenericType args
-            | 7 -> typedefof<ActionHelper<_,_,_,_,_,_,_>>.MakeGenericType args
-            | 8 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 9 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 10 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 11 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 12 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 13 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 14 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 15 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 16 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | 17 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | 18 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | 19 -> typedefof<ActionHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
@@ -139,22 +103,10 @@ module QuotationEvaluationTypes =
             | _ -> raise <| new NotSupportedException("Quotation expressions with statements or closures containing more then 20 free variables may not be translated in this release of the F# PowerPack. This is due to limitations in the variable binding expression forms available in LINQ expression trees")
 
     let GetFuncType (args:Type[])  = 
-        if args.Length <= 5 then 
+        if args.Length <= 17 then 
             Expression.GetFuncType args
         else
             match args.Length with 
-            | 6 -> typedefof<FuncHelper<_,_,_,_,_,_>>.MakeGenericType args
-            | 7 -> typedefof<FuncHelper<_,_,_,_,_,_,_>>.MakeGenericType args
-            | 8 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 9 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 10 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 11 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 12 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 13 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 14 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 15 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 16 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
-            | 17 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | 18 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | 19 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | 20 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
@@ -190,10 +142,10 @@ module QuotationEvaluationTypes =
         B.Invoke(f1,f2,f3)
 
     let LetRec4Helper 
-           (F1:FuncHelper<_,_,_,_,_,_>) 
-           (F2:FuncHelper<_,_,_,_,_,_>) 
-           (F3:FuncHelper<_,_,_,_,_,_>) 
-           (F4:FuncHelper<_,_,_,_,_,_>) 
+           (F1:System.Func<_,_,_,_,_,_>) 
+           (F2:System.Func<_,_,_,_,_,_>) 
+           (F3:System.Func<_,_,_,_,_,_>) 
+           (F4:System.Func<_,_,_,_,_,_>) 
            (B:System.Func<_,_,_,_,_>) = 
         let f1hole = ref (Unchecked.defaultof<_>)
         let f2hole = ref (Unchecked.defaultof<_>)
@@ -211,12 +163,12 @@ module QuotationEvaluationTypes =
 
 
     let LetRec5Helper 
-           (F1:FuncHelper<_,_,_,_,_,_,_>) 
-           (F2:FuncHelper<_,_,_,_,_,_,_>) 
-           (F3:FuncHelper<_,_,_,_,_,_,_>) 
-           (F4:FuncHelper<_,_,_,_,_,_,_>) 
-           (F5:FuncHelper<_,_,_,_,_,_,_>) 
-           (B:FuncHelper<_,_,_,_,_,_>) = 
+           (F1:System.Func<_,_,_,_,_,_,_>) 
+           (F2:System.Func<_,_,_,_,_,_,_>) 
+           (F3:System.Func<_,_,_,_,_,_,_>) 
+           (F4:System.Func<_,_,_,_,_,_,_>) 
+           (F5:System.Func<_,_,_,_,_,_,_>) 
+           (B:System.Func<_,_,_,_,_,_>) = 
         let f1hole = ref (Unchecked.defaultof<_>)
         let f2hole = ref (Unchecked.defaultof<_>)
         let f3hole = ref (Unchecked.defaultof<_>)
@@ -235,13 +187,13 @@ module QuotationEvaluationTypes =
         B.Invoke(f1,f2,f3,f4,f5)
 
     let LetRec6Helper 
-           (F1:FuncHelper<_,_,_,_,_,_,_,_>) 
-           (F2:FuncHelper<_,_,_,_,_,_,_,_>) 
-           (F3:FuncHelper<_,_,_,_,_,_,_,_>) 
-           (F4:FuncHelper<_,_,_,_,_,_,_,_>) 
-           (F5:FuncHelper<_,_,_,_,_,_,_,_>) 
-           (F6:FuncHelper<_,_,_,_,_,_,_,_>) 
-           (B:FuncHelper<_,_,_,_,_,_,_>) = 
+           (F1:System.Func<_,_,_,_,_,_,_,_>) 
+           (F2:System.Func<_,_,_,_,_,_,_,_>) 
+           (F3:System.Func<_,_,_,_,_,_,_,_>) 
+           (F4:System.Func<_,_,_,_,_,_,_,_>) 
+           (F5:System.Func<_,_,_,_,_,_,_,_>) 
+           (F6:System.Func<_,_,_,_,_,_,_,_>) 
+           (B:System.Func<_,_,_,_,_,_,_>) = 
         let f1hole = ref (Unchecked.defaultof<_>)
         let f2hole = ref (Unchecked.defaultof<_>)
         let f3hole = ref (Unchecked.defaultof<_>)
@@ -264,14 +216,14 @@ module QuotationEvaluationTypes =
 
 
     let LetRec7Helper 
-           (F1:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (F2:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (F3:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (F4:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (F5:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (F6:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (F7:FuncHelper<_,_,_,_,_,_,_,_,_>) 
-           (B:FuncHelper<_,_,_,_,_,_,_,_>) = 
+           (F1:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (F2:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (F3:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (F4:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (F5:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (F6:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (F7:System.Func<_,_,_,_,_,_,_,_,_>) 
+           (B:System.Func<_,_,_,_,_,_,_,_>) = 
         let f1hole = ref (Unchecked.defaultof<_>)
         let f2hole = ref (Unchecked.defaultof<_>)
         let f3hole = ref (Unchecked.defaultof<_>)
@@ -297,15 +249,15 @@ module QuotationEvaluationTypes =
 
 
     let LetRec8Helper 
-           (F1:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F2:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F3:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F4:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F5:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F6:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F7:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (F8:FuncHelper<_,_,_,_,_,_,_,_,_,_>) 
-           (B:FuncHelper<_,_,_,_,_,_,_,_,_>) = 
+           (F1:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F2:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F3:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F4:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F5:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F6:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F7:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (F8:System.Func<_,_,_,_,_,_,_,_,_,_>) 
+           (B:System.Func<_,_,_,_,_,_,_,_,_>) = 
         let f1hole = ref (Unchecked.defaultof<_>)
         let f2hole = ref (Unchecked.defaultof<_>)
         let f3hole = ref (Unchecked.defaultof<_>)
