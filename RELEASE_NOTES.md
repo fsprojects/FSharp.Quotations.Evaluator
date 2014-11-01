@@ -4,3 +4,6 @@
 
 ### 1.0.1 - Update release
 * Updated release notes
+
+### 1.0.2 - Using System.Linq.Expressions .net 4.0+ functionality
+* Updated release notes
