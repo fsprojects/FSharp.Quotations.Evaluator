@@ -734,6 +734,38 @@ module QuotationEvaluationTypes =
                     breakLabel)
 
             linqLoop |> asExpr
+
+        | Patterns.ForIntegerRangeLoop(indexer, lowerValue, upperValue, iteration) ->
+            let linqLowerValue = ConvExpr env lowerValue
+            let linqUpperValue = ConvExpr env upperValue
+            let linqIndexer = Expression.Variable (linqLowerValue.Type, indexer.Name)
+            let linqAssignLower = Expression.Assign (linqIndexer, linqLowerValue)
+            let linqCondition = Expression.LessThanOrEqual (linqIndexer, linqUpperValue)
+            
+            let envInner = { env with varEnv = Map.add indexer (linqIndexer |> asExpr) env.varEnv }
+
+            let linqIteration = 
+                Expression.Block (
+                    ConvExpr envInner iteration,
+                    Expression.Assign(linqIndexer, Expression.Increment (linqIndexer)))
+
+            let breakLabel = Expression.Label ()
+            let linqLoop =
+                Expression.Loop (
+                    Expression.Block (
+                        Expression.IfThenElse (
+                            linqCondition,
+                            linqIteration,
+                            Expression.Break breakLabel)),
+                    breakLabel)
+
+            let linqStatements =
+                Expression.Block (
+                    [linqIndexer],
+                    [linqAssignLower |> asExpr; linqLoop |> asExpr]
+                )
+
+            linqStatements |> asExpr
         
         | Patterns.TryFinally(e,h) -> 
             let eP = ConvExpr env (Expr.Lambda(new Var("unitVar",typeof<unit>), e))
