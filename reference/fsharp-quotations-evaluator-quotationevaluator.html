@@ -47,32 +47,12 @@
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '37', 37)" onmouseover="showTip(event, '37', 37)">
+          <code onmouseout="hideTip(event, '16', 16)" onmouseover="showTip(event, '16', 16)">
             Compile(arg1)
           </code>
-          <div class="tip" id="37">
+          <div class="tip" id="16">
             <strong>Signature:</strong> Expr&lt;&#39;T&gt; -&gt; &#39;T<br />
                           <strong>Type parameters:</strong> 'T          </div>
-        </td>
-        <td class="xmldoc">
-        <p>Compile the quotation expression by first converting to LINQ expression trees
-The expression is currently always compiled.</p>
-
-<p>Exceptions: InvalidArgumentException will be raised if the input expression is
-not in the subset that can be converted to a LINQ expression tree</p>
-
-            <a href="http://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/src/FSharp.Quotations.Evaluator/QuotationsEvaluator.fs#L882-882" class="github-link">Go to GitHub source</a>
-        </td>
-      </tr>
-      <tr>
-        <td class="member-name">
-
-          <code onmouseout="hideTip(event, '38', 38)" onmouseover="showTip(event, '38', 38)">
-            CompileUntyped(arg1)
-          </code>
-          <div class="tip" id="38">
-            <strong>Signature:</strong> Expr -&gt; obj<br />
-                      </div>
         </td>
         <td class="xmldoc">
         <p>Compile the quotation expression by first converting to LINQ expression trees
@@ -87,34 +67,35 @@ not in the subset that can be converted to a LINQ expression tree</p>
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '39', 39)" onmouseover="showTip(event, '39', 39)">
-            Evaluate(arg1)
+          <code onmouseout="hideTip(event, '17', 17)" onmouseover="showTip(event, '17', 17)">
+            CompileUntyped(arg1)
           </code>
-          <div class="tip" id="39">
-            <strong>Signature:</strong> Expr&lt;&#39;T&gt; -&gt; &#39;T<br />
-                          <strong>Type parameters:</strong> 'T          </div>
+          <div class="tip" id="17">
+            <strong>Signature:</strong> Expr -&gt; obj<br />
+                      </div>
         </td>
         <td class="xmldoc">
-        <p>Evaluate the quotation expression by first converting to LINQ expression trees</p>
+        <p>Compile the quotation expression by first converting to LINQ expression trees
+The expression is currently always compiled.</p>
 
 <p>Exceptions: InvalidArgumentException will be raised if the input expression is
 not in the subset that can be converted to a LINQ expression tree</p>
 
-            <a href="http://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/src/FSharp.Quotations.Evaluator/QuotationsEvaluator.fs#L884-884" class="github-link">Go to GitHub source</a>
+            <a href="http://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/src/FSharp.Quotations.Evaluator/QuotationsEvaluator.fs#L870-870" class="github-link">Go to GitHub source</a>
         </td>
       </tr>
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '40', 40)" onmouseover="showTip(event, '40', 40)">
-            EvaluateUntyped(arg1)
+          <code onmouseout="hideTip(event, '18', 18)" onmouseover="showTip(event, '18', 18)">
+            Evaluate(arg1)
           </code>
-          <div class="tip" id="40">
-            <strong>Signature:</strong> Expr -&gt; obj<br />
-                      </div>
+          <div class="tip" id="18">
+            <strong>Signature:</strong> Expr&lt;&#39;T&gt; -&gt; &#39;T<br />
+                          <strong>Type parameters:</strong> 'T          </div>
         </td>
         <td class="xmldoc">
-        <p>Compile the quotation expression by first converting to LINQ expression trees</p>
+        <p>Evaluate the quotation expression by first converting to LINQ expression trees</p>
 
 <p>Exceptions: InvalidArgumentException will be raised if the input expression is
 not in the subset that can be converted to a LINQ expression tree</p>
@@ -125,10 +106,29 @@ not in the subset that can be converted to a LINQ expression tree</p>
       <tr>
         <td class="member-name">
 
-          <code onmouseout="hideTip(event, '41', 41)" onmouseover="showTip(event, '41', 41)">
+          <code onmouseout="hideTip(event, '19', 19)" onmouseover="showTip(event, '19', 19)">
+            EvaluateUntyped(arg1)
+          </code>
+          <div class="tip" id="19">
+            <strong>Signature:</strong> Expr -&gt; obj<br />
+                      </div>
+        </td>
+        <td class="xmldoc">
+        <p>Compile the quotation expression by first converting to LINQ expression trees</p>
+
+<p>Exceptions: InvalidArgumentException will be raised if the input expression is
+not in the subset that can be converted to a LINQ expression tree</p>
+
+            <a href="http://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/src/FSharp.Quotations.Evaluator/QuotationsEvaluator.fs#L872-872" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '20', 20)" onmouseover="showTip(event, '20', 20)">
             ToLinqExpression(arg1)
           </code>
-          <div class="tip" id="41">
+          <div class="tip" id="20">
             <strong>Signature:</strong> Expr -&gt; Expression<br />
                       </div>
         </td>
@@ -140,7 +140,7 @@ not in the subset that can be converted to a LINQ expression tree</p>
 <p>Exceptions: InvalidArgumentException will be raised if the input expression is
 not in the subset that can be converted to a LINQ expression tree</p>
 
-            <a href="http://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/src/FSharp.Quotations.Evaluator/QuotationsEvaluator.fs#L874-874" class="github-link">Go to GitHub source</a>
+            <a href="http://github.com/fsprojects/FSharp.Quotations.Evaluator/tree/master/src/FSharp.Quotations.Evaluator/QuotationsEvaluator.fs#L868-868" class="github-link">Go to GitHub source</a>
         </td>
       </tr>
     </tbody>
