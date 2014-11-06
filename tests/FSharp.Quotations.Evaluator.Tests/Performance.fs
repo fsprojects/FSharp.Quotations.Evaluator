@@ -136,7 +136,7 @@ let ``Test [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
 let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
-[<ReflectedDefinition; TimeAllowance 45.0>]
+[<ReflectedDefinition; TimeAllowance 35.0>]
 let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     let euler f (h : float) t0 y0 =
         (t0, y0)
@@ -162,7 +162,7 @@ let ``Time [Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     timeFunction <@ ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` @>
 
 
-[<ReflectedDefinition; TestIterations 1000; TimeAllowance 4.0>]
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.1>]
 let ``int Operators +-/*%`` () =
     let rand = Random 3141592
     let mutable result = 0

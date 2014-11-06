@@ -323,13 +323,6 @@ module QuotationEvaluationTypes =
         else
             e
 
-    let (|GenericEqualityQ|_|) = (|SpecificCall|_|) <@ LanguagePrimitives.GenericEquality @>
-    let (|EqualsQ|_|)    = (|SpecificCall|_|) <@ ( = ) @>
-    let (|GreaterQ|_|)   = (|SpecificCall|_|) <@ ( > ) @>
-    let (|GreaterEqQ|_|) = (|SpecificCall|_|) <@ ( >=) @>
-    let (|LessQ|_|)      = (|SpecificCall|_|) <@ ( <)  @>
-    let (|LessEqQ|_|) = (|SpecificCall|_|) <@ ( <=) @>
-    let (|NotEqQ|_|) = (|SpecificCall|_|) <@ ( <>) @>
     let (|NotQ|_|) =  (|SpecificCall|_|) <@ not   @>
     let (|NegQ|_|) = (|SpecificCall|_|) <@ ( ~-) : int -> int @>
     let (|PlusQ|_|)      = (|SpecificCall|_|) <@ ( + ) @>
@@ -450,7 +443,7 @@ module QuotationEvaluationTypes =
                 let e1 = ConvExpr env x1
                 let e2 = ConvExpr env x2
 
-                if env.eraseEquality then
+                if e1.Type.IsPrimitive || env.eraseEquality then
                     exprErasedConstructor(e1,e2) |> asExpr
                 else 
                     exprConstructor(e1, e2, false, intrinsic.MakeGenericMethod([|x1.Type|])) |> asExpr
@@ -460,22 +453,13 @@ module QuotationEvaluationTypes =
             |  PlusQ (_, [ty1;ty2;ty3],[x1;x2]) when (ty1 = typeof<string>) && (ty2 = typeof<string>) ->
                  ConvExpr env (<@@  System.String.Concat( [| %%x1 ; %%x2 |] : string array ) @@>)
 
-            //| SpecificCall <@ LanguagePrimitives.GenericEquality @>([ty1],[x1;x2]) 
-            //| SpecificCall <@ ( = ) @>([ty1],[x1;x2]) when (ty1 = typeof<string>) ->
-            //     ConvExpr env (<@@  System.String.op_Equality(%%x1,%%x2) @@>)
-
-            | GenericEqualityQ (_, _,[x1;x2]) 
-            | EqualsQ (_, _,[x1;x2]) ->     transComparison x1 x2 Expression.Equal Expression.Equal genericEqualityIntrinsic
-
-            | GreaterQ (_, _,[x1;x2]) ->    transComparison x1 x2 Expression.GreaterThan Expression.GreaterThan genericGreaterThanIntrinsic
-
-            | GreaterEqQ (_, _,[x1;x2]) ->  transComparison x1 x2 Expression.GreaterThanOrEqual Expression.GreaterThanOrEqual genericGreaterOrEqualIntrinsic
-
-            | LessQ (_, _,[x1;x2]) ->       transComparison x1 x2 Expression.LessThan Expression.LessThan genericLessThanIntrinsic
-
-            | LessEqQ (_, _,[x1;x2]) ->     transComparison x1 x2 Expression.LessThanOrEqual Expression.LessThanOrEqual genericLessOrEqualIntrinsic
-
-            | NotEqQ (_, _,[x1;x2]) ->      transComparison x1 x2 Expression.NotEqual Expression.NotEqual genericNotEqualIntrinsic
+            | SpecificCall <@ LanguagePrimitives.GenericEquality @> (_, _,[x1;x2]) 
+            | SpecificCall <@ ( =  ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.Equal              Expression.Equal              genericEqualityIntrinsic
+            | SpecificCall <@ ( >  ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.GreaterThan        Expression.GreaterThan        genericGreaterThanIntrinsic
+            | SpecificCall <@ ( >= ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.GreaterThanOrEqual Expression.GreaterThanOrEqual genericGreaterOrEqualIntrinsic
+            | SpecificCall <@ ( <  ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.LessThan           Expression.LessThan           genericLessThanIntrinsic
+            | SpecificCall <@ ( <= ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.LessThanOrEqual    Expression.LessThanOrEqual    genericLessOrEqualIntrinsic
+            | SpecificCall <@ ( <> ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.NotEqual           Expression.NotEqual           genericNotEqualIntrinsic
 
             | NotQ (_, _,[x1])    -> Expression.Not(ConvExpr env x1)                                   |> asExpr
 
