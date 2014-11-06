@@ -162,11 +162,114 @@ let ``Time [Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     timeFunction <@ ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` @>
 
 
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 4.0>]
+let ``int Operators +-/*%`` () =
+    let rand = Random 3141592
+    let mutable result = 0
+    for i = 1 to 10000 do
+        let mutable x = rand.Next ()
+        x <- x / i
+        x <- x + i
+        x <- x * i
+        x <- x - i 
+        if x % 2 = 1 then
+            result <- result + 1
+    result
+
+[<Test>]
+let ``Test int Operators +-/*%`` () =
+    testFunction <@ ``int Operators +-/*%`` @>
+
+[<Test>]
+let ``Time int Operators +-/*%`` () =
+    timeFunction <@ ``int Operators +-/*%`` @>
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 50.0>]
+let ``int64 Operators +-/*%`` () =
+    let rand = Random 3141592
+    let mutable result = 0L
+    for i = 1 to 10000 do
+        let mutable x = int64 <| rand.Next ()
+        let i = int64 i
+        x <- x / i
+        x <- x + i
+        x <- x * i
+        x <- x - i 
+        if x % 2L = 1L then
+            result <- result + 1L
+    result
+
+[<Test>]
+let ``Test int64 Operators +-/*%`` () =
+    testFunction <@ ``int64 Operators +-/*%`` @>
+
+[<Test>]
+let ``Time int64 Operators +-/*%`` () =
+    timeFunction <@ ``int64 Operators +-/*%`` @>
+
+
+
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 30.0>]
+let ``float Operators +-/*%`` () =
+    let rand = Random 3141592
+    let mutable result = 0.0
+    for i = 1 to 10000 do
+        let mutable x = float <| rand.Next ()
+        let i = float i
+        x <- x / i
+        x <- x + i
+        x <- x * i
+        x <- x - i 
+        if x % 2.0 = 1.0 then
+            result <- result + 1.0
+    result
+
+[<Test>]
+let ``Test float Operators +-/*%`` () =
+    testFunction <@ ``float Operators +-/*%`` @>
+
+[<Test>]
+let ``Time float Operators +-/*%`` () =
+    timeFunction <@ ``float Operators +-/*%`` @>
+
+
+(*
+fails to run compiled version; I think because of Microsoft.FSharp.Core.ExtraTopLevelOperators.ToSingle
+
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 30.0>]
+let ``single Operators +-/*%`` () =
+    let rand = Random 3141592
+    let mutable result = 0.0
+    for i = 1 to 10000 do
+        let mutable x = single <| rand.Next ()
+        let i = single i
+        x <- x / i
+        x <- x + i
+        x <- x * i
+        x <- x - i 
+        if x % 2.0f = 1.0f then
+            result <- result + 1.0
+    result
+
+[<Test>]
+let ``Test single Operators +-/*%`` () =
+    testFunction <@ ``single Operators +-/*%`` @>
+
+[<Test>]
+let ``Time single Operators +-/*%`` () =
+    timeFunction <@ ``single Operators +-/*%`` @>
+*)
+
+
 (*
 [<ReflectedDefinition>]
 let ``[]()`` () =
 
 [<Test>]
-let ```` () =
-    testFunction <@ ```` @>
+let `` `` () =
+    testFunction <@ `` `` @>
+
+[<Test>]
+let `` `` () =
+    timeFunction <@ `` `` @>
 *)
