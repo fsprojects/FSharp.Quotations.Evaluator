@@ -104,6 +104,7 @@ let timeFunction functionQuotation =
         "Too fast; decrease the multiplier! linq={0:0} compiled={1:0} allowed multiples={2:0.00}-{3:0.00} actual multiples={4:0.00}", 
         viaLinqMs, directMs, timeAllowanceMultiplier * 0.75, timeAllowanceMultiplier, viaLinqMs / directMs)
 
+
 [<ReflectedDefinition; TestIterations 1000; TimeAllowance 27.0>]
 let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let ToggleNth n (lst:bool array) =                  // Toggle every n'th door
@@ -121,6 +122,7 @@ let ``Test [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
 let ``Time [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
+
 [<ReflectedDefinition; TimeAllowance 40.0>]
 let ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let PerfectSquare n =
@@ -136,7 +138,8 @@ let ``Test [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
 let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
-[<ReflectedDefinition; TimeAllowance 35.0>]
+
+[<ReflectedDefinition; TimeAllowance 32.0>]
 let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     let euler f (h : float) t0 y0 =
         (t0, y0)
@@ -184,6 +187,7 @@ let ``Test int Operators +-/*%`` () =
 let ``Time int Operators +-/*%`` () =
     timeFunction <@ ``int Operators +-/*%`` @>
 
+
 [<ReflectedDefinition; TestIterations 1000; TimeAllowance 50.0>]
 let ``int64 Operators +-/*%`` () =
     let rand = Random 3141592
@@ -208,7 +212,6 @@ let ``Time int64 Operators +-/*%`` () =
     timeFunction <@ ``int64 Operators +-/*%`` @>
 
 
-
 [<ReflectedDefinition; TestIterations 100; TimeAllowance 30.0>]
 let ``float Operators +-/*%`` () =
     let rand = Random 3141592
@@ -231,7 +234,6 @@ let ``Test float Operators +-/*%`` () =
 [<Test>]
 let ``Time float Operators +-/*%`` () =
     timeFunction <@ ``float Operators +-/*%`` @>
-
 
 (*
 fails to run compiled version; I think because of Microsoft.FSharp.Core.ExtraTopLevelOperators.ToSingle
@@ -259,6 +261,156 @@ let ``Test single Operators +-/*%`` () =
 let ``Time single Operators +-/*%`` () =
     timeFunction <@ ``single Operators +-/*%`` @>
 *)
+
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.1>]
+let ``int Operators <>=`` () =
+    let rand = Random 3141592
+    let mutable result = 0
+    for i = 1 to 1000 do
+        let a = rand.Next ()
+        let b = rand.Next ()
+        let c = rand.Next ()
+        let d = rand.Next ()
+        let e = rand.Next 3
+        let f = rand.Next 3
+        let g = rand.Next 3
+        if a < b  then result <- result + 1
+        if b > c  then result <- result - 1
+        if a >= c then result <- result + 2
+        if a <= d then result <- result - 2
+        if e = f  then result <- result + 3
+        if f <> g then result <- result - 3
+    result
+
+[<Test>]
+let ``Test int Operators <>=`` () =
+    testFunction <@ ``int Operators <>=`` @>
+
+[<Test>]
+let ``Time int Operators <>=`` () =
+    timeFunction <@ ``int Operators <>=`` @>
+
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.1>]
+let ``int64 Operators <>=`` () =
+    let rand = Random 3141592
+    let mutable result = 0
+    for i = 1 to 1000 do
+        let a = rand.Next ()
+        let b = rand.Next ()
+        let c = rand.Next ()
+        let d = rand.Next ()
+        let e = rand.Next 3
+        let f = rand.Next 3
+        let g = rand.Next 3
+        if a < b  then result <- result + 1
+        if b > c  then result <- result - 1
+        if a >= c then result <- result + 2
+        if a <= d then result <- result - 2
+        if e = f  then result <- result + 3
+        if f <> g then result <- result - 3
+    result
+
+[<Test>]
+let ``Test int64 Operators <>=`` () =
+    testFunction <@ ``int64 Operators <>=`` @>
+
+[<Test>]
+let ``Time int64 Operators <>=`` () =
+    timeFunction <@ ``int64 Operators <>=`` @>
+
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.1>]
+let ``float Operators <>=`` () =
+    let rand = Random 3141592
+    let mutable result = 0
+    for i = 1 to 1000 do
+        let a = rand.Next ()
+        let b = rand.Next ()
+        let c = rand.Next ()
+        let d = rand.Next ()
+        let e = rand.Next 3
+        let f = rand.Next 3
+        let g = rand.Next 3
+        if a < b  then result <- result + 1
+        if b > c  then result <- result - 1
+        if a >= c then result <- result + 2
+        if a <= d then result <- result - 2
+        if e = f  then result <- result + 3
+        if f <> g then result <- result - 3
+    result
+
+[<Test>]
+let ``Test float Operators <>=`` () =
+    testFunction <@ ``float Operators <>=`` @>
+
+[<Test>]
+let ``Time float Operators <>=`` () =
+    timeFunction <@ ``float Operators <>=`` @>
+
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.1>]
+let ``single Operators <>=`` () =
+    let rand = Random 3141592
+    let mutable result = 0
+    for i = 1 to 1000 do
+        let a = rand.Next ()
+        let b = rand.Next ()
+        let c = rand.Next ()
+        let d = rand.Next ()
+        let e = rand.Next 3
+        let f = rand.Next 3
+        let g = rand.Next 3
+        if a < b  then result <- result + 1
+        if b > c  then result <- result - 1
+        if a >= c then result <- result + 2
+        if a <= d then result <- result - 2
+        if e = f  then result <- result + 3
+        if f <> g then result <- result - 3
+    result
+
+[<Test>]
+let ``Test single Operators <>=`` () =
+    testFunction <@ ``single Operators <>=`` @>
+
+[<Test>]
+let ``Time single Operators <>=`` () =
+    timeFunction <@ ``single Operators <>=`` @>
+
+
+[<ReflectedDefinition; TimeAllowance 1.1>]
+let ``float cast`` () =
+    let rand = Random 3141592
+    let mutable total = 0.0
+    for i=0 to 1000 do
+        total <- total + (float (rand.Next ()))
+    total
+
+[<Test>]
+let ``Test float cast`` () =
+    testFunction <@ ``float cast`` @>
+
+[<Test>]
+let ``Time float cast`` () =
+    timeFunction <@ ``float cast`` @>
+
+
+[<ReflectedDefinition; TimeAllowance 1.1>]
+let ``int64 cast`` () =
+    let rand = Random 3141592
+    let mutable total = 0L
+    for i=0 to 1000 do
+        total <- total + (int64 (rand.Next ()))
+    total
+
+[<Test>]
+let ``Test int64 cast`` () =
+    testFunction <@ ``int64 cast`` @>
+
+[<Test>]
+let ``Time int64 cast`` () =
+    timeFunction <@ ``int64 cast`` @>
 
 
 (*
