@@ -1,4 +1,4 @@
-﻿module FSharp.Quotations.Evaluator.Rosetta
+﻿module FSharp.Quotations.Evaluator.Performance
 
 open System
 open System.Diagnostics
@@ -12,10 +12,13 @@ open Microsoft.FSharp.Quotations
 
 type TestIterationsAttribute (count) =
     inherit Attribute ()
-
     member __.Count = count
-
     static member DefaultCount = 10000
+
+type TimeAllowanceAttribute (multiplier) =
+    inherit Attribute ()
+    member __.Multiplier = multiplier
+    static member DefaultMultiplier = 2.0
 
 let getTypedReflectedDefinition (functionQuotation:Expr<'t>) : MethodInfo * Expr<'t> =
     match functionQuotation with
@@ -48,28 +51,60 @@ let getIterations (``method``:MethodInfo) =
         then TestIterationsAttribute.DefaultCount
         else testIterations.Count
 
+let getTimeAllowanceMultiplier (``method``:MethodInfo) =
+    let timeAllowance = ``method``.GetCustomAttribute<TimeAllowanceAttribute> ()
+    if box timeAllowance = null
+        then TimeAllowanceAttribute.DefaultMultiplier
+        else timeAllowance.Multiplier
+
+// we probably have a lot of ceremony here for no particular reason, but it shouldn't hurt
 let timeFunction functionQuotation =
     let ``method``, compiledMethod, directlyCallMethod =
         getEntryPoints functionQuotation
 
-    compiledMethod () |> ignore
+    // just run them once to 'prime' them to some degree... 
+    compiledMethod ()            |> ignore
     directlyCallMethod.Invoke () |> ignore
 
-    let iterations = getIterations ``method``
+    let iterations              = ``method`` |> getIterations
+    let timeAllowanceMultiplier = ``method`` |> getTimeAllowanceMultiplier
 
-    let sw = Stopwatch.StartNew ()
-    for i=0 to iterations-1 do
-        compiledMethod () |> ignore
-    let viaLinqMs = sw.ElapsedMilliseconds
+    let getLinqCompiledTime () =
+        GC.Collect ()
+        System.Threading.Thread.Sleep(1) // start a time slice afresh; maybe!
+        let sw = Stopwatch.StartNew ()
+        for i=0 to iterations-1 do
+            compiledMethod () |> ignore
+        float sw.ElapsedMilliseconds
 
-    let sw = Stopwatch.StartNew ()
-    for i=0 to iterations-1 do
-        directlyCallMethod.Invoke () |> ignore
-    let directMs = sw.ElapsedMilliseconds
+    let getDirectelyCompiledTime () =
+        GC.Collect ()
+        System.Threading.Thread.Sleep(1) // start a time slice afresh; maybe!
+        let sw = Stopwatch.StartNew ()
+        for i=0 to iterations-1 do
+            directlyCallMethod.Invoke () |> ignore
+        float sw.ElapsedMilliseconds
 
-    Assert.LessOrEqual (viaLinqMs, 2L * directMs)
+    let directMs, viaLinqMs = 
+        // "randomly" choose one to run first
+        if DateTime.Now.Millisecond / 100 % 2 = 1 then
+            getDirectelyCompiledTime(), getLinqCompiledTime ()
+        else
+            let linqCompiledTime      = getLinqCompiledTime ()
+            let directelyCompiledTime = getDirectelyCompiledTime () 
+            directelyCompiledTime, linqCompiledTime
 
-[<ReflectedDefinition; TestIterations 1000>]
+    let allowedTime = directMs * timeAllowanceMultiplier
+
+    Assert.LessOrEqual (viaLinqMs, allowedTime,
+        "Took too long! linq={0:0} compiled={1:0} multiples of allowed time={2:0.00}",
+        viaLinqMs, directMs, viaLinqMs / allowedTime)
+
+    Assert.GreaterOrEqual (viaLinqMs, allowedTime * 0.75,
+        "Too fast; decrease the multiplier! linq={0:0} compiled={1:0} allowed multiples={2:0.00}-{3:0.00} actual multiples={4:0.00}", 
+        viaLinqMs, directMs, timeAllowanceMultiplier * 0.75, timeAllowanceMultiplier, viaLinqMs / directMs)
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 27.0>]
 let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let ToggleNth n (lst:bool array) =                  // Toggle every n'th door
         [(n-1) .. n .. 99]                              // For each appropriate door
@@ -86,7 +121,7 @@ let ``Test [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
 let ``Time [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
-[<ReflectedDefinition>]
+[<ReflectedDefinition; TimeAllowance 40.0>]
 let ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let PerfectSquare n =
         let sqrt = int(Math.Sqrt(float n))
@@ -101,7 +136,7 @@ let ``Test [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
 let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
-[<ReflectedDefinition>]
+[<ReflectedDefinition; TimeAllowance 45.0>]
 let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     let euler f (h : float) t0 y0 =
         (t0, y0)
