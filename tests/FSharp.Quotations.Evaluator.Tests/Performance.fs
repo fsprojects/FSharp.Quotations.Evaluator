@@ -413,6 +413,56 @@ let ``Time int64 cast`` () =
     timeFunction <@ ``int64 cast`` @>
 
 
+[<ReflectedDefinition; TimeAllowance 1.25>]
+let ``id function`` () =
+    let rand = Random 3141592
+    let mutable total = 0
+    for i = 0 to 1000 do
+        total <- id (rand.Next ())
+    total
+
+[<Test>]
+let ``Test id function`` () =
+    testFunction <@ ``id function`` @>
+
+[<Test>]
+let ``Time id function`` () =
+    timeFunction <@ ``id function`` @>
+
+
+[<ReflectedDefinition; TimeAllowance 150.0>]
+let ``operator |>`` () =
+    let rand = Random 3141592
+    let mutable total = 0
+    for i = 0 to 1000 do
+        total <- (rand.Next ()) |> id
+    total
+
+[<Test>]
+let ``Test operator |>`` () =
+    testFunction <@ ``operator |>`` @>
+
+[<Test>]
+let ``Time operator |>`` () =
+    timeFunction <@ ``operator |>`` @>
+
+
+[<ReflectedDefinition; TimeAllowance 150.0>]
+let ``operator <|`` () =
+    let rand = Random 3141592
+    let mutable total = 0
+    for i = 0 to 1000 do
+        total <- id <| (rand.Next ())
+    total
+
+[<Test>]
+let ``Test operator <|`` () =
+    testFunction <@ ``operator <|`` @>
+
+[<Test>]
+let ``Time operator <|`` () =
+    timeFunction <@ ``operator <|`` @>
+
 (*
 [<ReflectedDefinition>]
 let ``[]()`` () =
