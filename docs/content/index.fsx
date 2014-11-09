@@ -20,7 +20,7 @@ Documentation
   <div class="span1"></div>
 </div>
 
-Ovverview
+Overview
 -------
 
 This component is an F# quotations evaluator, implemented by compiling to LINQ expression trees.
