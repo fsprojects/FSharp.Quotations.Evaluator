@@ -139,7 +139,7 @@ let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 32.0>]
+[<ReflectedDefinition; TimeAllowance 12.0>]
 let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     let euler f (h : float) t0 y0 =
         (t0, y0)
@@ -188,7 +188,7 @@ let ``Time int Operators +-/*%`` () =
     timeFunction <@ ``int Operators +-/*%`` @>
 
 
-[<ReflectedDefinition; TestIterations 1000; TimeAllowance 50.0>]
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.2>]
 let ``int64 Operators +-/*%`` () =
     let rand = Random 3141592
     let mutable result = 0L
@@ -212,7 +212,7 @@ let ``Time int64 Operators +-/*%`` () =
     timeFunction <@ ``int64 Operators +-/*%`` @>
 
 
-[<ReflectedDefinition; TestIterations 100; TimeAllowance 30.0>]
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 1.2>]
 let ``float Operators +-/*%`` () =
     let rand = Random 3141592
     let mutable result = 0.0
@@ -430,7 +430,7 @@ let ``Time id function`` () =
     timeFunction <@ ``id function`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 150.0>]
+[<ReflectedDefinition; TimeAllowance 1.7>]
 let ``operator |>`` () =
     let rand = Random 3141592
     let mutable total = 0
@@ -447,7 +447,7 @@ let ``Time operator |>`` () =
     timeFunction <@ ``operator |>`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 150.0>]
+[<ReflectedDefinition; TimeAllowance 1.7>]
 let ``operator <|`` () =
     let rand = Random 3141592
     let mutable total = 0

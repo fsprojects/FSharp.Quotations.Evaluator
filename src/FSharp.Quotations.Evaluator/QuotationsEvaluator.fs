@@ -284,6 +284,33 @@ module QuotationEvaluationTypes =
         f8hole := f8
         B.Invoke(f1,f2,f3,f4,f5,f6,f7,f8)
 
+    type FuncFSharp<'a> (f:Func<'a>) =
+        inherit FSharpFunc<unit, 'a>()
+        override __.Invoke _ = f.Invoke()
+
+    type FuncFSharp<'a,'b> (f:Func<'a, 'b>) =
+        inherit FSharpFunc<'a,'b>()
+        override __.Invoke a = f.Invoke a
+
+    type FuncFSharp<'a,'b,'c> (f:Func<'a,'b,'c>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c>()
+        override __.Invoke (a,b) = f.Invoke (a,b)
+        override __.Invoke a = fun b -> f.Invoke (a,b)
+
+    type FuncFSharp<'a,'b,'c,'d> (f:Func<'a,'b,'c,'d>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d>()
+        override __.Invoke (a,b,c) = f.Invoke (a,b,c)
+        override __.Invoke a = fun b c -> f.Invoke (a,b,c)
+
+    type FuncFSharp<'a,'b,'c,'d,'e> (f:Func<'a,'b,'c,'d,'e>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e>()
+        override __.Invoke (a,b,c,d) = f.Invoke (a,b,c,d)
+        override __.Invoke a = fun b c d -> f.Invoke (a,b,c,d)
+
+    type FuncFSharp<'a,'b,'c,'d,'e,'f> (f:Func<'a,'b,'c,'d,'e,'f>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f>()
+        override __.Invoke (a,b,c,d,e) = f.Invoke (a,b,c,d,e)
+        override __.Invoke a = fun b c d e -> f.Invoke (a,b,c,d,e)
 
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
@@ -642,14 +669,68 @@ module QuotationEvaluationTypes =
             let linqValue = ConvExpr env value
             Expression.Assign (linqVariable, linqValue)|> asExpr
 
-        | Patterns.Lambda(v,body) -> 
-            let vP = ConvVar v
-            let env = { env with varEnv = Map.add v (vP |> asExpr) env.varEnv }
-            let tyargs = [| v.Type; body.Type |]
-            let bodyP = ConvExpr env body
-            let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
-            let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpr
-            Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
+        | Patterns.Lambda(firstVar, firstBody) as lambda ->
+            let rec getVars vars maybeBody = function
+            | Lambda (v, body) -> getVars (v::vars) (Some body) body
+            | _ -> List.rev vars, maybeBody.Value
+
+            let vars, body = getVars [] None lambda
+
+            let freeVars = Set (body.GetFreeVars ())
+
+            let freeVarsCount = freeVars.Count
+            if freeVarsCount <= 5 && freeVarsCount = vars.Length && vars |> List.forall freeVars.Contains then
+                let varParameters =
+                    vars
+                    |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name))
+
+                let env =
+                    { env with
+                         varEnv =
+                            (env.varEnv, varParameters)
+                            ||> List.fold (fun varEnv (var, parameter) ->
+                                varEnv
+                                |> Map.add var (parameter |> asExpr)) }
+
+                let linqBody = ConvExpr env body
+
+                let parameters = 
+                    varParameters
+                    |> List.map snd
+
+                let ``function`` =
+                    Expression.Lambda (linqBody, parameters)
+                    |> fun lambda -> lambda.Compile ()
+              
+                let funcFSharp =
+                    if   freeVarsCount = 1 then typedefof<FuncFSharp<_,_>>
+                    elif freeVarsCount = 2 then typedefof<FuncFSharp<_,_,_>>
+                    elif freeVarsCount = 3 then typedefof<FuncFSharp<_,_,_,_>>
+                    elif freeVarsCount = 4 then typedefof<FuncFSharp<_,_,_,_,_>>
+                    elif freeVarsCount = 5 then typedefof<FuncFSharp<_,_,_,_,_,_>>
+                    else failwith "Logic error"
+
+                let parameterTypes =
+                    [|  yield! varParameters |> List.map (fun (vars,_) -> vars.Type)
+                        yield linqBody.Type |]
+                  
+                let ``type`` = funcFSharp.MakeGenericType parameterTypes
+
+                let ``constructor`` = ``type``.GetConstructor [| ``function``.GetType () |]
+
+                let obj = ``constructor``.Invoke [| ``function`` |]
+
+                Expression.Constant (obj) |> asExpr
+            else
+                let v, body = firstVar, firstBody
+
+                let vP = ConvVar v
+                let env = { env with varEnv = Map.add v (vP |> asExpr) env.varEnv }
+                let tyargs = [| v.Type; body.Type |]
+                let bodyP = ConvExpr env body
+                let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
+                let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpr
+                Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
     
         | Patterns.WhileLoop(condition, iteration) -> 
             let linqCondition = ConvExpr env condition
