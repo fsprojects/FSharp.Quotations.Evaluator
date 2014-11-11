@@ -284,33 +284,33 @@ module QuotationEvaluationTypes =
         f8hole := f8
         B.Invoke(f1,f2,f3,f4,f5,f6,f7,f8)
 
-    type FuncFSharp<'a> (f:Func<'a>) =
+    type FuncFSharp<'state,'a> (f:Func<'state,'a>, state:'state) =
         inherit FSharpFunc<unit, 'a>()
-        override __.Invoke _ = f.Invoke()
+        override __.Invoke _ = f.Invoke state
 
-    type FuncFSharp<'a,'b> (f:Func<'a, 'b>) =
+    type FuncFSharp<'state,'a,'b> (f:Func<'state,'a,'b>, state:'state) =
         inherit FSharpFunc<'a,'b>()
-        override __.Invoke a = f.Invoke a
+        override __.Invoke a = f.Invoke (state,a)
 
-    type FuncFSharp<'a,'b,'c> (f:Func<'a,'b,'c>) =
+    type FuncFSharp<'state,'a,'b,'c> (f:Func<'state,'a,'b,'c>, state:'state) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c>()
-        override __.Invoke (a,b) = f.Invoke (a,b)
-        override __.Invoke a = fun b -> f.Invoke (a,b)
+        override __.Invoke (a,b) = f.Invoke (state,a,b)
+        override this.Invoke a = fun b -> this.Invoke (a,b)
 
-    type FuncFSharp<'a,'b,'c,'d> (f:Func<'a,'b,'c,'d>) =
+    type FuncFSharp<'state,'a,'b,'c,'d> (f:Func<'state,'a,'b,'c,'d>, state:'state) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d>()
-        override __.Invoke (a,b,c) = f.Invoke (a,b,c)
-        override __.Invoke a = fun b c -> f.Invoke (a,b,c)
+        override __.Invoke (a,b,c) = f.Invoke (state,a,b,c)
+        override this.Invoke a = fun b c -> this.Invoke (a,b,c)
 
-    type FuncFSharp<'a,'b,'c,'d,'e> (f:Func<'a,'b,'c,'d,'e>) =
+    type FuncFSharp<'state,'a,'b,'c,'d,'e> (f:Func<'state,'a,'b,'c,'d,'e>, state:'state) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e>()
-        override __.Invoke (a,b,c,d) = f.Invoke (a,b,c,d)
-        override __.Invoke a = fun b c d -> f.Invoke (a,b,c,d)
+        override __.Invoke (a,b,c,d) = f.Invoke (state,a,b,c,d)
+        override this.Invoke a = fun b c d -> this.Invoke (a,b,c,d)
 
-    type FuncFSharp<'a,'b,'c,'d,'e,'f> (f:Func<'a,'b,'c,'d,'e,'f>) =
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f> (f:Func<'state,'a,'b,'c,'d,'e,'f>, state:'state) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f>()
-        override __.Invoke (a,b,c,d,e) = f.Invoke (a,b,c,d,e)
-        override __.Invoke a = fun b c d e -> f.Invoke (a,b,c,d,e)
+        override __.Invoke (a,b,c,d,e) = f.Invoke (state,a,b,c,d,e)
+        override this.Invoke a = fun b c d e -> this.Invoke (a,b,c,d,e)
 
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
@@ -676,51 +676,105 @@ module QuotationEvaluationTypes =
 
             let vars, body = getVars [] None lambda
 
-            let freeVars = Set (body.GetFreeVars ())
+            let capturedVars =
+                let parameterVars = Set vars
 
-            let freeVarsCount = freeVars.Count
-            if freeVarsCount <= 5 && freeVarsCount = vars.Length && vars |> List.forall freeVars.Contains then
+                body.GetFreeVars ()
+                |> Seq.filter (fun freeVar -> not <| Set.contains freeVar parameterVars)
+                |> Seq.sortBy (fun freeVar -> freeVar.Name)
+                |> Seq.toList
+
+            let varsCount = vars.Length
+            if varsCount <= 5 && capturedVars.Length <= 8 then
+                let stateType =
+                    match capturedVars with
+                    | []                                 -> typeof<Unit>
+                    | v1::[]                             -> v1.Type
+                    | v1::v2::[]                         -> typedefof<Tuple<_,_>>.            MakeGenericType(v1.Type,v2.Type)
+                    | v1::v2::v3::[]                     -> typedefof<Tuple<_,_,_>>.          MakeGenericType(v1.Type,v2.Type,v3.Type)
+                    | v1::v2::v3::v4::[]                 -> typedefof<Tuple<_,_,_,_>>.        MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type)
+                    | v1::v2::v3::v4::v5::[]             -> typedefof<Tuple<_,_,_,_,_>>.      MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type)
+                    | v1::v2::v3::v4::v5::v6::[]         -> typedefof<Tuple<_,_,_,_,_,_>>.    MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type,v6.Type)
+                    | v1::v2::v3::v4::v5::v6::v7::[]     -> typedefof<Tuple<_,_,_,_,_,_,_>>.  MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type,v6.Type,v7.Type)
+                    | v1::v2::v3::v4::v5::v6::v7::v8::[] -> typedefof<Tuple<_,_,_,_,_,_,_,_>>.MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type,v6.Type,v7.Type,v8.Type)
+                    | _ -> failwith "Not currently supported"
+
+                let stateParameter =
+                    Expression.Parameter (stateType, "state")
+
+                let stateEnvironment =
+                    match capturedVars with
+                    | [] -> []
+                    | v1 :: [] -> [v1, stateParameter |> asExpr]
+                    | _ ->
+                        capturedVars
+                        |> List.mapi (fun idx var -> var, Expression.Property (stateParameter, "Item" + (idx+1).ToString()) |> asExpr)
+
                 let varParameters =
                     vars
                     |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name))
 
-                let env =
+                let lambdaEnv =
                     { env with
                          varEnv =
-                            (env.varEnv, varParameters)
+                            let environmentVariables =
+                                varParameters
+                                |> List.map (fun (v,p) -> v, p |> asExpr)
+                                |> List.append stateEnvironment
+
+                            (env.varEnv, environmentVariables)
                             ||> List.fold (fun varEnv (var, parameter) ->
                                 varEnv
-                                |> Map.add var (parameter |> asExpr)) }
+                                |> Map.add var parameter) }
 
-                let linqBody = ConvExpr env body
+                let linqBody = ConvExpr lambdaEnv body
 
                 let parameters = 
-                    varParameters
-                    |> List.map snd
+                    [ yield stateParameter
+                      yield! varParameters |> List.map snd ]
 
-                let ``function`` =
-                    Expression.Lambda (linqBody, parameters)
-                    |> fun lambda -> lambda.Compile ()
+                let linqLambda = Expression.Lambda (linqBody, parameters)
+
+                let ``function`` = linqLambda.Compile ()
               
                 let funcFSharp =
-                    if   freeVarsCount = 1 then typedefof<FuncFSharp<_,_>>
-                    elif freeVarsCount = 2 then typedefof<FuncFSharp<_,_,_>>
-                    elif freeVarsCount = 3 then typedefof<FuncFSharp<_,_,_,_>>
-                    elif freeVarsCount = 4 then typedefof<FuncFSharp<_,_,_,_,_>>
-                    elif freeVarsCount = 5 then typedefof<FuncFSharp<_,_,_,_,_,_>>
+                    if   varsCount = 1 then typedefof<FuncFSharp<_,_,_>>
+                    elif varsCount = 2 then typedefof<FuncFSharp<_,_,_,_>>
+                    elif varsCount = 3 then typedefof<FuncFSharp<_,_,_,_,_>>
+                    elif varsCount = 4 then typedefof<FuncFSharp<_,_,_,_,_,_>>
+                    elif varsCount = 5 then typedefof<FuncFSharp<_,_,_,_,_,_,_>>
                     else failwith "Logic error"
 
                 let parameterTypes =
-                    [|  yield! varParameters |> List.map (fun (vars,_) -> vars.Type)
+                    [|  yield stateType
+                        yield! varParameters |> List.map (fun (vars,_) -> vars.Type)
                         yield linqBody.Type |]
                   
                 let ``type`` = funcFSharp.MakeGenericType parameterTypes
 
-                let ``constructor`` = ``type``.GetConstructor [| ``function``.GetType () |]
+                let ``constructor`` = ``type``.GetConstructor [| ``function``.GetType (); stateType |]
 
-                let obj = ``constructor``.Invoke [| ``function`` |]
+                match capturedVars with
+                | [] ->
+                    let obj = ``constructor``.Invoke [| ``function``; null |]
+                    Expression.Constant (obj) |> asExpr
+                | v1 :: [] ->
+                    let state = Map.find v1 env.varEnv
+                    Expression.New (``constructor``, [Expression.Constant(``function``) |> asExpr; state]) |> asExpr
+                | _ ->
+                    let state =
+                        capturedVars
+                        |> List.map (fun var -> Map.find var env.varEnv)
 
-                Expression.Constant (obj) |> asExpr
+                    let stateConstructor =
+                        let types = 
+                            capturedVars
+                            |> List.map (fun var -> var.Type)
+                            |> List.toArray
+
+                        stateType.GetConstructor types
+
+                    Expression.New (``constructor``, [Expression.Constant(``function``) |> asExpr; Expression.New(stateConstructor, state) |> asExpr]) |> asExpr
             else
                 let v, body = firstVar, firstBody
 
@@ -890,11 +944,14 @@ module QuotationEvaluationTypes =
         //printf "** Expression .Parameter(%a, %a)\n" output_any ty output_any nm;
         Expression.Parameter(v.Type, v.Name)
 
-    let Conv (e: #Expr,eraseEquality) = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty } (e :> Expr)
+    let Conv (e: #Expr,eraseEquality) =
+        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty } (e :> Expr)
+
+        Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpr
 
     let CompileImpl (e: #Expr, eraseEquality) = 
-       let ty = e.Type
-       let e = Expr.NewDelegate(GetFuncType([|typeof<unit>; ty |]), [new Var("unit",typeof<unit>)],e)
+//       let ty = e.Type
+//       let e = Expr.NewDelegate(GetFuncType([|typeof<unit>; ty |]), [new Var("unit",typeof<unit>)],e)
        let linqExpr = Conv (e,eraseEquality)
        let linqExpr = (linqExpr :?> LambdaExpression)
        let d = linqExpr.Compile()

@@ -105,7 +105,7 @@ let timeFunction functionQuotation =
         viaLinqMs, directMs, timeAllowanceMultiplier * 0.75, timeAllowanceMultiplier, viaLinqMs / directMs)
 
 
-[<ReflectedDefinition; TestIterations 1000; TimeAllowance 27.0>]
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 16.0>]
 let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let ToggleNth n (lst:bool array) =                  // Toggle every n'th door
         [(n-1) .. n .. 99]                              // For each appropriate door
