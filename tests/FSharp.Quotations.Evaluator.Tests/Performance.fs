@@ -57,6 +57,7 @@ let getTimeAllowanceMultiplier (``method``:MethodInfo) =
         then TimeAllowanceAttribute.DefaultMultiplier
         else timeAllowance.Multiplier
 
+#if INCLUDE_TIMING_TESTS
 // we probably have a lot of ceremony here for no particular reason, but it shouldn't hurt
 let timeFunction functionQuotation =
     let ``method``, compiledMethod, directlyCallMethod =
@@ -103,7 +104,10 @@ let timeFunction functionQuotation =
     Assert.GreaterOrEqual (viaLinqMs, allowedTime * 0.75,
         "Too fast; decrease the multiplier! linq={0:0} compiled={1:0} allowed multiples={2:0.00}-{3:0.00} actual multiples={4:0.00}", 
         viaLinqMs, directMs, timeAllowanceMultiplier * 0.75, timeAllowanceMultiplier, viaLinqMs / directMs)
-
+#else
+let timeFunction _ =
+    Assert.Ignore "Ignoring timing tests. Set INCLUDE_TIMING_TESTS"
+#endif
 
 [<ReflectedDefinition; TestIterations 1000; TimeAllowance 16.0>]
 let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
@@ -139,7 +143,7 @@ let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 12.0>]
+[<ReflectedDefinition; TimeAllowance 1.7>]
 let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     let euler f (h : float) t0 y0 =
         (t0, y0)
@@ -379,7 +383,7 @@ let ``Time single Operators <>=`` () =
     timeFunction <@ ``single Operators <>=`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.1>]
+[<ReflectedDefinition; TimeAllowance 1.2>]
 let ``float cast`` () =
     let rand = Random 3141592
     let mutable total = 0.0
@@ -396,7 +400,7 @@ let ``Time float cast`` () =
     timeFunction <@ ``float cast`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.1>]
+[<ReflectedDefinition; TimeAllowance 1.2>]
 let ``int64 cast`` () =
     let rand = Random 3141592
     let mutable total = 0L
@@ -413,7 +417,7 @@ let ``Time int64 cast`` () =
     timeFunction <@ ``int64 cast`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.25>]
+[<ReflectedDefinition; TimeAllowance 1.1>]
 let ``id function`` () =
     let rand = Random 3141592
     let mutable total = 0
@@ -430,7 +434,7 @@ let ``Time id function`` () =
     timeFunction <@ ``id function`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.7>]
+[<ReflectedDefinition; TimeAllowance 1.1>]
 let ``operator |>`` () =
     let rand = Random 3141592
     let mutable total = 0
@@ -447,7 +451,7 @@ let ``Time operator |>`` () =
     timeFunction <@ ``operator |>`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.7>]
+[<ReflectedDefinition; TimeAllowance 1.1>]
 let ``operator <|`` () =
     let rand = Random 3141592
     let mutable total = 0
