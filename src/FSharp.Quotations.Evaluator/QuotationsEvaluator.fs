@@ -476,10 +476,6 @@ module QuotationEvaluationTypes =
                     exprConstructor(e1, e2, false, intrinsic.MakeGenericMethod([|x1.Type|])) |> asExpr
 
             match inp with 
-            // Special cases for this translation
-            |  PlusQ (_, [ty1;ty2;ty3],[x1;x2]) when (ty1 = typeof<string>) && (ty2 = typeof<string>) ->
-                 ConvExpr env (<@@  System.String.Concat( [| %%x1 ; %%x2 |] : string array ) @@>)
-
             | SpecificCall <@ LanguagePrimitives.GenericEquality @> (_, _,[x1;x2]) 
             | SpecificCall <@ ( =  ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.Equal              Expression.Equal              genericEqualityIntrinsic
             | SpecificCall <@ ( >  ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.GreaterThan        Expression.GreaterThan        genericGreaterThanIntrinsic
@@ -944,7 +940,68 @@ module QuotationEvaluationTypes =
         //printf "** Expression .Parameter(%a, %a)\n" output_any ty output_any nm;
         Expression.Parameter(v.Type, v.Name)
 
+    let (|Λ|_|) (``method``:MethodInfo) = function
+    | Patterns.Call (o, methodInfo, args) when methodInfo.IsGenericMethod && methodInfo.Name = ``method``.Name ->
+        let generic = methodInfo.GetGenericMethodDefinition() 
+        if ``method`` = generic then
+            let genericArgs = methodInfo.GetGenericArguments ()
+            Some (o, genericArgs, args)
+        else
+            None
+    | _ -> None
+
+    let rec getMethodInfo = function
+    | Patterns.Call(_,``method``,_) -> ``method``
+    | Patterns.Lambda(_,body) -> getMethodInfo body
+    | _ -> failwith "Unexpected Form"
+
+    let getGenericMethodInfo functionExpression =
+        let methodInfo = getMethodInfo functionExpression
+        if not methodInfo.IsGenericMethod then
+            failwith "Logic error; expected only generic methods"
+        methodInfo.GetGenericMethodDefinition ()
+
+    let ``|>`` = getGenericMethodInfo <@ (|>) @>
+    let ``<|`` = getGenericMethodInfo <@ (<|) @>
+    let ``+``  = getGenericMethodInfo <@ (+) @>
+    let ``id`` = getGenericMethodInfo <@ id @>
+
+    let (|TraverseExpr|_|) f = function
+    | ExprShape.ShapeCombination (o, exprlist) -> Some (ExprShape.RebuildShapeCombination (o, List.map f exprlist))
+    | ExprShape.ShapeLambda (var, expr) -> Some (Expr.Lambda (var, f expr))
+    | untouched -> Some untouched
+
+    let rec constantReplacement var value = function
+    | Patterns.Var v when v = var -> value
+    | TraverseExpr (constantReplacement var value) result -> result
+    | _ -> failwith "Invalid logic"
+
+    let rec optimize = function
+    | Patterns.Let (var, binding, body) when not var.IsMutable ->
+        match optimize binding with
+        | (Patterns.Value _) as value -> optimize <| constantReplacement var value body
+        | optimizedBinding -> Expr.Let (var, optimizedBinding, optimize body)
+    | Patterns.Application (Lambda(var, body), input) -> optimize <| Expr.Let (var, input, body)
+    | Λ ``|>`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x2, x1)
+    | Λ ``<|`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x1, x2)
+    | Λ ``+`` (None, [|t1;_;_|], [x1;x2]) when t1 = typeof<string> ->
+        let rec getStrings strings = function
+        | Λ ``+`` (None, [|t1;_;_|], [x1;x2]) when t1 = typeof<string> -> getStrings (x2::strings) (x1)
+        | remainder -> remainder :: strings
+        let concat = 
+            match getStrings [x2] (x1) with
+            | s1::s2::[]         -> <@@ String.Concat(%%s1, %%s2) @@>
+            | s1::s2::s3::[]     -> <@@ String.Concat(%%s1, %%s2, %%s3) @@>
+            | s1::s2::s3::s4::[] -> <@@ String.Concat(%%s1, %%s2, %%s3, %%s4) @@>
+            | strings            -> Expr.Call (getMethodInfo <@ String.Concat ([||]:array<string>) @>, [Expr.NewArray (typeof<string>, strings)])
+        optimize <| concat
+    | Λ ``id`` (None, _, [x1]) -> optimize x1
+    | TraverseExpr optimize result -> result
+    | _ -> failwith "Invalid logic"
+
     let Conv (e: #Expr,eraseEquality) =
+        let e = optimize e
+
         let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty } (e :> Expr)
 
         Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpr
