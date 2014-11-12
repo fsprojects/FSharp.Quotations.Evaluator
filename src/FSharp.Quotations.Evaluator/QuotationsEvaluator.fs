@@ -834,10 +834,9 @@ module QuotationEvaluationTypes =
             linqStatements |> asExpr
         
         | Patterns.TryFinally(e,h) -> 
-            let eP = ConvExpr env (Expr.Lambda(new Var("unitVar",typeof<unit>), e))
-            let hP = ConvExpr env <@@ (fun () -> (%%h:unit)) @@>
-            let minfo = TryFinallyMethod.GetGenericMethodDefinition().MakeGenericMethod [| e.Type |]
-            Expression.Call(minfo,[| eP; hP |]) |> asExpr
+            let eP = ConvExpr env e
+            let hP = ConvExpr env h
+            Expression.TryFinally(eP, hP) |> asExpr
         
         | Patterns.TryWith(e,vf,filter,vh,handler) -> 
             let eP = ConvExpr env (Expr.Lambda(new Var("unitVar",typeof<unit>), e))
