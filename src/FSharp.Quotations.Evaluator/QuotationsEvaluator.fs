@@ -19,6 +19,8 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Quotations.DerivedPatterns
 
+
+
 module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
@@ -376,9 +378,6 @@ module QuotationEvaluationTypes =
         else
             methodInfo
 
-    let ``-> |>`` = getGenericMethodInfo <@ (|>) @>
-    let ``-> <|`` = getGenericMethodInfo <@ (<|) @>
-    let ``-> id`` = getGenericMethodInfo <@ id @>
     let ``-> not`` = getGenericMethodInfo <@ not @>
 
     let ``-> generic=`` = getGenericMethodInfo <@ LanguagePrimitives.GenericEquality @>
@@ -984,6 +983,84 @@ module QuotationEvaluationTypes =
         //printf "** Expression .Parameter(%a, %a)\n" output_any ty output_any nm;
         Expression.Parameter(v.Type, v.Name)
 
+    module ``Custom Enumerables`` =
+        let CurrentIsState preStartState (moveNext:Func<_,_>) =
+            let getEnumerator () =
+                let current = ref preStartState
+                { new IEnumerator<'a> with
+                    member __.Dispose() =  ()
+                    member __.Current : 'a = !current
+                    member __.Current : obj = upcast (!current)
+                    member __.MoveNext()  = 
+                        match moveNext.Invoke (!current) with
+                        | None -> false
+                        | Some next -> current := next; true
+                    member __.Reset() = current := preStartState }
+
+            { new IEnumerable<'a> with
+                member __.GetEnumerator() = getEnumerator ()
+                member __.GetEnumerator(): Collections.IEnumerator = upcast (getEnumerator ()) }
+
+    let inline IsType<'a,'b> = typeof<'a> = typeof<'b>
+
+    [<Sealed>]
+    type ``Custom Operators``<'a> private () =
+        static let one =
+            if   IsType<'a, sbyte>   then Expression.Constant 1y
+            elif IsType<'a, byte>    then Expression.Constant 1uy
+            elif IsType<'a, int16>   then Expression.Constant 1s
+            elif IsType<'a, uint16>  then Expression.Constant 1us
+            elif IsType<'a, int32>   then Expression.Constant 1
+            elif IsType<'a, uint32>  then Expression.Constant 1ul
+            elif IsType<'a, int64>   then Expression.Constant 1L
+            elif IsType<'a, uint64>  then Expression.Constant 1UL
+            elif IsType<'a, float32> then Expression.Constant 1.f
+            elif IsType<'a, float>   then Expression.Constant 1.
+            elif IsType<'a, bigint>  then Expression.Constant 1I
+            elif IsType<'a, decimal> then Expression.Constant 1M
+            else failwith <| sprintf "Don't support type %A" typeof<'a>
+
+        static let optionType = typeof<option<'a>>
+        static let optionConstructor = optionType.GetConstructor [| typeof<'a> |]
+
+        static let subtractOne =
+            let n = Expression.Parameter (typeof<'a>, "n")
+            let subtractOne = Expression.Lambda<Func<'a,'a>>( Expression.Subtract(n, one), n)
+            subtractOne.Compile()
+
+        static let boundedIncrement =
+            let upper = Expression.Parameter (typeof<'a>, "upper")
+            let n     = Expression.Parameter (typeof<'a>, "n")
+
+            let next = Expression.Variable (typeof<'a>)
+            let innerIncrement =
+                Expression.Lambda(
+                    Expression.Block(
+                        [next],
+                        [   Expression.Assign (next, Expression.Add(n, one)) :> Expression
+                            Expression.Condition (
+                                Expression.LessThanOrEqual (next, upper),
+                                Expression.New (optionConstructor, next),
+                                Expression.Property (null, optionType, "None")) :> Expression ]),
+                    n)
+
+            let outerBounding =
+                Expression.Lambda<Func<'a, Func<'a, option<'a>>>> (innerIncrement, upper)
+
+            outerBounding.Compile ()
+
+        static member (..) lower upper =
+            let preStartState = subtractOne.Invoke lower
+            let moveNext = boundedIncrement.Invoke upper
+            ``Custom Enumerables``.CurrentIsState preStartState moveNext
+
+    let ``-> id`` = getGenericMethodInfo <@ id @>
+    let ``-> |>`` = getGenericMethodInfo <@ (|>) @>
+    let ``-> <|`` = getGenericMethodInfo <@ (<|) @>
+    let ``-> ..`` = getGenericMethodInfo <@ (..) @>
+    let ``-> .. ..`` = getGenericMethodInfo <@ (.. ..) @>
+    let ``-> Custom ..`` = getGenericMethodInfo <@ ``Custom Operators``.op_Range @>
+
     let (|TraverseExpr|_|) f = function
     | ExprShape.ShapeCombination (o, exprlist) -> Some (ExprShape.RebuildShapeCombination (o, List.map f exprlist))
     | ExprShape.ShapeLambda (var, expr) -> Some (Expr.Lambda (var, f expr))
@@ -1000,6 +1077,11 @@ module QuotationEvaluationTypes =
         | (Patterns.Value _) as value -> optimize <| constantReplacement var value body
         | optimizedBinding -> Expr.Let (var, optimizedBinding, optimize body)
     | Patterns.Application (Lambda(var, body), input) -> optimize <| Expr.Let (var, input, body)
+    | Λ ``-> ..`` (None, ``type``, args) ->
+        let customOperatorsType = typedefof<``Custom Operators``<_>>
+        let specificType = customOperatorsType.MakeGenericType ``type``
+        let ``method`` = specificType.GetMethod ("op_Range", BindingFlags.NonPublic ||| BindingFlags.Static)
+        optimize <| Expr.Call (``method``, args)
     | Λ ``-> |>`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x2, x1)
     | Λ ``-> <|`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x1, x2)
     | Λ ``-> +`` (None, [|t1;_;_|], [x1;x2]) when t1 = typeof<string> ->

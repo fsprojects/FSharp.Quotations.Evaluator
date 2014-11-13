@@ -127,7 +127,7 @@ let ``Time [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 40.0>]
+[<ReflectedDefinition; TimeAllowance 1.6>]
 let ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let PerfectSquare n =
         let sqrt = int(Math.Sqrt(float n))
