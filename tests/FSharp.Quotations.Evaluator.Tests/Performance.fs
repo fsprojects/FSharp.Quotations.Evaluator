@@ -109,7 +109,7 @@ let timeFunction _ =
     Assert.Ignore "Ignoring timing tests. Set INCLUDE_TIMING_TESTS"
 #endif
 
-[<ReflectedDefinition; TestIterations 1000; TimeAllowance 16.0>]
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 4.2>]
 let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let ToggleNth n (lst:bool array) =                  // Toggle every n'th door
         [(n-1) .. n .. 99]                              // For each appropriate door

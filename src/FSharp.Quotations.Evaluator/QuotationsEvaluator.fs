@@ -1006,29 +1006,31 @@ module QuotationEvaluationTypes =
     [<Sealed>]
     type ``Custom Operators``<'a> private () =
         static let one =
-            if   IsType<'a, sbyte>   then Expression.Constant 1y
-            elif IsType<'a, byte>    then Expression.Constant 1uy
-            elif IsType<'a, int16>   then Expression.Constant 1s
-            elif IsType<'a, uint16>  then Expression.Constant 1us
-            elif IsType<'a, int32>   then Expression.Constant 1
-            elif IsType<'a, uint32>  then Expression.Constant 1ul
-            elif IsType<'a, int64>   then Expression.Constant 1L
-            elif IsType<'a, uint64>  then Expression.Constant 1UL
-            elif IsType<'a, float32> then Expression.Constant 1.f
-            elif IsType<'a, float>   then Expression.Constant 1.
-            elif IsType<'a, bigint>  then Expression.Constant 1I
-            elif IsType<'a, decimal> then Expression.Constant 1M
+            if   IsType<'a, sbyte>   then failwith "Not supported"
+            elif IsType<'a, byte>    then failwith "Not supported"
+            elif IsType<'a, int16>   then box 1s
+            elif IsType<'a, uint16>  then box 1us
+            elif IsType<'a, int32>   then box 1
+            elif IsType<'a, uint32>  then box 1ul
+            elif IsType<'a, int64>   then box 1L
+            elif IsType<'a, uint64>  then box 1UL
+            elif IsType<'a, float32> then box 1.f
+            elif IsType<'a, float>   then box 1.
+            elif IsType<'a, bigint>  then box 1I
+            elif IsType<'a, decimal> then box 1M
             else failwith <| sprintf "Don't support type %A" typeof<'a>
 
         static let optionType = typeof<option<'a>>
         static let optionConstructor = optionType.GetConstructor [| typeof<'a> |]
 
-        static let subtractOne =
+        static let subtract =
             let n = Expression.Parameter (typeof<'a>, "n")
-            let subtractOne = Expression.Lambda<Func<'a,'a>>( Expression.Subtract(n, one), n)
+            let amount = Expression.Parameter (typeof<'a>, "amount")
+            let subtractOne = Expression.Lambda<Func<'a,'a,'a>>( Expression.Subtract(n, amount), n, amount)
             subtractOne.Compile()
 
         static let boundedIncrement =
+            let incr  = Expression.Parameter (typeof<'a>, "incr")
             let upper = Expression.Parameter (typeof<'a>, "upper")
             let n     = Expression.Parameter (typeof<'a>, "n")
 
@@ -1037,7 +1039,7 @@ module QuotationEvaluationTypes =
                 Expression.Lambda(
                     Expression.Block(
                         [next],
-                        [   Expression.Assign (next, Expression.Add(n, one)) :> Expression
+                        [   Expression.Assign (next, Expression.Add(n, incr)) :> Expression
                             Expression.Condition (
                                 Expression.LessThanOrEqual (next, upper),
                                 Expression.New (optionConstructor, next),
@@ -1045,13 +1047,19 @@ module QuotationEvaluationTypes =
                     n)
 
             let outerBounding =
-                Expression.Lambda<Func<'a, Func<'a, option<'a>>>> (innerIncrement, upper)
+                Expression.Lambda<Func<'a, 'a, Func<'a, option<'a>>>> (innerIncrement, incr, upper)
 
             outerBounding.Compile ()
 
         static member (..) lower upper =
-            let preStartState = subtractOne.Invoke lower
-            let moveNext = boundedIncrement.Invoke upper
+            let one = one :?> 'a
+            let preStartState = subtract.Invoke (lower, one)
+            let moveNext = boundedIncrement.Invoke (one, upper)
+            ``Custom Enumerables``.CurrentIsState preStartState moveNext
+
+        static member (.. ..) lower (incr:'a) upper =
+            let preStartState = subtract.Invoke (lower, incr)
+            let moveNext = boundedIncrement.Invoke (incr, upper)
             ``Custom Enumerables``.CurrentIsState preStartState moveNext
 
     let ``-> id`` = getGenericMethodInfo <@ id @>
@@ -1060,6 +1068,7 @@ module QuotationEvaluationTypes =
     let ``-> ..`` = getGenericMethodInfo <@ (..) @>
     let ``-> .. ..`` = getGenericMethodInfo <@ (.. ..) @>
     let ``-> Custom ..`` = getGenericMethodInfo <@ ``Custom Operators``.op_Range @>
+    let ``-> Custom .. ..`` = getGenericMethodInfo <@ ``Custom Operators``.op_RangeStep @>
 
     let (|TraverseExpr|_|) f = function
     | ExprShape.ShapeCombination (o, exprlist) -> Some (ExprShape.RebuildShapeCombination (o, List.map f exprlist))
@@ -1077,10 +1086,15 @@ module QuotationEvaluationTypes =
         | (Patterns.Value _) as value -> optimize <| constantReplacement var value body
         | optimizedBinding -> Expr.Let (var, optimizedBinding, optimize body)
     | Patterns.Application (Lambda(var, body), input) -> optimize <| Expr.Let (var, input, body)
-    | Λ ``-> ..`` (None, ``type``, args) ->
+    | Λ ``-> ..`` (None, [|``type``|], args) when ``type`` <> typeof<byte> && ``type`` <> typeof<sbyte> ->
         let customOperatorsType = typedefof<``Custom Operators``<_>>
         let specificType = customOperatorsType.MakeGenericType ``type``
-        let ``method`` = specificType.GetMethod ("op_Range", BindingFlags.NonPublic ||| BindingFlags.Static)
+        let ``method`` = specificType.GetMethod (``-> Custom ..``.Name, BindingFlags.NonPublic ||| BindingFlags.Static)
+        optimize <| Expr.Call (``method``, args)
+    | Λ ``-> .. ..`` (None, [|ty1;ty2|], args) when ty1 = ty2 && (ty1 <> typeof<byte> && ty1 <> typeof<sbyte>) ->
+        let customOperatorsType = typedefof<``Custom Operators``<_>>
+        let specificType = customOperatorsType.MakeGenericType ty1
+        let ``method`` = specificType.GetMethod (``-> Custom .. ..``.Name, BindingFlags.NonPublic ||| BindingFlags.Static)
         optimize <| Expr.Call (``method``, args)
     | Λ ``-> |>`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x2, x1)
     | Λ ``-> <|`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x1, x2)
