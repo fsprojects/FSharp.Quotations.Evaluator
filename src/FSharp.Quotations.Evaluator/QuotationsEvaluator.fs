@@ -324,33 +324,12 @@ module QuotationEvaluationTypes =
 
     let showAll = BindingFlags.Public ||| BindingFlags.NonPublic 
 
-    let WrapVoid b objOpt args (env: ConvEnv) (e:Expression) = 
-        if b then 
-            let frees (e:Expr) = e.GetFreeVars()
-            let addFrees e acc = List.foldBack Set.add (frees e |> Seq.toList) acc
-            let fvs = Option.foldBack addFrees objOpt (List.foldBack addFrees args Set.empty) |> Set.toArray
-            let fvsP = fvs |> Array.map (fun v -> (Map.find v env.varEnv :?> ParameterExpression))
-            let fvtys = fvs |> Array.map (fun v -> v.Type) 
-
-            let dty = GetActionType fvtys 
-            let e = Expression.Lambda(dty,e,fvsP)
-            let d = e.Compile()
-
-            let argtys = Array.append fvtys [| dty |]
-            let delP = Expression.Parameter(dty, "del")
-
-            let m = new System.Reflection.Emit.DynamicMethod("wrapper",typeof<unit>,argtys)
-            let ilg = m.GetILGenerator()
-            
-            ilg.Emit(OpCodes.Ldarg ,fvs.Length)
-            fvs |> Array.iteri (fun i _ -> ilg.Emit(OpCodes.Ldarg ,int16 i))
-            ilg.EmitCall(OpCodes.Callvirt,dty.GetMethod("Invoke",instanceBindingFlags),null)
-            ilg.Emit(OpCodes.Ldnull)
-            ilg.Emit(OpCodes.Ret)
-            let args = Array.append (fvsP |> Array.map asExpr) [| (Expression.Constant(d) |> asExpr) |]
-            Expression.Call((null:Expression),(m:>MethodInfo),args) |> asExpr
-        else
-            e
+    let wrapVoid (e:#Expression) =
+        if e.Type <> typeof<System.Void> then e |> asExpr
+        else 
+            Expression.Block(
+                e,
+                Expression.Constant(null, typeof<Unit>)) |> asExpr
 
     let (|Λ|_|) (``method``:MethodInfo) = function
     | Patterns.Call (o, methodInfo, args) when methodInfo.Name = ``method``.Name ->
@@ -505,7 +484,7 @@ module QuotationEvaluationTypes =
             let args = (args @ [v])
             let argsP = ConvExprs env args 
             let minfo = propInfo.GetSetMethod(true)
-            Expression.Call(ConvObjArg env objOpt None, minfo,argsP) |> asExpr |> WrapVoid (IsVoidType minfo.ReturnType) objOpt args env 
+            Expression.Call(ConvObjArg env objOpt None, minfo,argsP) |> wrapVoid
 
         // Expr.(Call,Application)
         | Patterns.Call(objOpt,minfo,args) -> 
@@ -594,7 +573,7 @@ module QuotationEvaluationTypes =
               /// ElementInit
             | _ -> 
                 let argsP = ConvExprs env args 
-                Expression.Call(ConvObjArg env objOpt None, minfo, argsP) |> asExpr |> WrapVoid (IsVoidType minfo.ReturnType) objOpt args env 
+                Expression.Call(ConvObjArg env objOpt None, minfo, argsP) |> wrapVoid
 
         // f x1 x2 x3 x4 --> InvokeFast4
         | Patterns.Application(Patterns.Application(Patterns.Application(Patterns.Application(f,arg1),arg2),arg3),arg4) -> 
@@ -840,10 +819,7 @@ module QuotationEvaluationTypes =
                             Expression.Break breakLabel)),
                     breakLabel)
             
-            let linqAsUnitType =
-                Expression.Block(linqLoop, ConvExpr env <@ () @>)
-
-            linqAsUnitType |> asExpr
+            linqLoop |> wrapVoid
 
         | Patterns.ForIntegerRangeLoop(indexer, lowerValue, upperValue, iteration) ->
             let linqLowerValue = ConvExpr env lowerValue
