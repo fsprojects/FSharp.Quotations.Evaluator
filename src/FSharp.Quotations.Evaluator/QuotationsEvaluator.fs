@@ -980,71 +980,58 @@ module QuotationEvaluationTypes =
     let inline IsType<'a,'b> = typeof<'a> = typeof<'b>
 
     [<Sealed>]
-    type ``Custom Operators``<'a> private () =
-        static let one =
-            if   IsType<'a, sbyte>   then failwith "Not supported"
-            elif IsType<'a, byte>    then failwith "Not supported"
-            elif IsType<'a, int16>   then box 1s
-            elif IsType<'a, uint16>  then box 1us
-            elif IsType<'a, int32>   then box 1
-            elif IsType<'a, uint32>  then box 1ul
-            elif IsType<'a, int64>   then box 1L
-            elif IsType<'a, uint64>  then box 1UL
-            elif IsType<'a, float32> then box 1.f
-            elif IsType<'a, float>   then box 1.
-            elif IsType<'a, bigint>  then box 1I
-            elif IsType<'a, decimal> then box 1M
-            else failwith <| sprintf "Don't support type %A" typeof<'a>
+    type OpRange() =
+        static let methods =
+            typeof<OpRange>.GetMethods (BindingFlags.Static ||| BindingFlags.NonPublic)
+            |> Array.filter (fun ``method`` -> ``method``.Name = "op_Range")
+            |> Array.map (fun ``method`` -> ``method``.ReturnType.GetGenericArguments().[0], ``method``)
+            |> dict
 
-        static let optionType = typeof<option<'a>>
-        static let optionConstructor = optionType.GetConstructor [| typeof<'a> |]
+        static member TypeProvided ``type`` = methods.ContainsKey ``type``
+        static member GetMethod ``type`` = methods.[``type``]
 
-        static let subtract =
-            let n = Expression.Parameter (typeof<'a>, "n")
-            let amount = Expression.Parameter (typeof<'a>, "amount")
-            let subtractOne = Expression.Lambda<Func<'a,'a,'a>>( Expression.Subtract(n, amount), n, amount)
-            subtractOne.Compile()
+        static member private (..) (lower, upper) : seq<byte>    = { lower .. upper}
+        static member private (..) (lower, upper) : seq<sbyte>   = { lower .. upper}
+        static member private (..) (lower, upper) : seq<int16>   = { lower .. upper}
+        static member private (..) (lower, upper) : seq<uint16>  = { lower .. upper}
+        static member private (..) (lower, upper) : seq<int32>   = { lower .. upper}
+        static member private (..) (lower, upper) : seq<uint32>  = { lower .. upper}
+        static member private (..) (lower, upper) : seq<int64>   = { lower .. upper}
+        static member private (..) (lower, upper) : seq<uint64>  = { lower .. upper}
+        static member private (..) (lower, upper) : seq<float32> = { lower .. upper}
+        static member private (..) (lower, upper) : seq<float>   = { lower .. upper}
+        static member private (..) (lower, upper) : seq<bigint>  = { lower .. upper}
+        static member private (..) (lower, upper) : seq<decimal> = { lower .. upper}
 
-        static let boundedIncrement =
-            let incr  = Expression.Parameter (typeof<'a>, "incr")
-            let upper = Expression.Parameter (typeof<'a>, "upper")
-            let n     = Expression.Parameter (typeof<'a>, "n")
+    [<Sealed>]
+    type OpRangeStep() =
+        static let methods =
+            typeof<OpRangeStep>.GetMethods (BindingFlags.Static ||| BindingFlags.NonPublic)
+            |> Array.filter (fun ``method`` -> ``method``.Name = "op_RangeStep")
+            |> Array.map (fun ``method`` -> ``method``.ReturnType.GetGenericArguments().[0], ``method``)
+            |> dict
 
-            let next = Expression.Variable (typeof<'a>)
-            let innerIncrement =
-                Expression.Lambda(
-                    Expression.Block(
-                        [next],
-                        [   Expression.Assign (next, Expression.Add(n, incr)) :> Expression
-                            Expression.Condition (
-                                Expression.LessThanOrEqual (next, upper),
-                                Expression.New (optionConstructor, next),
-                                Expression.Property (null, optionType, "None")) :> Expression ]),
-                    n)
+        static member TypeProvided ``type`` = methods.ContainsKey ``type``
+        static member GetMethod ``type`` = methods.[``type``]
 
-            let outerBounding =
-                Expression.Lambda<Func<'a, 'a, Func<'a, option<'a>>>> (innerIncrement, incr, upper)
-
-            outerBounding.Compile ()
-
-        static member (..) lower upper =
-            let one = one :?> 'a
-            let preStartState = subtract.Invoke (lower, one)
-            let moveNext = boundedIncrement.Invoke (one, upper)
-            ``Custom Enumerables``.CurrentIsState preStartState moveNext
-
-        static member (.. ..) lower (incr:'a) upper =
-            let preStartState = subtract.Invoke (lower, incr)
-            let moveNext = boundedIncrement.Invoke (incr, upper)
-            ``Custom Enumerables``.CurrentIsState preStartState moveNext
+        static member private (.. ..) (lower, incr, upper) : seq<byte>    = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<sbyte>   = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<int16>   = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<uint16>  = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<int32>   = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<uint32>  = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<int64>   = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<uint64>  = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<float32> = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<float>   = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<bigint>  = { lower .. incr .. upper}
+        static member private (.. ..) (lower, incr, upper) : seq<decimal> = { lower .. incr .. upper}
 
     let ``-> id`` = getGenericMethodInfo <@ id @>
     let ``-> |>`` = getGenericMethodInfo <@ (|>) @>
     let ``-> <|`` = getGenericMethodInfo <@ (<|) @>
     let ``-> ..`` = getGenericMethodInfo <@ (..) @>
     let ``-> .. ..`` = getGenericMethodInfo <@ (.. ..) @>
-    let ``-> Custom ..`` = getGenericMethodInfo <@ ``Custom Operators``.op_Range @>
-    let ``-> Custom .. ..`` = getGenericMethodInfo <@ ``Custom Operators``.op_RangeStep @>
 
     let (|TraverseExpr|_|) f = function
     | ExprShape.ShapeCombination (o, exprlist) -> Some (ExprShape.RebuildShapeCombination (o, List.map f exprlist))
@@ -1061,19 +1048,11 @@ module QuotationEvaluationTypes =
         match optimize binding with
         | (Patterns.Value _) as value -> optimize <| constantReplacement var value body
         | optimizedBinding -> Expr.Let (var, optimizedBinding, optimize body)
-    | Patterns.Application (Lambda(var, body), input) -> optimize <| Expr.Let (var, input, body)
-    | Λ ``-> ..`` (None, [|``type``|], args) when ``type`` <> typeof<byte> && ``type`` <> typeof<sbyte> ->
-        let customOperatorsType = typedefof<``Custom Operators``<_>>
-        let specificType = customOperatorsType.MakeGenericType ``type``
-        let ``method`` = specificType.GetMethod (``-> Custom ..``.Name, BindingFlags.NonPublic ||| BindingFlags.Static)
-        optimize <| Expr.Call (``method``, args)
-    | Λ ``-> .. ..`` (None, [|ty1;ty2|], args) when ty1 = ty2 && (ty1 <> typeof<byte> && ty1 <> typeof<sbyte>) ->
-        let customOperatorsType = typedefof<``Custom Operators``<_>>
-        let specificType = customOperatorsType.MakeGenericType ty1
-        let ``method`` = specificType.GetMethod (``-> Custom .. ..``.Name, BindingFlags.NonPublic ||| BindingFlags.Static)
-        optimize <| Expr.Call (``method``, args)
+    | Λ ``-> ..``    (None, [|``type``|], args) when              OpRange.TypeProvided ``type`` -> optimize <| Expr.Call (OpRange.GetMethod ``type``, args)
+    | Λ ``-> .. ..`` (None, [|ty1;ty2|],  args) when ty1 = ty2 && OpRangeStep.TypeProvided ty1  -> optimize <| Expr.Call (OpRangeStep.GetMethod ty1,  args)
     | Λ ``-> |>`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x2, x1)
     | Λ ``-> <|`` (None, _, [x1;x2]) -> optimize <| Expr.Application (x1, x2)
+    | Patterns.Application (Lambda(var, body), input) -> optimize <| Expr.Let (var, input, body)
     | Λ ``-> +`` (None, [|t1;_;_|], [x1;x2]) when t1 = typeof<string> ->
         let rec getStrings strings = function
         | Λ ``-> +`` (None, [|t1;_;_|], [x1;x2]) when t1 = typeof<string> -> getStrings (x2::strings) (x1)

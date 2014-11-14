@@ -109,7 +109,7 @@ let timeFunction _ =
     Assert.Ignore "Ignoring timing tests. Set INCLUDE_TIMING_TESTS"
 #endif
 
-[<ReflectedDefinition; TestIterations 1000; TimeAllowance 4.2>]
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.25>]
 let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let ToggleNth n (lst:bool array) =                  // Toggle every n'th door
         [(n-1) .. n .. 99]                              // For each appropriate door
@@ -127,7 +127,7 @@ let ``Time [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.6>]
+[<ReflectedDefinition; TimeAllowance 1.25>]
 let ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     let PerfectSquare n =
         let sqrt = int(Math.Sqrt(float n))
@@ -143,7 +143,7 @@ let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.7>]
+[<ReflectedDefinition; TimeAllowance 1.5>]
 let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     let euler f (h : float) t0 y0 =
         (t0, y0)
@@ -434,7 +434,7 @@ let ``Time id function`` () =
     timeFunction <@ ``id function`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.1>]
+[<ReflectedDefinition; TimeAllowance 1.2>]
 let ``operator |>`` () =
     let rand = Random 3141592
     let mutable total = 0
@@ -451,7 +451,7 @@ let ``Time operator |>`` () =
     timeFunction <@ ``operator |>`` @>
 
 
-[<ReflectedDefinition; TimeAllowance 1.1>]
+[<ReflectedDefinition; TimeAllowance 1.2>]
 let ``operator <|`` () =
     let rand = Random 3141592
     let mutable total = 0
@@ -466,6 +466,21 @@ let ``Test operator <|`` () =
 [<Test>]
 let ``Time operator <|`` () =
     timeFunction <@ ``operator <|`` @>
+
+[<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.1>]
+let ``operator .. ..`` () =
+    let mutable n = 0.0
+    for i in { 1 .. 3 .. 100000 } do
+        n <- float i
+    n
+
+[<Test>]
+let ``Test operator .. ..`` () =
+    testFunction <@ ``operator .. ..`` @>
+
+[<Test>]
+let ``Time operator .. ..`` () =
+    timeFunction <@ ``operator .. ..`` @>
 
 (*
 [<ReflectedDefinition>]
