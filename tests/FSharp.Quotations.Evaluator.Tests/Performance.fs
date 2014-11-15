@@ -482,6 +482,88 @@ let ``Test operator .. ..`` () =
 let ``Time operator .. ..`` () =
     timeFunction <@ ``operator .. ..`` @>
 
+
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 1.5>]
+let ``recursion is even or odd`` () =
+    let rec isEven n =
+        if n = 0 then true
+        else isOdd (n-1)
+    and isOdd n =
+        if n = 0 then false
+        else isEven (n-1)
+    
+    let r = Random 3141592
+    Seq.init 100 (fun _ -> if isEven (r.Next 10000) then 1 else -1)
+    |> Seq.sum
+
+[<Test>]
+let ``Test recursion is even or odd`` () =
+    testFunction <@ ``recursion is even or odd`` @>
+
+[<Test>]
+let ``Time recursion is even or odd`` () =
+    timeFunction <@ ``recursion is even or odd`` @>
+
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 15.0>]
+let ``recursion fibonacci`` () =
+    let rec fib n =
+        if n <= 2 then 1
+        else fib (n-1) + fib (n-2)
+    
+    let r = Random 3141592
+    Seq.init 10 (fun _ -> float <| fib (r.Next 30))
+    |> Seq.sum
+
+[<Test>]
+let ``Test recursion fibonacci`` () =
+    testFunction <@ ``recursion fibonacci`` @>
+
+[<Test>]
+let ``Time recursion fibonacci`` () =
+    timeFunction <@ ``recursion fibonacci`` @>
+
+type Partner = {
+    Name : string
+    Partner : Partner
+}
+
+[<ReflectedDefinition; TimeAllowance 15.0>]
+let ``recursion type creation`` () =
+    let rec penny  = { 
+        Name = "Penny"
+        Partner = paul }
+    and paul = {
+        Name = "Paul"
+        Partner = penny }
+
+    penny.Name + "&" + paul.Name = paul.Partner.Name + "&" + penny.Partner.Name
+
+[<Test; Ignore("Not currently supported")>]
+let ``Test recursion type creation`` () =
+    testFunction <@ ``recursion type creation`` @>
+
+[<Test; Ignore("Not currently supported")>]
+let ``Time recursion type creation`` () =
+    timeFunction <@ ``recursion type creation`` @>
+
+
+[<ReflectedDefinition; TimeAllowance 15.0>]
+let ``recursion tail`` () =
+    let rec count acc n = 
+        if n = 0 then acc
+        else count (acc+1) (n-1)
+
+    count 0 100000
+
+[<Test; Ignore("Not currently supported - blows up")>]
+let ``Test recursion tail`` () =
+    testFunction <@ ``recursion tail`` @>
+
+[<Test; Ignore("Not currently supported - blows up")>]
+let ``Time recursion tail`` () =
+    timeFunction <@ ``recursion tail`` @>
+
+
 (*
 [<ReflectedDefinition>]
 let ``[]()`` () =
