@@ -45,7 +45,8 @@ module QuotationEvaluationTypes =
         varEnv        : Map<Var,Expression>
         letrec        : option<Var>
     }
-    let asExpr x = (x :> Expression)
+    let asExpr x = (x :> Expression), None
+    let asExpression x = (x :> Expression)
 
     let bindingFlags = BindingFlags.Public ||| BindingFlags.NonPublic
     let instanceBindingFlags = BindingFlags.Instance ||| BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.DeclaredOnly
@@ -428,13 +429,17 @@ module QuotationEvaluationTypes =
     /// A more polished LINQ-Quotation translator will be published
     /// concert with later versions of LINQ.
     let rec ConvExpr (env:ConvEnv) (inp:Expr) = 
+        match LetRecConvExpr env inp with
+        | expr, None -> expr
+        | _, Some _ -> failwith "Invalid logic"
+    and LetRecConvExpr (env:ConvEnv) (inp:Expr) = 
        //printf "ConvExpr : %A\n" e;
         match inp with 
 
         // Generic cases 
         | Patterns.Var(v) -> 
                 try
-                    Map.find v env.varEnv
+                    Map.find v env.varEnv |> asExpr
                 with
                 |   :? KeyNotFoundException when v.Name = "this" ->
                         let message = 
@@ -470,7 +475,7 @@ module QuotationEvaluationTypes =
                  | propInfo,None -> 
                      Expression.Property(argP, propInfo)  |> asExpr
                  | propInfo,Some(nestedTy,n2) -> 
-                     build nestedTy (Expression.Property(argP,propInfo) |> asExpr) n2
+                     build nestedTy (Expression.Property(argP,propInfo) |> asExpression) n2
              build arg.Type argP n
               
         | Patterns.PropertyGet(objOpt,propInfo,args) -> 
@@ -572,7 +577,7 @@ module QuotationEvaluationTypes =
             
             // Throw away markers inserted to satisfy C#'s design where they pass an argument
             // or type T to an argument expecting Expr<T>.
-            | Λ ``-> linqExpressionHelper`` (_, [|_|],[x1]) -> ConvExpr env x1
+            | Λ ``-> linqExpressionHelper`` (_, [|_|],[x1]) -> LetRecConvExpr env x1
              
               /// ArrayLength
               /// ListBind
@@ -644,9 +649,9 @@ module QuotationEvaluationTypes =
             let tagE = 
                 match methInfo with 
                 | :? PropertyInfo as p -> 
-                    Expression.Property(obj,p) |> asExpr
+                    Expression.Property(obj,p) |> asExpression
                 | :? MethodInfo as m -> 
-                    Expression.Call((null:Expression),m,[| obj |]) |> asExpr
+                    Expression.Call((null:Expression),m,[| obj |]) |> asExpression
                 | _ -> failwith "unreachable case"
             Expression.Equal(tagE, Expression.Constant(unionCaseInfo.Tag)) |> asExpr
 
@@ -655,7 +660,7 @@ module QuotationEvaluationTypes =
 
         | Patterns.NewDelegate(dty,vs,b) -> 
             let vsP = List.map ConvVar vs 
-            let env = {env with varEnv = List.foldBack2 (fun (v:Var) vP -> Map.add v (vP |> asExpr)) vs vsP env.varEnv }
+            let env = {env with varEnv = List.foldBack2 (fun (v:Var) vP -> Map.add v (vP |> asExpression)) vs vsP env.varEnv }
             let bodyP = ConvExpr env b
             Expression.Lambda(dty, bodyP, vsP) |> asExpr 
 
@@ -664,11 +669,11 @@ module QuotationEvaluationTypes =
              let argsP = ConvExprs env args 
              let rec build ty (argsP: Expression[]) = 
                  match Reflection.FSharpValue.PreComputeTupleConstructorInfo(ty) with 
-                 | ctorInfo,None -> Expression.New(ctorInfo,argsP) |> asExpr 
+                 | ctorInfo,None -> Expression.New(ctorInfo,argsP) |> asExpression 
                  | ctorInfo,Some(nestedTy) -> 
                      let n = ctorInfo.GetParameters().Length - 1
-                     Expression.New(ctorInfo, Array.append argsP.[0..n-1] [| build nestedTy argsP.[n..] |]) |> asExpr
-             build tupTy argsP
+                     Expression.New(ctorInfo, Array.append argsP.[0..n-1] [| build nestedTy argsP.[n..] |]) |> asExpression
+             build tupTy argsP |> asExpr
 
         | Patterns.IfThenElse(g,t,e) -> 
             match e with
@@ -688,9 +693,9 @@ module QuotationEvaluationTypes =
 
             let vP = Expression.Variable (v.Type, v.Name)
             let eP = ConvExpr env e
-            let assign = Expression.Assign (vP, eP) |> asExpr
+            let assign = Expression.Assign (vP, eP) |> asExpression
 
-            let env = { env with varEnv = env.varEnv |> Map.add v (vP |> asExpr) } 
+            let env = { env with varEnv = env.varEnv |> Map.add v (vP |> asExpression) } 
             let bodyP = ConvExpr env b 
 
             Expression.Block ([vP], [assign; bodyP]) |> asExpr
@@ -741,10 +746,10 @@ module QuotationEvaluationTypes =
                 let stateEnvironment =
                     match capturedVars with
                     | [] -> []
-                    | v1 :: [] -> [v1, stateParameter |> asExpr]
+                    | v1 :: [] -> [v1, stateParameter |> asExpression]
                     | _ ->
                         capturedVars
-                        |> List.mapi (fun idx var -> var, Expression.Property (stateParameter, "Item" + (idx+1).ToString()) |> asExpr)
+                        |> List.mapi (fun idx var -> var, Expression.Property (stateParameter, "Item" + (idx+1).ToString()) |> asExpression)
 
                 let varParameters =
                     vars
@@ -755,7 +760,7 @@ module QuotationEvaluationTypes =
                          varEnv =
                             let environmentVariables =
                                 varParameters
-                                |> List.map (fun (v,p) -> v, p |> asExpr)
+                                |> List.map (fun (v,p) -> v, p |> asExpression)
                                 |> List.append stateEnvironment
 
                             (env.varEnv, environmentVariables)
@@ -799,7 +804,7 @@ module QuotationEvaluationTypes =
 
                     let getVar var =
                         if Some var = env.letrec
-                            then construction |> asExpr
+                            then construction |> asExpression
                             else Map.find var env.varEnv
 
                     let state =
@@ -818,7 +823,7 @@ module QuotationEvaluationTypes =
 
                                 stateType.GetConstructor types
 
-                            Expression.New(stateConstructor, state) |> asExpr
+                            Expression.New(stateConstructor, state) |> asExpression
 
                     Expression.Block (
                         [ construction ],
@@ -827,21 +832,21 @@ module QuotationEvaluationTypes =
                                 construction,
                                 Expression.New (
                                     ``constructor``,
-                                    [Expression.Constant(``function``) |> asExpr])) |> asExpr;
+                                    [Expression.Constant(``function``) |> asExpression])) |> asExpression;
                             Expression.Assign(
                                 Expression.PropertyOrField(construction, "State"),
-                                state) |> asExpr;
-                            construction |> asExpr
+                                state) |> asExpression;
+                            construction |> asExpression
                         ]) |> asExpr
             else
                 let v, body = firstVar, firstBody
 
                 let vP = ConvVar v
-                let env = { env with varEnv = Map.add v (vP |> asExpr) env.varEnv }
+                let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
                 let tyargs = [| v.Type; body.Type |]
                 let bodyP = ConvExpr env body
                 let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
-                let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpr
+                let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpression
                 Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
     
         | Patterns.WhileLoop(condition, iteration) -> 
@@ -867,7 +872,7 @@ module QuotationEvaluationTypes =
             let linqAssignLower = Expression.Assign (linqIndexer, linqLowerValue)
             let linqCondition = Expression.LessThanOrEqual (linqIndexer, linqUpperValue)
             
-            let envInner = { env with varEnv = Map.add indexer (linqIndexer |> asExpr) env.varEnv }
+            let envInner = { env with varEnv = Map.add indexer (linqIndexer |> asExpression) env.varEnv }
 
             let linqIteration = 
                 Expression.Block (
@@ -887,7 +892,7 @@ module QuotationEvaluationTypes =
             let linqStatements =
                 Expression.Block (
                     [linqIndexer],
-                    [linqAssignLower |> asExpr; linqLoop |> asExpr]
+                    [linqAssignLower |> asExpression; linqLoop |> asExpression]
                 )
 
             linqStatements |> asExpr
@@ -916,7 +921,7 @@ module QuotationEvaluationTypes =
                         (env.varEnv, vPs)
                         ||> List.fold (fun varEnv (v,vP,_) ->
                             varEnv
-                            |> Map.add v (vP |> asExpr)) }
+                            |> Map.add v (vP |> asExpression)) }
 
             let vePs =
                 vPs
@@ -927,7 +932,7 @@ module QuotationEvaluationTypes =
             let assigns =
                 vePs
                 |> List.map (fun (vP, eP) ->
-                    Expression.Assign (vP, eP) |> asExpr)
+                    Expression.Assign (vP, eP) |> asExpression)
 
             let bodyP = ConvExpr env body
 
@@ -1134,12 +1139,12 @@ module QuotationEvaluationTypes =
     | TraverseExpr optimize result -> result
     | _ -> failwith "Invalid logic"
 
-    let Conv (e: #Expr,eraseEquality) =
+    let Conv (e:#Expr, eraseEquality) =
         let e = optimize e
 
-        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty; letrec = None } (e :> Expr)
+        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty; letrec = None } e
 
-        Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpr
+        Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpression
 
     let CompileImpl (e: #Expr, eraseEquality) = 
 //       let ty = e.Type
