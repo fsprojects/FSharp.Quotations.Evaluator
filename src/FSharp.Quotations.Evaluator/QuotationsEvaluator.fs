@@ -40,10 +40,11 @@ module QuotationEvaluationTypes =
     let genericLessOrEqualIntrinsic = "GenericLessOrEqualIntrinsic" |> hashCompareType.GetMethod
 
 
-    type ConvEnv = 
-        {   eraseEquality : bool;
-            varEnv : Map<Var,Expression>
-        }
+    type ConvEnv = {
+        eraseEquality : bool
+        varEnv        : Map<Var,Expression>
+        letrec        : option<Var>
+    }
     let asExpr x = (x :> Expression)
 
     let bindingFlags = BindingFlags.Public ||| BindingFlags.NonPublic
@@ -286,33 +287,39 @@ module QuotationEvaluationTypes =
         f8hole := f8
         B.Invoke(f1,f2,f3,f4,f5,f6,f7,f8)
 
-    type FuncFSharp<'state,'a> (f:Func<'state,'a>, state:'state) =
+    type FuncFSharp<'state,'a> (f:Func<'state,'a>) =
         inherit FSharpFunc<unit, 'a>()
-        override __.Invoke _ = f.Invoke state
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke _ = f.Invoke this.State
 
-    type FuncFSharp<'state,'a,'b> (f:Func<'state,'a,'b>, state:'state) =
+    type FuncFSharp<'state,'a,'b> (f:Func<'state,'a,'b>) =
         inherit FSharpFunc<'a,'b>()
-        override __.Invoke a = f.Invoke (state,a)
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke a = f.Invoke (this.State,a)
 
-    type FuncFSharp<'state,'a,'b,'c> (f:Func<'state,'a,'b,'c>, state:'state) =
+    type FuncFSharp<'state,'a,'b,'c> (f:Func<'state,'a,'b,'c>) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c>()
-        override __.Invoke (a,b) = f.Invoke (state,a,b)
-        override this.Invoke a = fun b -> this.Invoke (a,b)
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b) = f.Invoke (this.State,a,b)
+        override this.Invoke a = fun b -> f.Invoke (this.State,a,b)
 
-    type FuncFSharp<'state,'a,'b,'c,'d> (f:Func<'state,'a,'b,'c,'d>, state:'state) =
+    type FuncFSharp<'state,'a,'b,'c,'d> (f:Func<'state,'a,'b,'c,'d>) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d>()
-        override __.Invoke (a,b,c) = f.Invoke (state,a,b,c)
-        override this.Invoke a = fun b c -> this.Invoke (a,b,c)
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c) = f.Invoke (this.State,a,b,c)
+        override this.Invoke a = fun b c -> f.Invoke (this.State,a,b,c)
 
-    type FuncFSharp<'state,'a,'b,'c,'d,'e> (f:Func<'state,'a,'b,'c,'d,'e>, state:'state) =
+    type FuncFSharp<'state,'a,'b,'c,'d,'e> (f:Func<'state,'a,'b,'c,'d,'e>) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e>()
-        override __.Invoke (a,b,c,d) = f.Invoke (state,a,b,c,d)
-        override this.Invoke a = fun b c d -> this.Invoke (a,b,c,d)
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d) = f.Invoke (this.State,a,b,c,d)
+        override this.Invoke a = fun b c d -> f.Invoke (this.State,a,b,c,d)
 
-    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f> (f:Func<'state,'a,'b,'c,'d,'e,'f>, state:'state) =
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f> (f:Func<'state,'a,'b,'c,'d,'e,'f>) =
         inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f>()
-        override __.Invoke (a,b,c,d,e) = f.Invoke (state,a,b,c,d,e)
-        override this.Invoke a = fun b c d e -> this.Invoke (a,b,c,d,e)
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = f.Invoke (this.State,a,b,c,d,e)
+        override this.Invoke a = fun b c d e -> f.Invoke (this.State,a,b,c,d,e)
 
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
@@ -674,12 +681,17 @@ module QuotationEvaluationTypes =
             Expression.Block(e1P, e2P) |> asExpr
 
         | Patterns.Let (v,e,b) -> 
+            let env =
+                match env.letrec with
+                | None -> env
+                | _ -> { env with letrec = None }
+
             let vP = Expression.Variable (v.Type, v.Name)
             let eP = ConvExpr env e
             let assign = Expression.Assign (vP, eP) |> asExpr
 
-            let envInner = { env with varEnv = Map.add v (vP |> asExpr) env.varEnv } 
-            let bodyP = ConvExpr envInner b 
+            let env = { env with varEnv = env.varEnv |> Map.add v (vP |> asExpr) } 
+            let bodyP = ConvExpr env b 
 
             Expression.Block ([vP], [assign; bodyP]) |> asExpr
 
@@ -688,7 +700,7 @@ module QuotationEvaluationTypes =
             let linqValue = ConvExpr env value
             Expression.Assign (linqVariable, linqValue)|> asExpr
 
-        | Patterns.Lambda(firstVar, firstBody) as lambda ->
+        | Patterns.Lambda (firstVar, firstBody) as lambda ->
             let rec getVars vars maybeBody = function
             | Lambda (v, body) -> getVars (v::vars) (Some body) body
             | _ -> List.rev vars, maybeBody.Value
@@ -700,8 +712,13 @@ module QuotationEvaluationTypes =
 
                 body.GetFreeVars ()
                 |> Seq.filter (fun freeVar -> not <| Set.contains freeVar parameterVars)
-                |> Seq.sortBy (fun freeVar -> freeVar.Name)
+                |> Seq.sortBy (fun freeVar -> (if env.letrec = Some freeVar then 0 else 1), freeVar.Name)
                 |> Seq.toList
+
+            let isLetRec =
+                match capturedVars with
+                | first :: _ when Some first = env.letrec -> true
+                | _ -> false
 
             let varsCount = vars.Length
             if varsCount <= 5 && capturedVars.Length <= 8 then
@@ -719,7 +736,7 @@ module QuotationEvaluationTypes =
                     | _ -> failwith "Not currently supported"
 
                 let stateParameter =
-                    Expression.Parameter (stateType, "state")
+                    Expression.Parameter (stateType, "capturedState")
 
                 let stateEnvironment =
                     match capturedVars with
@@ -771,29 +788,51 @@ module QuotationEvaluationTypes =
                   
                 let ``type`` = funcFSharp.MakeGenericType parameterTypes
 
-                let ``constructor`` = ``type``.GetConstructor [| ``function``.GetType (); stateType |]
+                let ``constructor`` = ``type``.GetConstructor [| ``function``.GetType () |]
 
                 match capturedVars with
                 | [] ->
-                    let obj = ``constructor``.Invoke [| ``function``; null |]
+                    let obj = ``constructor``.Invoke [| ``function`` |]
                     Expression.Constant (obj) |> asExpr
-                | v1 :: [] ->
-                    let state = Map.find v1 env.varEnv
-                    Expression.New (``constructor``, [Expression.Constant(``function``) |> asExpr; state]) |> asExpr
                 | _ ->
+                    let construction = Expression.Variable (``type``, "construction")
+
+                    let getVar var =
+                        if Some var = env.letrec
+                            then construction |> asExpr
+                            else Map.find var env.varEnv
+
                     let state =
-                        capturedVars
-                        |> List.map (fun var -> Map.find var env.varEnv)
+                        match capturedVars with
+                        | v1 :: [] -> getVar v1
+                        | _ ->
+                            let state =
+                                capturedVars
+                                |> List.map getVar
 
-                    let stateConstructor =
-                        let types = 
-                            capturedVars
-                            |> List.map (fun var -> var.Type)
-                            |> List.toArray
+                            let stateConstructor =
+                                let types = 
+                                    capturedVars
+                                    |> List.map (fun var -> var.Type)
+                                    |> List.toArray
 
-                        stateType.GetConstructor types
+                                stateType.GetConstructor types
 
-                    Expression.New (``constructor``, [Expression.Constant(``function``) |> asExpr; Expression.New(stateConstructor, state) |> asExpr]) |> asExpr
+                            Expression.New(stateConstructor, state) |> asExpr
+
+                    Expression.Block (
+                        [ construction ],
+                        [
+                            Expression.Assign(
+                                construction,
+                                Expression.New (
+                                    ``constructor``,
+                                    [Expression.Constant(``function``) |> asExpr])) |> asExpr;
+                            Expression.Assign(
+                                Expression.PropertyOrField(construction, "State"),
+                                state) |> asExpr;
+                            construction |> asExpr
+                        ]) |> asExpr
             else
                 let v, body = firstVar, firstBody
 
@@ -865,8 +904,35 @@ module QuotationEvaluationTypes =
             let minfo = TryWithMethod.GetGenericMethodDefinition().MakeGenericMethod [| e.Type |]
             Expression.Call(minfo,[| eP; filterP; handlerP |]) |> asExpr
 
-        | Patterns.LetRecursive(binds,body) -> 
+        | Patterns.LetRecursive (binds, body) -> 
+            let vPs =
+                binds
+                |> List.map (fun (v, e) ->
+                    v, Expression.Variable (v.Type, v.Name), e)
 
+            let env = {
+                env with
+                    varEnv =
+                        (env.varEnv, vPs)
+                        ||> List.fold (fun varEnv (v,vP,_) ->
+                            varEnv
+                            |> Map.add v (vP |> asExpr)) }
+
+            let vePs =
+                vPs
+                |> List.map (fun (v, vP, e) ->
+                    let env = { env with letrec = Some v }
+                    vP, ConvExpr env e)
+                
+            let assigns =
+                vePs
+                |> List.map (fun (vP, eP) ->
+                    Expression.Assign (vP, eP) |> asExpr)
+
+            let bodyP = ConvExpr env body
+
+            Expression.Block (List.map fst vePs, [yield! assigns; yield bodyP]) |> asExpr
+(*
             let vfs = List.map fst binds
             
             let pass1 = 
@@ -934,7 +1000,7 @@ module QuotationEvaluationTypes =
 
             let minfo = minfo.GetGenericMethodDefinition().MakeGenericMethod methTys
             Expression.Call(minfo,Array.append FPs [| BP |]) |> asExpr
-
+*)
         | Patterns.AddressOf _ -> raise <| new NotSupportedException("Address-of expressions may not be converted to LINQ expressions")
         | Patterns.AddressSet _ -> raise <| new NotSupportedException("Address-set expressions may not be converted to LINQ expressions")
         | Patterns.FieldSet _ -> raise <| new NotSupportedException("Field-set expressions may not be converted to LINQ expressions")
@@ -1071,7 +1137,7 @@ module QuotationEvaluationTypes =
     let Conv (e: #Expr,eraseEquality) =
         let e = optimize e
 
-        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty } (e :> Expr)
+        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty; letrec = None } (e :> Expr)
 
         Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpr
 
