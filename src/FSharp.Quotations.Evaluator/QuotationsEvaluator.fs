@@ -45,7 +45,13 @@ module QuotationEvaluationTypes =
         varEnv        : Map<Var,Expression>
         letrec        : option<Var>
     }
-    let asExpr x = (x :> Expression), None
+
+    type ConvResult =
+    | AsExpression of Expression
+    | AsLetRecExpression of ParameterExpression * Expression * Expression
+
+
+    let asExpr x = AsExpression x
     let asExpression x = (x :> Expression)
 
     let bindingFlags = BindingFlags.Public ||| BindingFlags.NonPublic
@@ -117,7 +123,7 @@ module QuotationEvaluationTypes =
             | 21 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | _ -> raise <| new NotSupportedException("Quotation expressions with statements or closures containing more then 20 free variables may not be translated in this release of the F# PowerPack. This is due to limitations in the variable binding expression forms available in LINQ expression trees")
             
-
+(*
     let LetRec1Helper (F1:System.Func<_,_,_>) (B:System.Func<_,_>) = 
         let fhole = ref (Unchecked.defaultof<_>)
         let f = new System.Func<_,_>(fun x -> F1.Invoke(fhole.Value,x))
@@ -287,7 +293,7 @@ module QuotationEvaluationTypes =
         f7hole := f7
         f8hole := f8
         B.Invoke(f1,f2,f3,f4,f5,f6,f7,f8)
-
+*)
     type FuncFSharp<'state,'a> (f:Func<'state,'a>) =
         inherit FSharpFunc<unit, 'a>()
         [<Core.DefaultValue false>] val mutable State : 'state
@@ -430,8 +436,8 @@ module QuotationEvaluationTypes =
     /// concert with later versions of LINQ.
     let rec ConvExpr (env:ConvEnv) (inp:Expr) = 
         match LetRecConvExpr env inp with
-        | expr, None -> expr
-        | _, Some _ -> failwith "Invalid logic"
+        | AsExpression expr -> expr
+        | _ -> failwith "Invalid logic"
     and LetRecConvExpr (env:ConvEnv) (inp:Expr) = 
        //printf "ConvExpr : %A\n" e;
         match inp with 
@@ -717,13 +723,10 @@ module QuotationEvaluationTypes =
 
                 body.GetFreeVars ()
                 |> Seq.filter (fun freeVar -> not <| Set.contains freeVar parameterVars)
-                |> Seq.sortBy (fun freeVar -> (if env.letrec = Some freeVar then 0 else 1), freeVar.Name)
+                |> Seq.sortBy (fun freeVar -> freeVar.Name)
                 |> Seq.toList
 
-            let isLetRec =
-                match capturedVars with
-                | first :: _ when Some first = env.letrec -> true
-                | _ -> false
+            let letRecVar = env.letrec
 
             let varsCount = vars.Length
             if varsCount <= 5 && capturedVars.Length <= 8 then
@@ -757,6 +760,7 @@ module QuotationEvaluationTypes =
 
                 let lambdaEnv =
                     { env with
+                         letrec = None
                          varEnv =
                             let environmentVariables =
                                 varParameters
@@ -795,19 +799,32 @@ module QuotationEvaluationTypes =
 
                 let ``constructor`` = ``type``.GetConstructor [| ``function``.GetType () |]
 
+                let theFuncObject = Expression.Variable (``type``, "funcObject")
+
                 match capturedVars with
                 | [] ->
                     let obj = ``constructor``.Invoke [| ``function`` |]
-                    Expression.Constant (obj) |> asExpr
+                    let func = Expression.Constant (obj) 
+                    if letRecVar.IsSome then
+                        // TODO: Simplify this; I only really need to return theFuncObject
+                        AsLetRecExpression (
+                            theFuncObject,
+                            Expression.Assign(theFuncObject, func),
+                            Expression.Empty () :> Expression)
+                    else
+                        func|> asExpr
                 | _ ->
-                    let construction = Expression.Variable (``type``, "construction")
-
-                    let getVar var =
-                        if Some var = env.letrec
-                            then construction |> asExpression
-                            else Map.find var env.varEnv
+                    let newObject = 
+                        Expression.New (
+                            ``constructor``,
+                            [Expression.Constant(``function``) |> asExpression])
 
                     let state =
+                        let getVar var =
+                            if Some var = letRecVar
+                                then theFuncObject |> asExpression
+                                else Map.find var env.varEnv
+
                         match capturedVars with
                         | v1 :: [] -> getVar v1
                         | _ ->
@@ -825,19 +842,26 @@ module QuotationEvaluationTypes =
 
                             Expression.New(stateConstructor, state) |> asExpression
 
-                    Expression.Block (
-                        [ construction ],
-                        [
-                            Expression.Assign(
-                                construction,
-                                Expression.New (
-                                    ``constructor``,
-                                    [Expression.Constant(``function``) |> asExpression])) |> asExpression;
-                            Expression.Assign(
-                                Expression.PropertyOrField(construction, "State"),
-                                state) |> asExpression;
-                            construction |> asExpression
-                        ]) |> asExpr
+                    let assignToConstruction =
+                        Expression.Assign(
+                            theFuncObject,
+                            newObject) |> asExpression;
+
+                    let assignState = 
+                        Expression.Assign(
+                            Expression.PropertyOrField(theFuncObject, "State"),
+                            state) |> asExpression;
+
+                    if letRecVar.IsSome then
+                        AsLetRecExpression (theFuncObject, assignToConstruction, assignState)
+                    else
+                        Expression.Block (
+                            [ theFuncObject ],
+                            [
+                                assignToConstruction;
+                                assignState;
+                                theFuncObject |> asExpression
+                            ]) |> asExpr
             else
                 let v, body = firstVar, firstBody
 
@@ -927,16 +951,35 @@ module QuotationEvaluationTypes =
                 vPs
                 |> List.map (fun (v, vP, e) ->
                     let env = { env with letrec = Some v }
-                    vP, ConvExpr env e)
-                
-            let assigns =
+                    let funcObject, assignToConstruction, assignState = 
+                        match LetRecConvExpr env e with
+                        | AsLetRecExpression (funcObject, assignToFuncObject, assignState) -> funcObject, assignToFuncObject, assignState
+                        | _ -> failwith "Logic error"
+                    vP, funcObject, assignToConstruction, assignState)
+
+            let assignToLocalObject =
                 vePs
-                |> List.map (fun (vP, eP) ->
-                    Expression.Assign (vP, eP) |> asExpression)
+                |> List.map (fun (_,_,assignToFuncObject,_) -> assignToFuncObject)
+
+            let assignToFuncObject =
+                vePs
+                |> List.map (fun (vP, funcObject, assignToConstruction, assignState) ->
+                    Expression.Assign (vP, funcObject) |> asExpression)
+                
+            let assignState =
+                vePs
+                |> List.map (fun (vP, funcObject, assignToConstruction, assignState) -> assignState)
 
             let bodyP = ConvExpr env body
 
-            Expression.Block (List.map fst vePs, [yield! assigns; yield bodyP]) |> asExpr
+            Expression.Block (
+                vePs |> List.collect (fun (v,fo,_,_) -> [ v; fo ]),
+                [
+                    yield! assignToLocalObject;
+                    yield! assignToFuncObject;
+                    yield! assignState;
+                    yield bodyP
+                ]) |> asExpr
 (*
             let vfs = List.map fst binds
             
