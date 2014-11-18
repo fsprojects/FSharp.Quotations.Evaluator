@@ -19,14 +19,10 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Quotations.DerivedPatterns
 
-
-
 module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
-
 module QuotationEvaluationTypes = 
-    
     type This = 
         static member Assembly = typeof<This>.Assembly
 
@@ -39,7 +35,6 @@ module QuotationEvaluationTypes =
     let genericGreaterOrEqualIntrinsic = "GenericGreaterOrEqualIntrinsic" |> hashCompareType.GetMethod
     let genericLessOrEqualIntrinsic = "GenericLessOrEqualIntrinsic" |> hashCompareType.GetMethod
 
-
     type ConvEnv = {
         eraseEquality : bool
         varEnv        : Map<Var,Expression>
@@ -49,7 +44,6 @@ module QuotationEvaluationTypes =
     type ConvResult =
     | AsExpression of Expression
     | AsLetRecExpression of ParameterExpression * Expression * Expression
-
 
     let asExpr x = AsExpression x
     let asExpression x = (x :> Expression)
@@ -69,23 +63,16 @@ module QuotationEvaluationTypes =
         if not (isFunctionType typ) then invalidArg "typ" "cannot convert recursion except for function types"
         let tyargs = typ.GetGenericArguments()
         tyargs.[0], tyargs.[1]
-    
 
     let ArrayAssignHelper (arr : 'T[]) (idx:int) (elem:'T) : 'unt = 
         arr.[idx] <- elem;
         unbox (box ())
-
-
-    let TryFinallyHelper e h = 
-        try e() 
-        finally h()
 
     let TryWithHelper e filter handler = 
         try e() 
         with e when (filter e <> 0) -> handler e
 
     let ArrayAssignMethod = match <@@ ArrayAssignHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
-    let TryFinallyMethod = match <@@ TryFinallyHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
     let TryWithMethod = match <@@ TryWithHelper @@> with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
 
     module HelperTypes = 
@@ -123,177 +110,6 @@ module QuotationEvaluationTypes =
             | 21 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
             | _ -> raise <| new NotSupportedException("Quotation expressions with statements or closures containing more then 20 free variables may not be translated in this release of the F# PowerPack. This is due to limitations in the variable binding expression forms available in LINQ expression trees")
             
-(*
-    let LetRec1Helper (F1:System.Func<_,_,_>) (B:System.Func<_,_>) = 
-        let fhole = ref (Unchecked.defaultof<_>)
-        let f = new System.Func<_,_>(fun x -> F1.Invoke(fhole.Value,x))
-        fhole := f
-        B.Invoke f
-
-    let LetRec2Helper (F1:System.Func<_,_,_,_>) (F2:System.Func<_,_,_,_>) (B:System.Func<_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        B.Invoke(f1,f2)
-
-    let LetRec3Helper (F1:System.Func<_,_,_,_,_>) (F2:System.Func<_,_,_,_,_>) (F3:System.Func<_,_,_,_,_>) (B:System.Func<_,_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f3hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,x))
-        let f3 = new System.Func<_,_>(fun x -> F3.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        f3hole := f3
-        B.Invoke(f1,f2,f3)
-
-    let LetRec4Helper 
-           (F1:System.Func<_,_,_,_,_,_>) 
-           (F2:System.Func<_,_,_,_,_,_>) 
-           (F3:System.Func<_,_,_,_,_,_>) 
-           (F4:System.Func<_,_,_,_,_,_>) 
-           (B:System.Func<_,_,_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f3hole = ref (Unchecked.defaultof<_>)
-        let f4hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,x))
-        let f3 = new System.Func<_,_>(fun x -> F3.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,x))
-        let f4 = new System.Func<_,_>(fun x -> F4.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        f3hole := f3
-        f4hole := f4
-        B.Invoke(f1,f2,f3,f4)
-
-
-    let LetRec5Helper 
-           (F1:System.Func<_,_,_,_,_,_,_>) 
-           (F2:System.Func<_,_,_,_,_,_,_>) 
-           (F3:System.Func<_,_,_,_,_,_,_>) 
-           (F4:System.Func<_,_,_,_,_,_,_>) 
-           (F5:System.Func<_,_,_,_,_,_,_>) 
-           (B:System.Func<_,_,_,_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f3hole = ref (Unchecked.defaultof<_>)
-        let f4hole = ref (Unchecked.defaultof<_>)
-        let f5hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,x))
-        let f3 = new System.Func<_,_>(fun x -> F3.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,x))
-        let f4 = new System.Func<_,_>(fun x -> F4.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,x))
-        let f5 = new System.Func<_,_>(fun x -> F5.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        f3hole := f3
-        f4hole := f4
-        f5hole := f5
-        B.Invoke(f1,f2,f3,f4,f5)
-
-    let LetRec6Helper 
-           (F1:System.Func<_,_,_,_,_,_,_,_>) 
-           (F2:System.Func<_,_,_,_,_,_,_,_>) 
-           (F3:System.Func<_,_,_,_,_,_,_,_>) 
-           (F4:System.Func<_,_,_,_,_,_,_,_>) 
-           (F5:System.Func<_,_,_,_,_,_,_,_>) 
-           (F6:System.Func<_,_,_,_,_,_,_,_>) 
-           (B:System.Func<_,_,_,_,_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f3hole = ref (Unchecked.defaultof<_>)
-        let f4hole = ref (Unchecked.defaultof<_>)
-        let f5hole = ref (Unchecked.defaultof<_>)
-        let f6hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,x))
-        let f3 = new System.Func<_,_>(fun x -> F3.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,x))
-        let f4 = new System.Func<_,_>(fun x -> F4.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,x))
-        let f5 = new System.Func<_,_>(fun x -> F5.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,x))
-        let f6 = new System.Func<_,_>(fun x -> F6.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        f3hole := f3
-        f4hole := f4
-        f5hole := f5
-        f6hole := f6
-        B.Invoke(f1,f2,f3,f4,f5,f6)
-
-
-    let LetRec7Helper 
-           (F1:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (F2:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (F3:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (F4:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (F5:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (F6:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (F7:System.Func<_,_,_,_,_,_,_,_,_>) 
-           (B:System.Func<_,_,_,_,_,_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f3hole = ref (Unchecked.defaultof<_>)
-        let f4hole = ref (Unchecked.defaultof<_>)
-        let f5hole = ref (Unchecked.defaultof<_>)
-        let f6hole = ref (Unchecked.defaultof<_>)
-        let f7hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        let f3 = new System.Func<_,_>(fun x -> F3.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        let f4 = new System.Func<_,_>(fun x -> F4.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        let f5 = new System.Func<_,_>(fun x -> F5.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        let f6 = new System.Func<_,_>(fun x -> F6.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        let f7 = new System.Func<_,_>(fun x -> F7.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        f3hole := f3
-        f4hole := f4
-        f5hole := f5
-        f6hole := f6
-        f7hole := f7
-        B.Invoke(f1,f2,f3,f4,f5,f6,f7)
-
-
-    let LetRec8Helper 
-           (F1:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F2:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F3:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F4:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F5:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F6:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F7:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (F8:System.Func<_,_,_,_,_,_,_,_,_,_>) 
-           (B:System.Func<_,_,_,_,_,_,_,_,_>) = 
-        let f1hole = ref (Unchecked.defaultof<_>)
-        let f2hole = ref (Unchecked.defaultof<_>)
-        let f3hole = ref (Unchecked.defaultof<_>)
-        let f4hole = ref (Unchecked.defaultof<_>)
-        let f5hole = ref (Unchecked.defaultof<_>)
-        let f6hole = ref (Unchecked.defaultof<_>)
-        let f7hole = ref (Unchecked.defaultof<_>)
-        let f8hole = ref (Unchecked.defaultof<_>)
-        let f1 = new System.Func<_,_>(fun x -> F1.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f2 = new System.Func<_,_>(fun x -> F2.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f3 = new System.Func<_,_>(fun x -> F3.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f4 = new System.Func<_,_>(fun x -> F4.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f5 = new System.Func<_,_>(fun x -> F5.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f6 = new System.Func<_,_>(fun x -> F6.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f7 = new System.Func<_,_>(fun x -> F7.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        let f8 = new System.Func<_,_>(fun x -> F8.Invoke(f1hole.Value,f2hole.Value,f3hole.Value,f4hole.Value,f5hole.Value,f6hole.Value,f7hole.Value,f8hole.Value,x))
-        f1hole := f1
-        f2hole := f2
-        f3hole := f3
-        f4hole := f4
-        f5hole := f5
-        f6hole := f6
-        f7hole := f7
-        f8hole := f8
-        B.Invoke(f1,f2,f3,f4,f5,f6,f7,f8)
-*)
     type FuncFSharp<'state,'a> (f:Func<'state,'a>) =
         inherit FSharpFunc<unit, 'a>()
         [<Core.DefaultValue false>] val mutable State : 'state
@@ -332,10 +148,6 @@ module QuotationEvaluationTypes =
 
     let LinqExpressionHelper (x:'T) : Expression<'T> = failwith ""
     
-    let MakeFakeExpression (x:Expr) = 
-        let minfo = match <@@ LinqExpressionHelper @@> with Lambda(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find method info"
-        Expr.Call(minfo.GetGenericMethodDefinition().MakeGenericMethod [| x.Type |], [ x ])
-
     let showAll = BindingFlags.Public ||| BindingFlags.NonPublic 
 
     let wrapVoid (e:#Expression) =
@@ -963,12 +775,12 @@ module QuotationEvaluationTypes =
 
             let assignToFuncObject =
                 vePs
-                |> List.map (fun (vP, funcObject, assignToConstruction, assignState) ->
+                |> List.map (fun (vP, funcObject, _,_) ->
                     Expression.Assign (vP, funcObject) |> asExpression)
                 
             let assignState =
                 vePs
-                |> List.map (fun (vP, funcObject, assignToConstruction, assignState) -> assignState)
+                |> List.map (fun (_,_,_, assignState) -> assignState)
 
             let bodyP = ConvExpr env body
 
@@ -980,75 +792,7 @@ module QuotationEvaluationTypes =
                     yield! assignState;
                     yield bodyP
                 ]) |> asExpr
-(*
-            let vfs = List.map fst binds
-            
-            let pass1 = 
-                binds |> List.map (fun (vf,expr) -> 
-                    match expr with 
-                    | Lambda(vx,expr) -> 
-                        let domainTy,rangeTy = getFunctionType vf.Type
-                        let vfdTy = GetFuncType [| domainTy; rangeTy |]
-                        let vfd = new Var("d",vfdTy)
-                        (vf,vx,expr,domainTy,rangeTy,vfdTy,vfd)
-                    | _ -> failwith "cannot convert recursive bindings that do not define functions")
 
-            let trans = pass1 |> List.map (fun (vf,vx,expr,domainTy,rangeTy,vfdTy,vfd) -> (vf,vfd)) |> Map.ofList
-
-            // Rewrite uses of the recursively defined functions to be invocations of the delegates
-            // We do this because the delegate are allocated "once" and we can normally just invoke them efficiently
-            let rec rw t = 
-                match t with 
-                | Application(Var(vf),t) when trans.ContainsKey(vf) -> 
-                     let vfd = trans.[vf]
-                     Expr.Call(Expr.Var(vfd),vfd.Type.GetMethod("Invoke",instanceBindingFlags),[t])
-                | ExprShape.ShapeVar(vf) when trans.ContainsKey(vf)-> 
-                     let vfd = trans.[vf]
-                     let nv = new Var("nv",fst(getFunctionType vf.Type)) 
-                     Expr.Lambda(nv,Expr.Call(Expr.Var(vfd),vfd.Type.GetMethod("Invoke",instanceBindingFlags),[Expr.Var(nv)]))
-                | ExprShape.ShapeVar(_) -> t
-                | ExprShape.ShapeCombination(obj,args) -> ExprShape.RebuildShapeCombination(obj,List.map rw args)
-                | ExprShape.ShapeLambda(v,arg) -> Expr.Lambda(v,rw arg)
-
-            let vfdTys    = pass1 |> List.map (fun (vf,vx,expr,domainTy,rangeTy,vfdTy,vfd) -> vfdTy) |> Array.ofList
-            let vfds      = pass1 |> List.map (fun (vf,vx,expr,domainTy,rangeTy,vfdTy,vfd) -> vfd)
-
-            let FPs = 
-                [| for (vf,vx,expr,domainTy,rangeTy,vfdTy,vfd) in pass1 do
-                      let expr = rw expr
-                      let tyF = GetFuncType (Array.append vfdTys [| vx.Type; expr.Type |])
-                      let F = Expr.NewDelegate(tyF,vfds@[vx],expr)
-                      let FP = ConvExpr env F
-                      yield FP |]
-
-            let body = rw body
-
-            let methTys   = 
-                [| for (vf,vx,expr,domainTy,rangeTy,vfdTy,vfd) in pass1 do
-                      yield domainTy
-                      yield rangeTy
-                   yield body.Type |]
-
-            let B = Expr.NewDelegate(GetFuncType (Array.append vfdTys [| body.Type |]),vfds,body)
-            let BP = ConvExpr env B
-
-            let minfo = 
-                let q = 
-                    match vfds.Length with 
-                    | 1 -> <@@ LetRec1Helper @@>
-                    | 2 -> <@@ LetRec2Helper @@>
-                    | 3 -> <@@ LetRec3Helper @@>
-                    | 4 -> <@@ LetRec4Helper @@>
-                    | 5 -> <@@ LetRec5Helper @@>
-                    | 6 -> <@@ LetRec6Helper @@>
-                    | 7 -> <@@ LetRec7Helper @@>
-                    | 8 -> <@@ LetRec8Helper @@>
-                    | _ -> raise <| new NotSupportedException("In this release of the F# Power Pack, mutually recursive function groups involving 9 or more functions may not be converted to LINQ expressions")
-                match q with Lambdas(_,Call(_,minfo,_)) -> minfo | _ -> failwith "couldn't find minfo"
-
-            let minfo = minfo.GetGenericMethodDefinition().MakeGenericMethod methTys
-            Expression.Call(minfo,Array.append FPs [| BP |]) |> asExpr
-*)
         | Patterns.AddressOf _ -> raise <| new NotSupportedException("Address-of expressions may not be converted to LINQ expressions")
         | Patterns.AddressSet _ -> raise <| new NotSupportedException("Address-set expressions may not be converted to LINQ expressions")
         | Patterns.FieldSet _ -> raise <| new NotSupportedException("Field-set expressions may not be converted to LINQ expressions")
