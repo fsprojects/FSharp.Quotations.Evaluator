@@ -38,7 +38,6 @@ module QuotationEvaluationTypes =
     type ConvEnv = {
         eraseEquality : bool
         varEnv        : Map<Var,Expression>
-        letrec        : option<Var>
     }
 
     type ConvResult =
@@ -247,10 +246,10 @@ module QuotationEvaluationTypes =
     /// A more polished LINQ-Quotation translator will be published
     /// concert with later versions of LINQ.
     let rec ConvExpr (env:ConvEnv) (inp:Expr) = 
-        match LetRecConvExpr env inp with
+        match LetRecConvExpr env None inp with
         | AsExpression expr -> expr
         | _ -> failwith "Invalid logic"
-    and LetRecConvExpr (env:ConvEnv) (inp:Expr) = 
+    and LetRecConvExpr (env:ConvEnv) (letrec:option<Var>) (inp:Expr) = 
        //printf "ConvExpr : %A\n" e;
         match inp with 
 
@@ -395,7 +394,7 @@ module QuotationEvaluationTypes =
             
             // Throw away markers inserted to satisfy C#'s design where they pass an argument
             // or type T to an argument expecting Expr<T>.
-            | Λ ``-> linqExpressionHelper`` (_, [|_|],[x1]) -> LetRecConvExpr env x1
+            | Λ ``-> linqExpressionHelper`` (_, [|_|],[x1]) -> LetRecConvExpr env letrec x1
              
               /// ArrayLength
               /// ListBind
@@ -504,11 +503,6 @@ module QuotationEvaluationTypes =
             Expression.Block(e1P, e2P) |> asExpr
 
         | Patterns.Let (v,e,b) -> 
-            let env =
-                match env.letrec with
-                | None -> env
-                | _ -> { env with letrec = None }
-
             let vP = Expression.Variable (v.Type, v.Name)
             let eP = ConvExpr env e
             let assign = Expression.Assign (vP, eP) |> asExpression
@@ -537,8 +531,6 @@ module QuotationEvaluationTypes =
                 |> Seq.filter (fun freeVar -> not <| Set.contains freeVar parameterVars)
                 |> Seq.sortBy (fun freeVar -> freeVar.Name)
                 |> Seq.toList
-
-            let letRecVar = env.letrec
 
             let varsCount = vars.Length
             if varsCount <= 5 && capturedVars.Length <= 8 then
@@ -572,7 +564,6 @@ module QuotationEvaluationTypes =
 
                 let lambdaEnv =
                     { env with
-                         letrec = None
                          varEnv =
                             let environmentVariables =
                                 varParameters
@@ -617,7 +608,7 @@ module QuotationEvaluationTypes =
                 | [] ->
                     let obj = ``constructor``.Invoke [| ``function`` |]
                     let func = Expression.Constant (obj) 
-                    if letRecVar.IsSome then
+                    if letrec.IsSome then
                         // TODO: Simplify this; I only really need to return theFuncObject
                         AsLetRecExpression (
                             theFuncObject,
@@ -633,7 +624,7 @@ module QuotationEvaluationTypes =
 
                     let state =
                         let getVar var =
-                            if Some var = letRecVar
+                            if Some var = letrec
                                 then theFuncObject |> asExpression
                                 else Map.find var env.varEnv
 
@@ -664,7 +655,7 @@ module QuotationEvaluationTypes =
                             Expression.PropertyOrField(theFuncObject, "State"),
                             state) |> asExpression;
 
-                    if letRecVar.IsSome then
+                    if letrec.IsSome then
                         AsLetRecExpression (theFuncObject, assignToConstruction, assignState)
                     else
                         Expression.Block (
@@ -762,9 +753,8 @@ module QuotationEvaluationTypes =
             let vePs =
                 vPs
                 |> List.map (fun (v, vP, e) ->
-                    let env = { env with letrec = Some v }
                     let funcObject, assignToConstruction, assignState = 
-                        match LetRecConvExpr env e with
+                        match LetRecConvExpr env (Some v) e with
                         | AsLetRecExpression (funcObject, assignToFuncObject, assignState) -> funcObject, assignToFuncObject, assignState
                         | _ -> failwith "Logic error"
                     vP, funcObject, assignToConstruction, assignState)
@@ -929,7 +919,7 @@ module QuotationEvaluationTypes =
     let Conv (e:#Expr, eraseEquality) =
         let e = optimize e
 
-        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty; letrec = None } e
+        let linqExpr = ConvExpr { eraseEquality = eraseEquality; varEnv = Map.empty } e
 
         Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpression
 
