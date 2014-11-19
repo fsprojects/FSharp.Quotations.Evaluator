@@ -42,7 +42,8 @@ module QuotationEvaluationTypes =
 
     type ConvResult =
     | AsExpression of Expression
-    | AsLetRecExpression of ParameterExpression * Expression * Expression
+    | AsLetRecFunction of ParameterExpression * Expression * Expression
+//    | AsLetRecRecord of ParameterExpression * Expression * Expression
 
     let asExpr x = AsExpression x
     let asExpression x = (x :> Expression)
@@ -327,8 +328,6 @@ module QuotationEvaluationTypes =
                     exprConstructor(e1, e2, false, intrinsic.MakeGenericMethod([|x1.Type|])) |> asExpr
 
             match inp with 
-//            | SpecificCall <@ ( .. ) @> (_,_,[x1;x2]) -> transComparison x1 x2 Expression.Equal              Expression.Equal              genericEqualityIntrinsic
-
             | Λ ``-> generic=`` (_,_,[x1;x2])
             | Λ ``-> =``  (_,_,[x1;x2]) -> transComparison x1 x2 Expression.Equal              Expression.Equal              genericEqualityIntrinsic
             | Λ ``-> >``  (_,_,[x1;x2]) -> transComparison x1 x2 Expression.GreaterThan        Expression.GreaterThan        genericGreaterThanIntrinsic
@@ -607,15 +606,7 @@ module QuotationEvaluationTypes =
                 match capturedVars with
                 | [] ->
                     let obj = ``constructor``.Invoke [| ``function`` |]
-                    let func = Expression.Constant (obj) 
-                    if letrec.IsSome then
-                        // TODO: Simplify this; I only really need to return theFuncObject
-                        AsLetRecExpression (
-                            theFuncObject,
-                            Expression.Assign(theFuncObject, func),
-                            Expression.Empty () :> Expression)
-                    else
-                        func|> asExpr
+                    Expression.Constant obj |> asExpr
                 | _ ->
                     let newObject = 
                         Expression.New (
@@ -656,7 +647,7 @@ module QuotationEvaluationTypes =
                             state) |> asExpression;
 
                     if letrec.IsSome then
-                        AsLetRecExpression (theFuncObject, assignToConstruction, assignState)
+                        AsLetRecFunction (theFuncObject, assignToConstruction, assignState)
                     else
                         Expression.Block (
                             [ theFuncObject ],
@@ -737,7 +728,7 @@ module QuotationEvaluationTypes =
             Expression.Call(minfo,[| eP; filterP; handlerP |]) |> asExpr
 
         | Patterns.LetRecursive (binds, body) -> 
-            let vPs =
+            let variablesAsLinq =
                 binds
                 |> List.map (fun (v, e) ->
                     v, Expression.Variable (v.Type, v.Name), e)
@@ -745,42 +736,64 @@ module QuotationEvaluationTypes =
             let env = {
                 env with
                     varEnv =
-                        (env.varEnv, vPs)
+                        (env.varEnv, variablesAsLinq)
                         ||> List.fold (fun varEnv (v,vP,_) ->
                             varEnv
                             |> Map.add v (vP |> asExpression)) }
 
-            let vePs =
-                vPs
-                |> List.map (fun (v, vP, e) ->
-                    let funcObject, assignToConstruction, assignState = 
-                        match LetRecConvExpr env (Some v) e with
-                        | AsLetRecExpression (funcObject, assignToFuncObject, assignState) -> funcObject, assignToFuncObject, assignState
-                        | _ -> failwith "Logic error"
-                    vP, funcObject, assignToConstruction, assignState)
+            let bindingAsLinq =
+                variablesAsLinq
+                |> List.map (fun (v, vP, e) -> vP, LetRecConvExpr env (Some v) e)
+
+            let nonRecursiveBindings =
+                bindingAsLinq
+                |> List.choose (function
+                    | vP, AsExpression e -> Some (vP, Expression.Assign(vP, e) |> asExpression)
+                    | _ -> None)
+
+            let nonRecursiveAssignments =
+                nonRecursiveBindings
+                |> List.map snd
+
+            let variables =
+                nonRecursiveBindings
+                |> List.map fst
+
+            let recursiveFunctionBindings =
+                bindingAsLinq
+                |> List.choose (function
+                    | vP, AsLetRecFunction (funcObject, assignToFuncObject, assignState) ->
+                        Some (vP, funcObject, assignToFuncObject, assignState)
+                    | _ -> None)
+
+            let variables =
+                recursiveFunctionBindings
+                |> List.collect (fun (v,fo,_,_) -> [ v; fo ])
+                |> List.append variables
 
             let assignToLocalObject =
-                vePs
+                recursiveFunctionBindings
                 |> List.map (fun (_,_,assignToFuncObject,_) -> assignToFuncObject)
 
             let assignToFuncObject =
-                vePs
+                recursiveFunctionBindings
                 |> List.map (fun (vP, funcObject, _,_) ->
                     Expression.Assign (vP, funcObject) |> asExpression)
                 
             let assignState =
-                vePs
+                recursiveFunctionBindings
                 |> List.map (fun (_,_,_, assignState) -> assignState)
 
             let bodyP = ConvExpr env body
 
             Expression.Block (
-                vePs |> List.collect (fun (v,fo,_,_) -> [ v; fo ]),
+                variables,
                 [
+                    yield! nonRecursiveAssignments;
                     yield! assignToLocalObject;
                     yield! assignToFuncObject;
                     yield! assignState;
-                    yield bodyP
+                    yield bodyP;
                 ]) |> asExpr
 
         | Patterns.AddressOf _ -> raise <| new NotSupportedException("Address-of expressions may not be converted to LINQ expressions")
@@ -924,8 +937,6 @@ module QuotationEvaluationTypes =
         Expression.Lambda(linqExpr, Expression.Parameter(typeof<unit>)) |> asExpression
 
     let CompileImpl (e: #Expr, eraseEquality) = 
-//       let ty = e.Type
-//       let e = Expr.NewDelegate(GetFuncType([|typeof<unit>; ty |]), [new Var("unit",typeof<unit>)],e)
        let linqExpr = Conv (e,eraseEquality)
        let linqExpr = (linqExpr :?> LambdaExpression)
        let d = linqExpr.Compile()
