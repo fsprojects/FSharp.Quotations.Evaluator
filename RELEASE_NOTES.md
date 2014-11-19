@@ -7,3 +7,5 @@
 
 ### 1.0.2 - Using System.Linq.Expressions .net 4.0+ functionality
 * Updated release notes
+
+### 1.0.3 - A range of performance improvements
