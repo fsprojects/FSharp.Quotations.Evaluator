@@ -318,6 +318,12 @@ module QuotationEvaluationTypes =
 
         // Expr.(Call,Application)
         | Patterns.Call(objOpt,minfo,args) -> 
+            let unary x1 f     = f (ConvExpr env x1) |> asExpr
+            let binary x1 x2 f = f (ConvExpr env x1, ConvExpr env x2) |> asExpr
+
+            let convert x1 t        = Expression.Convert (ConvExpr env x1, t) |> asExpr
+            let convertChecked x1 t = Expression.Convert (ConvExpr env x1, t) |> asExpr
+
             let transComparison x1 x2 exprConstructor exprErasedConstructor (intrinsic : MethodInfo) =
                 let e1 = ConvExpr env x1
                 let e2 = ConvExpr env x2
@@ -336,53 +342,53 @@ module QuotationEvaluationTypes =
             | Λ ``-> <=`` (_,_,[x1;x2]) -> transComparison x1 x2 Expression.LessThanOrEqual    Expression.LessThanOrEqual    genericLessOrEqualIntrinsic
             | Λ ``-> <>`` (_,_,[x1;x2]) -> transComparison x1 x2 Expression.NotEqual           Expression.NotEqual           genericNotEqualIntrinsic
 
-            | Λ ``-> not`` (_,_,[x1])    -> Expression.Not(ConvExpr env x1)                                   |> asExpr
-            | Λ ``-> ~-``  (_,_,[x1])    -> Expression.Negate(ConvExpr env x1)                                |> asExpr
-            | Λ ``-> +``   (_,_,[x1;x2]) -> Expression.Add(ConvExpr env x1, ConvExpr env x2)      |> asExpr
-            | Λ ``-> /``   (_,_,[x1;x2]) -> Expression.Divide (ConvExpr env x1, ConvExpr env x2)  |> asExpr
-            | Λ ``-> -``   (_,_,[x1;x2]) -> Expression.Subtract(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> *``   (_,_,[x1;x2]) -> Expression.Multiply(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> %``   (_,_,[x1;x2]) -> Expression.Modulo (ConvExpr env x1, ConvExpr env x2) |> asExpr
+            | Λ ``-> not`` (_,_,[x1])    -> unary  x1    Expression.Not
+            | Λ ``-> ~-``  (_,_,[x1])    -> unary  x1    Expression.Negate
+            | Λ ``-> +``   (_,_,[x1;x2]) -> binary x1 x2 Expression.Add
+            | Λ ``-> /``   (_,_,[x1;x2]) -> binary x1 x2 Expression.Divide
+            | Λ ``-> -``   (_,_,[x1;x2]) -> binary x1 x2 Expression.Subtract
+            | Λ ``-> *``   (_,_,[x1;x2]) -> binary x1 x2 Expression.Multiply
+            | Λ ``-> %``   (_,_,[x1;x2]) -> binary x1 x2 Expression.Modulo
                  /// REVIEW: basic arithmetic with method witnesses
                  /// REVIEW: negate,add, divide, multiply, subtract with method witness
 
-            | Λ ``-> <<<`` (_,_,[x1;x2]) -> Expression.LeftShift(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> >>>`` (_,_,[x1;x2]) -> Expression.RightShift(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> &&&`` (_,_,[x1;x2]) -> Expression.And(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> |||`` (_,_,[x1;x2]) -> Expression.Or(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> ^^^`` (_,_,[x1;x2]) -> Expression.ExclusiveOr(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> ~~~`` (_,_,[x1]) -> Expression.Not(ConvExpr env x1) |> asExpr
+            | Λ ``-> <<<`` (_,_,[x1;x2]) -> binary x1 x2 Expression.LeftShift
+            | Λ ``-> >>>`` (_,_,[x1;x2]) -> binary x1 x2 Expression.RightShift
+            | Λ ``-> &&&`` (_,_,[x1;x2]) -> binary x1 x2 Expression.And
+            | Λ ``-> |||`` (_,_,[x1;x2]) -> binary x1 x2 Expression.Or
+            | Λ ``-> ^^^`` (_,_,[x1;x2]) -> binary x1 x2 Expression.ExclusiveOr
+            | Λ ``-> ~~~`` (_,_,[x1])    -> unary  x1    Expression.Not
                  /// REVIEW: bitwise operations with method witnesses
 
-            | Λ ``-> checked~-`` (_, _,[x1]) -> Expression.NegateChecked(ConvExpr env x1)                                |> asExpr
-            | Λ ``-> checked+`` (_, _,[x1;x2]) -> Expression.AddChecked(ConvExpr env x1, ConvExpr env x2)      |> asExpr
-            | Λ ``-> checked-`` (_, _,[x1;x2]) -> Expression.SubtractChecked(ConvExpr env x1, ConvExpr env x2) |> asExpr
-            | Λ ``-> checked*`` (_, _,[x1;x2]) -> Expression.MultiplyChecked(ConvExpr env x1, ConvExpr env x2) |> asExpr
-
-            | Λ ``-> char``    (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<char>) |> asExpr
-            | Λ ``-> decimal`` (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<decimal>) |> asExpr
-            | Λ ``-> float``   (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<float>) |> asExpr
-            | Λ ``-> float32`` (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<float32>) |> asExpr
-            | Λ ``-> sbyte``   (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<sbyte>) |> asExpr
-            | Λ ``-> int16``   (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<int16>) |> asExpr
-            | Λ ``-> int32``   (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<int32>) |> asExpr
-            | Λ ``-> int``     (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<int32>) |> asExpr
-            | Λ ``-> int64``   (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<int64>) |> asExpr
-            | Λ ``-> byte``    (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<byte>) |> asExpr
-            | Λ ``-> uint16``  (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<uint16>) |> asExpr
-            | Λ ``-> uint32``  (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<uint32>) |> asExpr
-            | Λ ``-> uint64``  (_, [|ty|],[x1]) -> Expression.Convert(ConvExpr env x1, typeof<uint64>) |> asExpr
+            | Λ ``-> checked~-`` (_,_,[x1])    -> unary  x1    Expression.NegateChecked
+            | Λ ``-> checked+``  (_,_,[x1;x2]) -> binary x1 x2 Expression.AddChecked
+            | Λ ``-> checked-``  (_,_,[x1;x2]) -> binary x1 x2 Expression.SubtractChecked
+            | Λ ``-> checked*``  (_,_,[x1;x2]) -> binary x1 x2 Expression.MultiplyChecked
+             
+            | Λ ``-> char``    (_,_,[x1]) -> convert x1 typeof<char>
+            | Λ ``-> decimal`` (_,_,[x1]) -> convert x1 typeof<decimal>
+            | Λ ``-> float``   (_,_,[x1]) -> convert x1 typeof<float>
+            | Λ ``-> float32`` (_,_,[x1]) -> convert x1 typeof<float32>
+            | Λ ``-> sbyte``   (_,_,[x1]) -> convert x1 typeof<sbyte>
+            | Λ ``-> int16``   (_,_,[x1]) -> convert x1 typeof<int16>
+            | Λ ``-> int32``   (_,_,[x1]) -> convert x1 typeof<int32>
+            | Λ ``-> int``     (_,_,[x1]) -> convert x1 typeof<int32>
+            | Λ ``-> int64``   (_,_,[x1]) -> convert x1 typeof<int64>
+            | Λ ``-> byte``    (_,_,[x1]) -> convert x1 typeof<byte>
+            | Λ ``-> uint16``  (_,_,[x1]) -> convert x1 typeof<uint16>
+            | Λ ``-> uint32``  (_,_,[x1]) -> convert x1 typeof<uint32>
+            | Λ ``-> uint64``  (_,_,[x1]) -> convert x1 typeof<uint64>
              /// REVIEW: convert with method witness
 
-            | Λ ``-> checked.char``   (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<char>) |> asExpr
-            | Λ ``-> checked.sbyte``  (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<sbyte>) |> asExpr
-            | Λ ``-> checked.int16``  (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<int16>) |> asExpr
-            | Λ ``-> checked.int32``  (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<int32>) |> asExpr
-            | Λ ``-> checked.int64``  (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<int64>) |> asExpr
-            | Λ ``-> checked.byte``   (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<byte>) |> asExpr
-            | Λ ``-> checked.uint16`` (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<uint16>) |> asExpr
-            | Λ ``-> checked.uint32`` (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<uint32>) |> asExpr
-            | Λ ``-> checked.uint64`` (_, [|ty|],[x1]) -> Expression.ConvertChecked(ConvExpr env x1, typeof<uint64>) |> asExpr
+            | Λ ``-> checked.char``   (_,_,[x1]) -> convertChecked x1 typeof<char>
+            | Λ ``-> checked.sbyte``  (_,_,[x1]) -> convertChecked x1 typeof<sbyte>
+            | Λ ``-> checked.int16``  (_,_,[x1]) -> convertChecked x1 typeof<int16>
+            | Λ ``-> checked.int32``  (_,_,[x1]) -> convertChecked x1 typeof<int32>
+            | Λ ``-> checked.int64``  (_,_,[x1]) -> convertChecked x1 typeof<int64>
+            | Λ ``-> checked.byte``   (_,_,[x1]) -> convertChecked x1 typeof<byte>
+            | Λ ``-> checked.uint16`` (_,_,[x1]) -> convertChecked x1 typeof<uint16>
+            | Λ ``-> checked.uint32`` (_,_,[x1]) -> convertChecked x1 typeof<uint32>
+            | Λ ``-> checked.uint64`` (_,_,[x1]) -> convertChecked x1 typeof<uint64>
 
             | Λ ``-> getArray``  (_, [|ArrayTypeQ(elemTy);_;_|],[x1;x2]) -> 
                 Expression.ArrayIndex(ConvExpr env x1, ConvExpr env x2) |> asExpr
