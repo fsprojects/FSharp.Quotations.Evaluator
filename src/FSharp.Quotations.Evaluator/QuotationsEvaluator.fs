@@ -581,12 +581,13 @@ module QuotationEvaluationTypes =
                 let ``function`` = linqLambda.Compile ()
               
                 let funcFSharp =
-                    if   varsCount = 1 then typedefof<FuncFSharp<_,_,_>>
-                    elif varsCount = 2 then typedefof<FuncFSharp<_,_,_,_>>
-                    elif varsCount = 3 then typedefof<FuncFSharp<_,_,_,_,_>>
-                    elif varsCount = 4 then typedefof<FuncFSharp<_,_,_,_,_,_>>
-                    elif varsCount = 5 then typedefof<FuncFSharp<_,_,_,_,_,_,_>>
-                    else failwith "Logic error"
+                    match varsCount with
+                    | 1 -> typedefof<FuncFSharp<_,_,_>>
+                    | 2 -> typedefof<FuncFSharp<_,_,_,_>>
+                    | 3 -> typedefof<FuncFSharp<_,_,_,_,_>>
+                    | 4 -> typedefof<FuncFSharp<_,_,_,_,_,_>>
+                    | 5 -> typedefof<FuncFSharp<_,_,_,_,_,_,_>>
+                    | _ -> failwith "Logic error"
 
                 let parameterTypes =
                     [|  yield stateType
