@@ -87,6 +87,7 @@ module QuotationEvaluationTypes =
         type FuncHelper<'T1,'T2,'T3,'T4,'T5,'T6,'T7,'T8,'T9,'T10, 'T11, 'T12, 'T13, 'T14, 'T15, 'T16, 'T17, 'T18, 'T19, 'T20, 'T21> = delegate of 'T1 * 'T2 * 'T3 * 'T4 * 'T5 * 'T6 * 'T7 * 'T8 * 'T9 * 'T10 * 'T11 * 'T12 * 'T13 * 'T14 * 'T15 * 'T16 * 'T17 * 'T18 * 'T19 * 'T20 -> 'T21 
 
     open HelperTypes
+    open Tools
     
     let GetActionType (args:Type[])  = 
         if args.Length <= 16 then 
@@ -538,30 +539,19 @@ module QuotationEvaluationTypes =
                 |> Seq.toList
 
             let varsCount = vars.Length
-            if varsCount <= 5 && capturedVars.Length <= 8 then
-                let stateType =
-                    match capturedVars with
-                    | []                                 -> typeof<Unit>
-                    | v1::[]                             -> v1.Type
-                    | v1::v2::[]                         -> typedefof<Tuple<_,_>>.            MakeGenericType(v1.Type,v2.Type)
-                    | v1::v2::v3::[]                     -> typedefof<Tuple<_,_,_>>.          MakeGenericType(v1.Type,v2.Type,v3.Type)
-                    | v1::v2::v3::v4::[]                 -> typedefof<Tuple<_,_,_,_>>.        MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type)
-                    | v1::v2::v3::v4::v5::[]             -> typedefof<Tuple<_,_,_,_,_>>.      MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type)
-                    | v1::v2::v3::v4::v5::v6::[]         -> typedefof<Tuple<_,_,_,_,_,_>>.    MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type,v6.Type)
-                    | v1::v2::v3::v4::v5::v6::v7::[]     -> typedefof<Tuple<_,_,_,_,_,_,_>>.  MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type,v6.Type,v7.Type)
-                    | v1::v2::v3::v4::v5::v6::v7::v8::[] -> typedefof<Tuple<_,_,_,_,_,_,_,_>>.MakeGenericType(v1.Type,v2.Type,v3.Type,v4.Type,v5.Type,v6.Type,v7.Type,v8.Type)
-                    | _ -> failwith "Not currently supported"
+            if varsCount <= 5 then
+                let stateType, makeStateConstructor =
+                    match capturedVars |> List.map (fun v -> v.Type) |> List.toArray with
+                    | [|t|] -> t, (fun x -> Seq.head x)
+                    | types -> createGenericTupleType types
 
                 let stateParameter =
                     Expression.Parameter (stateType, "capturedState")
 
                 let stateEnvironment =
                     match capturedVars with
-                    | [] -> []
                     | v1 :: [] -> [v1, stateParameter |> asExpression]
-                    | _ ->
-                        capturedVars
-                        |> List.mapi (fun idx var -> var, Expression.Property (stateParameter, "Item" + (idx+1).ToString()) |> asExpression)
+                    | _ -> List.mapi (fun idx var -> var, getExpressionFromTuple stateParameter idx) capturedVars
 
                 let varParameters =
                     vars
@@ -628,19 +618,9 @@ module QuotationEvaluationTypes =
                         match capturedVars with
                         | v1 :: [] -> getVar v1
                         | _ ->
-                            let state =
-                                capturedVars
-                                |> List.map getVar
-
-                            let stateConstructor =
-                                let types = 
-                                    capturedVars
-                                    |> List.map (fun var -> var.Type)
-                                    |> List.toArray
-
-                                stateType.GetConstructor types
-
-                            Expression.New(stateConstructor, state) |> asExpression
+                            capturedVars
+                            |> List.map getVar
+                            |> makeStateConstructor
 
                     let assignToConstruction =
                         Expression.Assign(

@@ -3,6 +3,11 @@
 open System.Linq.Expressions
 open System
 
+let rec getExpressionFromTuple (tuple:Expression) idx =
+    if idx >= 7
+        then getExpressionFromTuple (Expression.Property(tuple, "Rest")) (idx-7)
+        else Expression.Property (tuple, "Item" + (idx+1).ToString()) :> Expression
+
 let createTuple<'a> types =
     let tuple = typedefof<'a>.MakeGenericType types
     let ``constructor`` = tuple.GetConstructor types
@@ -10,9 +15,11 @@ let createTuple<'a> types =
         Expression.New (``constructor``, x) :> Expression
     tuple, callConstructor
 
+let unitNull = Expression.Constant(null, typeof<unit>) :> Expression
+
 let rec createGenericTupleType types =
     match types with
-    | [||]                      -> typeof<Unit>, (fun _ -> Expression.Constant(null, typeof<unit>) :> Expression)
+    | [||]                      -> typeof<Unit>, (fun _ -> unitNull)
     | [|t1|]                    -> createTuple<Tuple<_>>             types
     | [|t1;t2|]                 -> createTuple<Tuple<_,_>>           types
     | [|t1;t2;t3|]              -> createTuple<Tuple<_,_,_>>         types
@@ -32,5 +39,3 @@ let rec createGenericTupleType types =
                 yield create (Seq.skip 7 x) |]
             Expression.New(``constructor``, args) :> Expression
         tuple, callConstructor
-
-
