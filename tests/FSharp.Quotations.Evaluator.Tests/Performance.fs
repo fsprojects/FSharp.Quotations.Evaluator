@@ -563,7 +563,7 @@ let ``Test recursion tail`` () =
 let ``Time recursion tail`` () =
     timeFunction <@ ``recursion tail`` @>
 
-[<ReflectedDefinition; TimeAllowance 35.0>]
+[<ReflectedDefinition; TimeAllowance 9.0>]
 let ``many captures and parameters 1`` () =
     let ff a b c d e f =
         let gg a' b' c' d' e' f' =
@@ -585,15 +585,15 @@ let ``Test many captures and parameters 1`` () =
 let ``Time many captures and parameters 1`` () =
     timeFunction <@ ``many captures and parameters 1`` @>
 
-[<ReflectedDefinition; TestIterations 100; TimeAllowance 35.0>]
+[<ReflectedDefinition; TimeAllowance 3.5>]
 let ``many captures and parameters 2`` () =
-    let ff a b c d e f g h i j k l m n o p q r s t u v w x y z=
-        let gg a' = a' * a + a' * b - a' * c + a' * d - a' * e + a' * f - a' * g + a' * h - a' * i + a' * j - a' * k + a' * l - a' * m + a' * n - a' * o + a' * p - a' * q + a' * r - a' * s + a' * t - a' * u + a' * v - a' * w + a' * x - a' * y + a' * z
+    let ff a b c d e f g h i j k l m n o =
+        let gg a' = a' * a + a' * b - a' * c + a' * d - a' * e + a' * f - a' * g + a' * h - a' * i + a' * j - a' * k + a' * l - a' * m + a' * n - a' * o
         gg
     let r = Random 42
     let x () = r.Next()
     let mutable total = 0
-    let fff = ff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+    let fff = ff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
     for i=0 to 10 do
         total <- total + fff (x())
     total
@@ -606,18 +606,18 @@ let ``Test many captures and parameters 2`` () =
 let ``Time many captures and parameters 2`` () =
     timeFunction <@ ``many captures and parameters 2`` @>
 
-[<ReflectedDefinition; TestIterations 100; TimeAllowance 35.0>]
+[<ReflectedDefinition; TimeAllowance 11.0>]
 let ``many captures and parameters 3`` () =
     let ff a =
-        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' t' u' v' w' x' y' z' =
-            a' * a + b' * a - c' * a + d' * a - e' * a + f' * a - g' * a + h' * a - i' * a + j' * a - k' * a + l' * a - m' * a + n' * a - o' * a + p' * a - q' * a + r' * a - s' * a + t' * a - u' * a + v' * a - w' * a + x' * a - y' * a + z' * a
+        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' =
+            a' * a + b' * a - c' * a + d' * a - e' * a + f' * a - g' * a + h' * a - i' * a + j' * a - k' * a + l' * a - m' * a + n' * a - o' * a
         gg
     let r = Random 42
     let x () = r.Next()
     let mutable total = 0
     let fff = ff (x())
     for i=0 to 10 do
-        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
     total
 
 [<Test>]
@@ -628,18 +628,18 @@ let ``Test many captures and parameters 3`` () =
 let ``Time many captures and parameters 3`` () =
     timeFunction <@ ``many captures and parameters 3`` @>
 
-[<ReflectedDefinition; TestIterations 10>]
+[<ReflectedDefinition; TimeAllowance 9.0>]
 let ``many captures and parameters 4`` () =
-    let ff a b c d e f g h i j k l m n o p q r s t u v w x y z =
-        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' t' u' v' w' x' y' z' =
-            a' * a + b' * b - c' * c + d' * d - e' * e + f' * f - g' * g + h' * h - i' * i + j' * j - k' * k + l' * l - m' * m + n' * n - o' * o + p' * p - q' * q + r' * r - s' * s + t' * t - u' * u + v' * v - w' * w + x' * x - y' * y + z' * z
+    let ff a b c d e f g h i j k l m n o =
+        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' =
+            a' * a + b' * b - c' * c + d' * d - e' * e + f' * f - g' * g + h' * h - i' * i + j' * j - k' * k + l' * l - m' * m + n' * n - o' * o
         gg
     let r = Random 42
     let x () = r.Next()
     let mutable total = 0
     let fff = ff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
     for i=0 to 10 do
-        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+        total <- total + fff (x()) (x()) (x()) (x())
     total
 
 [<Test>]

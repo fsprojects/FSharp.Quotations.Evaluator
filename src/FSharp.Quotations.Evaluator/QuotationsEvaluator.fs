@@ -145,6 +145,66 @@ module QuotationEvaluationTypes =
         override this.Invoke (a,b,c,d,e) = f.Invoke (this.State,a,b,c,d,e)
         override this.Invoke a = fun b c d e -> f.Invoke (this.State,a,b,c,d,e)
 
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f -> func.Invoke (this.State,a,b,c,d,e,f)
+        override this.Invoke a = fun b c d e f -> func.Invoke (this.State,a,b,c,d,e,f)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g -> func.Invoke (this.State,a,b,c,d,e,f,g)
+        override this.Invoke a = fun b c d e f g -> func.Invoke (this.State,a,b,c,d,e,f,g)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h -> func.Invoke (this.State,a,b,c,d,e,f,g,h)
+        override this.Invoke a = fun b c d e f g h -> func.Invoke (this.State,a,b,c,d,e,f,g,h)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i)
+        override this.Invoke a = fun b c d e f g h i -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i j -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j)
+        override this.Invoke a = fun b c d e f g h i j -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i j k -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k)
+        override this.Invoke a = fun b c d e f g h i j k -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i j k l -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l)
+        override this.Invoke a = fun b c d e f g h i j k l -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i j k l m -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m)
+        override this.Invoke a = fun b c d e f g h i j k l m -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n)
+        override this.Invoke a = fun b c d e f g h i j k l m n -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n)
+
+    type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p>) =
+        inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o->'p>()
+        [<Core.DefaultValue false>] val mutable State : 'state
+        override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n o -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o)
+        override this.Invoke a = fun b c d e f g h i j k l m n o -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o)
+
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
     let LinqExpressionHelper (x:'T) : Expression<'T> = failwith ""
@@ -539,7 +599,7 @@ module QuotationEvaluationTypes =
                 |> Seq.toList
 
             let varsCount = vars.Length
-            if varsCount <= 5 then
+            if varsCount <= 15 then
                 let stateType, makeStateConstructor =
                     match capturedVars |> List.map (fun v -> v.Type) |> List.toArray with
                     | [|t|] -> t, (fun x -> Seq.head x)
@@ -582,11 +642,21 @@ module QuotationEvaluationTypes =
               
                 let funcFSharp =
                     match varsCount with
-                    | 1 -> typedefof<FuncFSharp<_,_,_>>
-                    | 2 -> typedefof<FuncFSharp<_,_,_,_>>
-                    | 3 -> typedefof<FuncFSharp<_,_,_,_,_>>
-                    | 4 -> typedefof<FuncFSharp<_,_,_,_,_,_>>
-                    | 5 -> typedefof<FuncFSharp<_,_,_,_,_,_,_>>
+                    | 1  -> typedefof<FuncFSharp<_,_,_>>
+                    | 2  -> typedefof<FuncFSharp<_,_,_,_>>
+                    | 3  -> typedefof<FuncFSharp<_,_,_,_,_>>
+                    | 4  -> typedefof<FuncFSharp<_,_,_,_,_,_>>
+                    | 5  -> typedefof<FuncFSharp<_,_,_,_,_,_,_>>
+                    | 6  -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_>>
+                    | 7  -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_>>
+                    | 8  -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_>>
+                    | 9  -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_>>
+                    | 10 -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_,_>>
+                    | 11 -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_,_,_>>
+                    | 12 -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
+                    | 13 -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
+                    | 14 -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
+                    | 15 -> typedefof<FuncFSharp<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>
                     | _ -> failwith "Logic error"
 
                 let parameterTypes =
