@@ -27,14 +27,15 @@ module QuotationEvaluationTypes =
     type This = 
         static member Assembly = typeof<This>.Assembly
 
-    let hashCompareType = typeof<list<_>>.Assembly.GetType("Microsoft.FSharp.Core.LanguagePrimitives+HashCompare")
+    let hashCompareType      = typeof<list<_>>.Assembly.GetType("Microsoft.FSharp.Core.LanguagePrimitives+HashCompare")
     let extraHashCompareType = This.Assembly.GetType("FSharp.Quotations.Evaluator.ExtraHashCompare")
-    let genericEqualityIntrinsic = "GenericEqualityIntrinsic" |> hashCompareType.GetMethod
-    let genericNotEqualIntrinsic = "GenericNotEqualIntrinsic" |> extraHashCompareType.GetMethod
-    let genericLessThanIntrinsic = "GenericLessThanIntrinsic" |> hashCompareType.GetMethod
-    let genericGreaterThanIntrinsic = "GenericGreaterThanIntrinsic" |> hashCompareType.GetMethod
-    let genericGreaterOrEqualIntrinsic = "GenericGreaterOrEqualIntrinsic" |> hashCompareType.GetMethod
-    let genericLessOrEqualIntrinsic = "GenericLessOrEqualIntrinsic" |> hashCompareType.GetMethod
+
+    let genericEqualityIntrinsic        = "GenericEqualityIntrinsic"       |> hashCompareType.GetMethod
+    let genericNotEqualIntrinsic        = "GenericNotEqualIntrinsic"       |> extraHashCompareType.GetMethod
+    let genericLessThanIntrinsic        = "GenericLessThanIntrinsic"       |> hashCompareType.GetMethod
+    let genericGreaterThanIntrinsic     = "GenericGreaterThanIntrinsic"    |> hashCompareType.GetMethod
+    let genericGreaterOrEqualIntrinsic  = "GenericGreaterOrEqualIntrinsic" |> hashCompareType.GetMethod
+    let genericLessOrEqualIntrinsic     = "GenericLessOrEqualIntrinsic"    |> hashCompareType.GetMethod
 
     type ConvEnv = {
         eraseEquality : bool
@@ -49,19 +50,23 @@ module QuotationEvaluationTypes =
     let asExpr x = AsExpression x
     let asExpression x = (x :> Expression)
 
-    let bindingFlags = BindingFlags.Public ||| BindingFlags.NonPublic
-    let instanceBindingFlags = BindingFlags.Instance ||| BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.DeclaredOnly
-    let isNamedType(typ:Type) = not (typ.IsArray || typ.IsByRef || typ.IsPointer)
-    let equivHeadTypes (ty1:Type) (ty2:Type) = 
-        isNamedType(ty1) &&
-        if ty1.IsGenericType then 
-          ty2.IsGenericType && (ty1.GetGenericTypeDefinition()).Equals(ty2.GetGenericTypeDefinition())
-        else 
-          ty1.Equals(ty2)
-
-    let isFunctionType typ = equivHeadTypes typ (typeof<(int -> int)>)
     let getFunctionType typ = 
-        if not (isFunctionType typ) then invalidArg "typ" "cannot convert recursion except for function types"
+        let isFunctionType typ =
+            let equivHeadTypes (ty1:Type) (ty2:Type) = 
+                let isNamedType (typ:Type) =
+                    not (typ.IsArray || typ.IsByRef || typ.IsPointer)
+    
+                isNamedType(ty1) &&
+                    if ty1.IsGenericType then 
+                      ty2.IsGenericType && (ty1.GetGenericTypeDefinition()).Equals(ty2.GetGenericTypeDefinition())
+                    else 
+                      ty1.Equals(ty2)
+
+            equivHeadTypes typ (typeof<(int->int)>)
+
+        if not (isFunctionType typ) then
+            invalidArg "typ" "cannot convert recursion except for function types"
+
         let tyargs = typ.GetGenericArguments()
         tyargs.[0], tyargs.[1]
 
@@ -108,8 +113,6 @@ module QuotationEvaluationTypes =
     let (|ArrayTypeQ|_|) (ty:System.Type) = if ty.IsArray && ty.GetArrayRank() = 1 then Some(ty.GetElementType()) else None
     
     /// Convert F# quotations to LINQ expression trees.
-    /// A more polished LINQ-Quotation translator will be published
-    /// concert with later versions of LINQ.
     let rec ConvExpr (env:ConvEnv) (inp:Expr) = 
         match LetRecConvExpr env None inp with
         | AsExpression expr -> expr
@@ -137,18 +140,17 @@ module QuotationEvaluationTypes =
                             "       let x = 1\r\n" +
                             "       let bar() = let x = x in <@ x @>\r\n";
 
-                        NotSupportedException(message) |> raise    
-        | DerivedPatterns.AndAlso(x1,x2)             -> Expression.AndAlso(ConvExpr env x1, ConvExpr env x2) |> asExpr
-        | DerivedPatterns.OrElse(x1,x2)              -> Expression.OrElse(ConvExpr env x1, ConvExpr env x2)  |> asExpr
-        | Patterns.Value(x,ty)                -> Expression.Constant(x,ty)              |> asExpr
+                        raise <| NotSupportedException message
+        | DerivedPatterns.AndAlso(x1,x2) -> Expression.AndAlso(ConvExpr env x1, ConvExpr env x2) |> asExpr
+        | DerivedPatterns.OrElse(x1,x2)  -> Expression.OrElse(ConvExpr env x1, ConvExpr env x2)  |> asExpr
+        | Patterns.Value(x,ty)           -> Expression.Constant(x,ty)                            |> asExpr
 
         // REVIEW: exact F# semantics for TypeAs and TypeIs
-        | Patterns.Coerce(x,toTy)             -> Expression.TypeAs(ConvExpr env x,toTy)     |> asExpr
-        | Patterns.TypeTest(x,toTy)           -> Expression.TypeIs(ConvExpr env x,toTy)     |> asExpr
+        | Patterns.Coerce(x,toTy)             -> Expression.TypeAs(ConvExpr env x,toTy) |> asExpr
+        | Patterns.TypeTest(x,toTy)           -> Expression.TypeIs(ConvExpr env x,toTy) |> asExpr
         
         // Expr.*Get
-        | Patterns.FieldGet(objOpt,fieldInfo) -> 
-            Expression.Field(ConvObjArg env objOpt None, fieldInfo) |> asExpr
+        | Patterns.FieldGet(objOpt,fieldInfo) -> Expression.Field(ConvObjArg env objOpt None, fieldInfo) |> asExpr
 
         | Patterns.TupleGet(arg,n) -> 
              let argP = ConvExpr env arg 
@@ -387,22 +389,36 @@ module QuotationEvaluationTypes =
             Expression.Assign (linqVariable, linqValue)|> asExpr
 
         | Patterns.Lambda (firstVar, firstBody) as lambda ->
-            let rec getVars vars maybeBody = function
-            | Lambda (v, body) -> getVars (v::vars) (Some body) body
-            | _ -> List.rev vars, maybeBody.Value
+            let rec getArguments args maybeBody = function
+            | Lambda (v, body) -> getArguments (v::args) (Some body) body
+            | _ -> List.rev args, maybeBody.Value
 
-            let vars, body = getVars [] None lambda
+            let arguments, body =
+                getArguments [] None lambda
 
             let capturedVars =
-                let parameterVars = Set vars
+                let parameterVars = Set arguments
 
                 body.GetFreeVars ()
                 |> Seq.filter (fun freeVar -> not <| Set.contains freeVar parameterVars)
                 |> Seq.sortBy (fun freeVar -> freeVar.Name)
                 |> Seq.toList
 
-            let varsCount = vars.Length
-            if varsCount <= 19 then
+            let argsCount = arguments.Length
+            if argsCount > 19 then
+                // due to limitations of compiling linq quotations we have this fallback where we just pop
+                // off a single argument and try again. This gives very poor runtime performance, but I'm
+                // guessing (hoping?) that there aren't too many real world functions that have > 19 arguments.
+                let v, body = firstVar, firstBody
+
+                let vP = ConvVar v
+                let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
+                let tyargs = [| v.Type; body.Type |]
+                let bodyP = ConvExpr env body
+                let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
+                let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpression
+                Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
+            else
                 let stateType, makeStateConstructor =
                     match capturedVars |> List.map (fun v -> v.Type) |> List.toArray with
                     | [|t|] -> t, (fun x -> Seq.head x)
@@ -417,7 +433,7 @@ module QuotationEvaluationTypes =
                     | _ -> List.mapi (fun idx var -> var, getExpressionFromTuple stateParameter idx) capturedVars
 
                 let varParameters =
-                    vars
+                    arguments
                     |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name))
 
                 let lambdaEnv =
@@ -448,7 +464,7 @@ module QuotationEvaluationTypes =
                 let ``function`` = linqLambda.Compile ()
               
                 let funcFSharp =
-                    getFuncFSharpTypedef varsCount
+                    getFuncFSharpTypedef argsCount
 
                 let parameterTypes =
                     [|  yield stateType
@@ -504,16 +520,6 @@ module QuotationEvaluationTypes =
                                 assignState;
                                 theFuncObject |> asExpression
                             ]) |> asExpr
-            else
-                let v, body = firstVar, firstBody
-
-                let vP = ConvVar v
-                let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
-                let tyargs = [| v.Type; body.Type |]
-                let bodyP = ConvExpr env body
-                let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
-                let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpression
-                Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
     
         | Patterns.WhileLoop(condition, iteration) -> 
             let linqCondition = ConvExpr env condition
