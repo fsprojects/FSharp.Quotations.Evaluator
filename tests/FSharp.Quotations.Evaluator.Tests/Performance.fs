@@ -606,18 +606,18 @@ let ``Test many captures and parameters 2`` () =
 let ``Time many captures and parameters 2`` () =
     timeFunction <@ ``many captures and parameters 2`` @>
 
-[<ReflectedDefinition; TimeAllowance 11.0>]
+[<ReflectedDefinition; TimeAllowance 13.0>]
 let ``many captures and parameters 3`` () =
     let ff a =
-        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' =
-            a' * a + b' * a - c' * a + d' * a - e' * a + f' * a - g' * a + h' * a - i' * a + j' * a - k' * a + l' * a - m' * a + n' * a - o' * a
+        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' =
+            a' * a + b' * a - c' * a + d' * a - e' * a + f' * a - g' * a + h' * a - i' * a + j' * a - k' * a + l' * a - m' * a + n' * a - o' * a + p' * a - q' * a + r' * a - s' * a
         gg
     let r = Random 42
     let x () = r.Next()
     let mutable total = 0
     let fff = ff (x())
     for i=0 to 10 do
-        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
     total
 
 [<Test>]
