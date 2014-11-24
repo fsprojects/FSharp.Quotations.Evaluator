@@ -482,6 +482,175 @@ let ``Test operator .. ..`` () =
 let ``Time operator .. ..`` () =
     timeFunction <@ ``operator .. ..`` @>
 
+
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 1.5>]
+let ``recursion is even or odd`` () =
+    let rec isEven n =
+        if n = 0 then true
+        else isOdd (n-1)
+    and isOdd n =
+        if n = 0 then false
+        else isEven (n-1)
+    
+    let r = Random 3141592
+    Seq.init 100 (fun _ -> if isEven (r.Next 10000) then 1 else -1)
+    |> Seq.sum
+
+[<Test>]
+let ``Test recursion is even or odd`` () =
+    testFunction <@ ``recursion is even or odd`` @>
+
+[<Test>]
+let ``Time recursion is even or odd`` () =
+    timeFunction <@ ``recursion is even or odd`` @>
+
+[<ReflectedDefinition; TestIterations 100; TimeAllowance 15.0>]
+let ``recursion fibonacci`` () =
+    let rec fib n =
+        if n <= 2 then 1
+        else fib (n-1) + fib (n-2)
+    
+    let r = Random 3141592
+    Seq.init 10 (fun _ -> float <| fib (r.Next 30))
+    |> Seq.sum
+
+[<Test>]
+let ``Test recursion fibonacci`` () =
+    testFunction <@ ``recursion fibonacci`` @>
+
+[<Test>]
+let ``Time recursion fibonacci`` () =
+    timeFunction <@ ``recursion fibonacci`` @>
+
+type Partner = {
+    Name : string
+    Partner : Partner
+}
+
+[<ReflectedDefinition; TimeAllowance 15.0>]
+let ``recursion type creation`` () =
+    let rec penny  = { 
+        Name = "Penny"
+        Partner = paul }
+    and paul = {
+        Name = "Paul"
+        Partner = penny }
+
+    penny.Name + "&" + paul.Name = paul.Partner.Name + "&" + penny.Partner.Name
+
+[<Test; Ignore("Not currently supported")>]
+let ``Test recursion type creation`` () =
+    testFunction <@ ``recursion type creation`` @>
+
+[<Test; Ignore("Not currently supported")>]
+let ``Time recursion type creation`` () =
+    timeFunction <@ ``recursion type creation`` @>
+
+
+[<ReflectedDefinition; TimeAllowance 15.0>]
+let ``recursion tail`` () =
+    let rec count acc n = 
+        if n = 0 then acc
+        else count (acc+1) (n-1)
+
+    count 0 100000
+
+[<Test; Ignore("Not currently supported - blows up")>]
+let ``Test recursion tail`` () =
+    testFunction <@ ``recursion tail`` @>
+
+[<Test; Ignore("Not currently supported - blows up")>]
+let ``Time recursion tail`` () =
+    timeFunction <@ ``recursion tail`` @>
+
+[<ReflectedDefinition; TimeAllowance 9.0>]
+let ``many captures and parameters 1`` () =
+    let ff a b c d e f =
+        let gg a' b' c' d' e' f' =
+            a' * a + b' * b - c' * c + d' * d - e' * e + f' * f
+        gg
+    let r = Random 42
+    let x () = r.Next()
+    let mutable total = 0
+    let fff = ff (x()) (x()) (x()) (x()) (x()) (x()) 
+    for i=0 to 10 do
+        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x())
+    total
+
+[<Test>]
+let ``Test many captures and parameters 1`` () =
+    testFunction <@ ``many captures and parameters 1`` @>
+
+[<Test>]
+let ``Time many captures and parameters 1`` () =
+    timeFunction <@ ``many captures and parameters 1`` @>
+
+[<ReflectedDefinition; TimeAllowance 3.5>]
+let ``many captures and parameters 2`` () =
+    let ff a b c d e f g h i j k l m n o =
+        let gg a' = a' * a + a' * b - a' * c + a' * d - a' * e + a' * f - a' * g + a' * h - a' * i + a' * j - a' * k + a' * l - a' * m + a' * n - a' * o
+        gg
+    let r = Random 42
+    let x () = r.Next()
+    let mutable total = 0
+    let fff = ff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+    for i=0 to 10 do
+        total <- total + fff (x())
+    total
+
+[<Test>]
+let ``Test many captures and parameters 2`` () =
+    testFunction <@ ``many captures and parameters 2`` @>
+
+[<Test>]
+let ``Time many captures and parameters 2`` () =
+    timeFunction <@ ``many captures and parameters 2`` @>
+
+[<ReflectedDefinition; TimeAllowance 13.0>]
+let ``many captures and parameters 3`` () =
+    let ff a =
+        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' p' q' r' s' =
+            a' * a + b' * a - c' * a + d' * a - e' * a + f' * a - g' * a + h' * a - i' * a + j' * a - k' * a + l' * a - m' * a + n' * a - o' * a + p' * a - q' * a + r' * a - s' * a
+        gg
+    let r = Random 42
+    let x () = r.Next()
+    let mutable total = 0
+    let fff = ff (x())
+    for i=0 to 10 do
+        total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+    total
+
+[<Test>]
+let ``Test many captures and parameters 3`` () =
+    testFunction <@ ``many captures and parameters 3`` @>
+
+[<Test>]
+let ``Time many captures and parameters 3`` () =
+    timeFunction <@ ``many captures and parameters 3`` @>
+
+[<ReflectedDefinition; TimeAllowance 9.0>]
+let ``many captures and parameters 4`` () =
+    let ff a b c d e f g h i j k l m n o =
+        let gg a' b' c' d' e' f' g' h' i' j' k' l' m' n' o' =
+            a' * a + b' * b - c' * c + d' * d - e' * e + f' * f - g' * g + h' * h - i' * i + j' * j - k' * k + l' * l - m' * m + n' * n - o' * o
+        gg
+    let r = Random 42
+    let x () = r.Next()
+    let mutable total = 0
+    let fff = ff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
+    for i=0 to 10 do
+        total <- total + fff (x()) (x()) (x()) (x())
+    total
+
+[<Test>]
+let ``Test many captures and parameters 4`` () =
+    testFunction <@ ``many captures and parameters 4`` @>
+
+[<Test>]
+let ``Time many captures and parameters 4`` () =
+    timeFunction <@ ``many captures and parameters 4`` @>
+
+
 (*
 [<ReflectedDefinition>]
 let ``[]()`` () =

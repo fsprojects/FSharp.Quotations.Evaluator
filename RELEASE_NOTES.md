@@ -9,3 +9,7 @@
 * Updated release notes
 
 ### 1.0.3 - A range of performance improvements
+
+### 1.0.4 - 'let rec' performance improvements
+* simplification refactorings
+* (my) stylistic code formatting

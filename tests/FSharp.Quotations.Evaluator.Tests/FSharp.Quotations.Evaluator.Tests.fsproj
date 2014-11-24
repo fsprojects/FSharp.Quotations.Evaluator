@@ -68,6 +68,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <ItemGroup>
+    <Compile Include="Tools.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="Performance.fs" />
     <None Include="packages.config" />
