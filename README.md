@@ -11,3 +11,8 @@ See http://fsprojects.github.io/FSharp.Quotations.Evaluator/
 - Build and publish release docs using ``build.cmd ReleaseDocs`` or ``build.sh ReleaseDocs`` 
 - Publish packages using ``nuget/publish.cmd`` or ``.nuget\nuget.exe push bin\<package> <apikey>``
 
+### Maintainer(s)
+
+[@manofstick](https://github.com/manofstick) - Paul Westcott
+[@fsgit](https://github.com/fsgit)
+
