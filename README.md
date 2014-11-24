@@ -13,6 +13,6 @@ See http://fsprojects.github.io/FSharp.Quotations.Evaluator/
 
 ### Maintainer(s)
 
-[@manofstick](https://github.com/manofstick) - Paul Westcott
-[@fsgit](https://github.com/fsgit)
+- [@manofstick](https://github.com/manofstick) - Paul Westcott
+- [@fsgit](https://github.com/fsgit)
 
