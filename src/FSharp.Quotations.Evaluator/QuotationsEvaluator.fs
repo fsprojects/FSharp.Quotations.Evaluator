@@ -474,31 +474,31 @@ module QuotationEvaluationTypes =
 
                 let stateEnvironment =
                     match capturedVars with
-                    | v1 :: [] -> [v1, stateParameter |> asExpression]
-                    | _ -> List.mapi (fun idx var -> var, getExpressionFromTuple stateParameter idx) capturedVars
+                    | v1 :: [] -> [v1, stateParameter |> asExpression, (snd <| Map.find v1 env.varEnv)]
+                    | _ -> List.mapi (fun idx var -> var, (getExpressionFromTuple stateParameter idx), (snd <| Map.find var env.varEnv)) capturedVars
 
                 let varParameters =
                     arguments
-                    |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name))
+                    |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name), None)
 
                 let lambdaEnv =
                     { env with
                          varEnv =
                             let environmentVariables =
                                 varParameters
-                                |> List.map (fun (v,p) -> v, p |> asExpression)
+                                |> List.map (fun (v,p,t) -> v, p |> asExpression, t)
                                 |> List.append stateEnvironment
 
                             (env.varEnv, environmentVariables)
-                            ||> List.fold (fun varEnv (var, parameter) ->
+                            ||> List.fold (fun varEnv (var, parameter, t) ->
                                 varEnv
-                                |> Map.add var (parameter, None)) }
+                                |> Map.add var (parameter, t)) }
 
                 let linqBody = ConvExpr lambdaEnv body
 
                 let parameters = 
                     [ yield stateParameter
-                      yield! varParameters |> List.map snd ]
+                      yield! varParameters |> List.map (fun (_,e,_) -> e) ]
 
                 let funcTypes =
                     [| yield! parameters |> List.map (fun p -> p.Type )
@@ -513,7 +513,7 @@ module QuotationEvaluationTypes =
 
                 let parameterTypes =
                     [|  yield stateType
-                        yield! varParameters |> List.map (fun (vars,_) -> vars.Type)
+                        yield! varParameters |> List.map (fun (vars,_,_) -> vars.Type)
                         yield linqBody.Type |]
                   
                 let ``type`` = funcFSharp.MakeGenericType parameterTypes
