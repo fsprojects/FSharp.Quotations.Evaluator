@@ -276,22 +276,36 @@ module QuotationEvaluationTypes =
                 Expression.Call(ConvObjArg env objOpt None, minfo, argsP) |> wrapVoid
 
         | Patterns.Application(_) as application ->
-            let c = ConvExpr env
-            let rec getApplications args = function
-            | Patterns.Application (Patterns.Application(_) as f, arg) -> getApplications ((c arg)::args) f
-            | Patterns.Application (Patterns.Var v, arg) ->
-                match Map.find v env.varEnv with
-                | f, Some funcType ->
-                    let args = (c arg)::args
-                    let func = funcType.GetProperty ("Function", BindingFlags.NonPublic ||| BindingFlags.Instance)
-                    let state = funcType.GetField ("State", BindingFlags.NonPublic ||| BindingFlags.Instance)
-                    if funcType.GetGenericArguments().Length = args.Length + 2 && func <> null && state <> null 
-                        then Some (f, args, funcType, func, state)
-                        else None
-                | _-> None
-            | _ -> None
+            // with Applications we first try to determine if the FSharpFunc is an internally created
+            // one, and if it is, then we call the linq compiled function directly. Otherwise we
+            // drop back to the InvokeFast calls, and finally just to the Invoke.
 
-            match getApplications [] application with
+            let c = ConvExpr env
+            let rec getApplications args applicationExpression =
+                match applicationExpression with 
+                | Patterns.Application (Patterns.Application(_) as f, arg) ->
+                    getApplications ((c arg)::args) f
+                | Patterns.Application (Patterns.Var v, arg) ->
+                    let linqExpr, ``type`` = Map.find v env.varEnv
+                    Some (linqExpr, ``type``, (c arg)::args)
+                | Patterns.Application (e, arg) ->
+                    let linqExpr = ConvExpr env e
+                    Some (linqExpr, Some linqExpr.Type, (c arg)::args)
+                | _ -> None
+
+            let nativeFunctionDetails = 
+                getApplications [] application
+                |> Option.bind (fun (e, t, args) ->
+                    match e, t with
+                    | f, Some funcType when args.Length > -1 ->
+                        let func = funcType.GetProperty ("Function", BindingFlags.NonPublic ||| BindingFlags.Instance)
+                        let state = funcType.GetField ("State", BindingFlags.NonPublic ||| BindingFlags.Instance)
+                        if funcType.GetGenericArguments().Length = args.Length + 2 && func <> null && state <> null 
+                            then Some (f, args, funcType, func, state)
+                            else None
+                    | _-> None)
+
+            match nativeFunctionDetails with
             | Some (f, args, funcType, func, state) ->
                 let asFuncType = Expression.Variable(funcType)
 
