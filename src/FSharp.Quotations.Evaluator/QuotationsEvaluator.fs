@@ -192,7 +192,11 @@ module QuotationEvaluationTypes =
                     parse (ConvExprs env args) |> asExpr
                 else
                     Expression.Convert (ConvExpr env x1, t) |> asExpr
-            let convertChecked x1 t = Expression.Convert (ConvExpr env x1, t) |> asExpr
+            let convertCheckedOrParse (x1: Expr) t parse =
+                if x1.Type = typeof<string> then
+                    parse (ConvExprs env args) |> asExpr
+                else
+                    Expression.Convert (ConvExpr env x1, t) |> asExpr
 
             let transComparison x1 x2 exprConstructor exprErasedConstructor (intrinsic : MethodInfo) =
                 let e1 = ConvExpr env x1
@@ -250,15 +254,16 @@ module QuotationEvaluationTypes =
             | Λ ``-> uint64``  (_,_,[x1]) -> convertOrParse x1 typeof<uint64> parseUInt64Expr
              /// REVIEW: convert with method witness
 
-            | Λ ``-> checked.char``   (_,_,[x1]) -> convertChecked x1 typeof<char>
-            | Λ ``-> checked.sbyte``  (_,_,[x1]) -> convertChecked x1 typeof<sbyte>
-            | Λ ``-> checked.int16``  (_,_,[x1]) -> convertChecked x1 typeof<int16>
-            | Λ ``-> checked.int32``  (_,_,[x1]) -> convertChecked x1 typeof<int32>
-            | Λ ``-> checked.int64``  (_,_,[x1]) -> convertChecked x1 typeof<int64>
-            | Λ ``-> checked.byte``   (_,_,[x1]) -> convertChecked x1 typeof<byte>
-            | Λ ``-> checked.uint16`` (_,_,[x1]) -> convertChecked x1 typeof<uint16>
-            | Λ ``-> checked.uint32`` (_,_,[x1]) -> convertChecked x1 typeof<uint32>
-            | Λ ``-> checked.uint64`` (_,_,[x1]) -> convertChecked x1 typeof<uint64>
+            | Λ ``-> checked.char``   (_,_,[x1]) -> convertCheckedOrParse x1 typeof<char> parseCharExpr
+            | Λ ``-> checked.sbyte``  (_,_,[x1]) -> convertCheckedOrParse x1 typeof<sbyte> parseSByteExpr
+            | Λ ``-> checked.int16``  (_,_,[x1]) -> convertCheckedOrParse x1 typeof<int16> parseInt16Expr
+            | Λ ``-> checked.int32``  (_,_,[x1]) -> convertCheckedOrParse x1 typeof<int32> parseInt32Expr
+            | Λ ``-> checked.int``    (_,_,[x1]) -> convertCheckedOrParse x1 typeof<int32> parseInt32Expr
+            | Λ ``-> checked.int64``  (_,_,[x1]) -> convertCheckedOrParse x1 typeof<int64> parseInt64Expr
+            | Λ ``-> checked.byte``   (_,_,[x1]) -> convertCheckedOrParse x1 typeof<byte> parseByteExpr
+            | Λ ``-> checked.uint16`` (_,_,[x1]) -> convertCheckedOrParse x1 typeof<uint16> parseUInt16Expr
+            | Λ ``-> checked.uint32`` (_,_,[x1]) -> convertCheckedOrParse x1 typeof<uint32> parseUInt32Expr
+            | Λ ``-> checked.uint64`` (_,_,[x1]) -> convertCheckedOrParse x1 typeof<uint64> parseUInt64Expr
 
             | Λ ``-> getArray``  (_, [|ArrayTypeQ(elemTy);_;_|],[x1;x2]) -> 
                 Expression.ArrayIndex(ConvExpr env x1, ConvExpr env x2) |> asExpr

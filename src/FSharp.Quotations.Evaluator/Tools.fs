@@ -301,6 +301,7 @@ let ``-> checked.char``   = getGenericMethodInfo <@ Checked.char @>
 let ``-> checked.sbyte``  = getGenericMethodInfo <@ Checked.sbyte @>
 let ``-> checked.int16``  = getGenericMethodInfo <@ Checked.int16 @>
 let ``-> checked.int32``  = getGenericMethodInfo <@ Checked.int32 @>
+let ``-> checked.int``    = getGenericMethodInfo <@ Checked.int @>
 let ``-> checked.int64``  = getGenericMethodInfo <@ Checked.int64 @>
 let ``-> checked.byte``   = getGenericMethodInfo <@ Checked.byte @>
 let ``-> checked.uint16`` = getGenericMethodInfo <@ Checked.uint16 @>
