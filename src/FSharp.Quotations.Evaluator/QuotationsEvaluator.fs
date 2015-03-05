@@ -187,7 +187,11 @@ module QuotationEvaluationTypes =
             let unary x1 f     = f (ConvExpr env x1) |> asExpr
             let binary x1 x2 f = f (ConvExpr env x1, ConvExpr env x2) |> asExpr
 
-            let convert x1 t        = Expression.Convert (ConvExpr env x1, t) |> asExpr
+            let convertOrParse (x1: Expr) t parse =
+                if x1.Type = typeof<string> then
+                    parse (ConvExprs env args) |> asExpr
+                else
+                    Expression.Convert (ConvExpr env x1, t) |> asExpr
             let convertChecked x1 t = Expression.Convert (ConvExpr env x1, t) |> asExpr
 
             let transComparison x1 x2 exprConstructor exprErasedConstructor (intrinsic : MethodInfo) =
@@ -231,19 +235,19 @@ module QuotationEvaluationTypes =
             | Λ ``-> checked-``  (_,_,[x1;x2]) -> binary x1 x2 Expression.SubtractChecked
             | Λ ``-> checked*``  (_,_,[x1;x2]) -> binary x1 x2 Expression.MultiplyChecked
              
-            | Λ ``-> char``    (_,_,[x1]) -> convert x1 typeof<char>
-            | Λ ``-> decimal`` (_,_,[x1]) -> convert x1 typeof<decimal>
-            | Λ ``-> float``   (_,_,[x1]) -> convert x1 typeof<float>
-            | Λ ``-> float32`` (_,_,[x1]) -> convert x1 typeof<float32>
-            | Λ ``-> sbyte``   (_,_,[x1]) -> convert x1 typeof<sbyte>
-            | Λ ``-> int16``   (_,_,[x1]) -> convert x1 typeof<int16>
-            | Λ ``-> int32``   (_,_,[x1]) -> convert x1 typeof<int32>
-            | Λ ``-> int``     (_,_,[x1]) -> convert x1 typeof<int32>
-            | Λ ``-> int64``   (_,_,[x1]) -> convert x1 typeof<int64>
-            | Λ ``-> byte``    (_,_,[x1]) -> convert x1 typeof<byte>
-            | Λ ``-> uint16``  (_,_,[x1]) -> convert x1 typeof<uint16>
-            | Λ ``-> uint32``  (_,_,[x1]) -> convert x1 typeof<uint32>
-            | Λ ``-> uint64``  (_,_,[x1]) -> convert x1 typeof<uint64>
+            | Λ ``-> char``    (_,_,[x1]) -> convertOrParse x1 typeof<char> parseCharExpr
+            | Λ ``-> decimal`` (_,_,[x1]) -> convertOrParse x1 typeof<decimal> parseDecimalExpr
+            | Λ ``-> float``   (_,_,[x1]) -> convertOrParse x1 typeof<float> parseDoubleExpr
+            | Λ ``-> float32`` (_,_,[x1]) -> convertOrParse x1 typeof<float32> parseSingleExpr
+            | Λ ``-> sbyte``   (_,_,[x1]) -> convertOrParse x1 typeof<sbyte> parseSByteExpr
+            | Λ ``-> int16``   (_,_,[x1]) -> convertOrParse x1 typeof<int16> parseInt16Expr
+            | Λ ``-> int32``   (_,_,[x1]) -> convertOrParse x1 typeof<int32> parseInt32Expr
+            | Λ ``-> int``     (_,_,[x1]) -> convertOrParse x1 typeof<int32> parseInt32Expr
+            | Λ ``-> int64``   (_,_,[x1]) -> convertOrParse x1 typeof<int64> parseInt64Expr
+            | Λ ``-> byte``    (_,_,[x1]) -> convertOrParse x1 typeof<byte> parseByteExpr
+            | Λ ``-> uint16``  (_,_,[x1]) -> convertOrParse x1 typeof<uint16> parseUInt16Expr
+            | Λ ``-> uint32``  (_,_,[x1]) -> convertOrParse x1 typeof<uint32> parseUInt32Expr
+            | Λ ``-> uint64``  (_,_,[x1]) -> convertOrParse x1 typeof<uint64> parseUInt64Expr
              /// REVIEW: convert with method witness
 
             | Λ ``-> checked.char``   (_,_,[x1]) -> convertChecked x1 typeof<char>
