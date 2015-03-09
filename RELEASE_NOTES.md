@@ -14,5 +14,7 @@
 * simplification refactorings
 * (my) stylistic code formatting
 
-### 1.0.5 - Fixes for "casts"
+### 1.0.5 - Skipped due to my [manofstick] stuffing up version
+
+### 1.0.6 - Fixes for "casts"
 * duplicate f# functionality where 'cast' functions parse strings
