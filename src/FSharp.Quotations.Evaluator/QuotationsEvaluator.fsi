@@ -40,6 +40,7 @@ namespace FSharp.Quotations.Evaluator
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
+        [<Obsolete("Use Evaluate")>]
         static member Compile : Microsoft.FSharp.Quotations.Expr<'T> -> 'T
 
         /// Evaluate the quotation expression by first converting to LINQ expression trees
