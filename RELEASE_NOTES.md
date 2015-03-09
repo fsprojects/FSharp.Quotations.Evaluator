@@ -13,3 +13,6 @@
 ### 1.0.4 - 'let rec' performance improvements
 * simplification refactorings
 * (my) stylistic code formatting
+
+### 1.0.5 - Fixes for "casts"
+* duplicate f# functionality where 'cast' functions parse strings

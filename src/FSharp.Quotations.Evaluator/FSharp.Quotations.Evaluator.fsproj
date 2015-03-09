@@ -43,6 +43,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Public.fs" />
     <Compile Include="Tools.fs" />
     <Compile Include="QuotationsEvaluator.fsi" />
