@@ -1400,4 +1400,57 @@ module CheckedTests =
          test "z7" (z7 = 2.0M<m>)
          test "z10" (z10 = 1)
           
-        
+module ParseTests =
+    [<Test>]
+    let ParseTests() =
+        let parseChar = <@ char "a" @> |> eval
+        let parseDecimal = <@ decimal "10.5" @> |> eval
+        let parseFloat = <@ float "10.5" @> |> eval
+        let parseFloat32 = <@ float32 "10.5" @> |> eval
+        let parseSbyte = <@ sbyte "42" @> |> eval
+        let parseInt16 = <@ int16 "42" @> |> eval
+        let parseInt32 = <@ int32 "42" @> |> eval
+        let parseInt = <@ int "42" @> |> eval
+        let parseInt64 = <@ int64 "42" @> |> eval
+        let parseByte = <@ byte "42" @> |> eval
+        let parseUint16 = <@ uint16 "42" @> |> eval
+        let parseUint32 = <@ uint32 "42" @> |> eval
+        let parseUint64 = <@ uint64 "42" @> |> eval
+
+        test "parseChar" (parseChar = 'a')
+        test "parseDecimal" (parseDecimal = 10.5M)
+        test "parseFloat" (parseFloat = 10.5)
+        test "parseFloat32" (parseFloat32 = 10.5f)
+        test "parseSbyte" (parseSbyte = 42y)
+        test "parseInt16" (parseInt16 = 42s)
+        test "parseInt32" (parseInt32 = 42)
+        test "parseInt" (parseInt = 42)
+        test "parseInt64" (parseInt64 = 42L)
+        test "parseByte" (parseByte = 42uy)
+        test "parseUint16" (parseUint16 = 42us)
+        test "parseUint32" (parseUint32 = 42u)
+        test "parseUint64" (parseUint64 = 42UL)
+
+    [<Test>]
+    let ParseCheckedTests() =
+        let parseChar = <@ Checked.char "a" @> |> eval
+        let parseSbyte = <@ Checked.sbyte "42" @> |> eval
+        let parseInt16 = <@ Checked.int16 "42" @> |> eval
+        let parseInt32 = <@ Checked.int32 "42" @> |> eval
+        let parseInt = <@ Checked.int "42" @> |> eval
+        let parseInt64 = <@ Checked.int64 "42" @> |> eval
+        let parseByte = <@ Checked.byte "42" @> |> eval
+        let parseUint16 = <@ Checked.uint16 "42" @> |> eval
+        let parseUint32 = <@ Checked.uint32 "42" @> |> eval
+        let parseUint64 = <@ Checked.uint64 "42" @> |> eval
+
+        test "parseChar" (parseChar = 'a')
+        test "parseSbyte" (parseSbyte = 42y)
+        test "parseInt16" (parseInt16 = 42s)
+        test "parseInt32" (parseInt32 = 42)
+        test "parseInt" (parseInt = 42)
+        test "parseInt64" (parseInt64 = 42L)
+        test "parseByte" (parseByte = 42uy)
+        test "parseUint16" (parseUint16 = 42us)
+        test "parseUint32" (parseUint32 = 42u)
+        test "parseUint64" (parseUint64 = 42UL)

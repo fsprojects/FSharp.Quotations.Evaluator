@@ -301,6 +301,7 @@ let ``-> checked.char``   = getGenericMethodInfo <@ Checked.char @>
 let ``-> checked.sbyte``  = getGenericMethodInfo <@ Checked.sbyte @>
 let ``-> checked.int16``  = getGenericMethodInfo <@ Checked.int16 @>
 let ``-> checked.int32``  = getGenericMethodInfo <@ Checked.int32 @>
+let ``-> checked.int``    = getGenericMethodInfo <@ Checked.int @>
 let ``-> checked.int64``  = getGenericMethodInfo <@ Checked.int64 @>
 let ``-> checked.byte``   = getGenericMethodInfo <@ Checked.byte @>
 let ``-> checked.uint16`` = getGenericMethodInfo <@ Checked.uint16 @>
@@ -315,3 +316,51 @@ let ``-> |>`` = getGenericMethodInfo <@ (|>) @>
 let ``-> <|`` = getGenericMethodInfo <@ (<|) @>
 let ``-> ..`` = getGenericMethodInfo <@ (..) @>
 let ``-> .. ..`` = getGenericMethodInfo <@ (.. ..) @>
+
+let private languagePrimitivesType =
+    typedefof<_ list>.Assembly.GetType("Microsoft.FSharp.Core.LanguagePrimitives")
+
+let private parseInt32M = languagePrimitivesType.GetMethod("ParseInt32")
+let private parseInt64M = languagePrimitivesType.GetMethod("ParseInt64")
+let private parseUInt32M = languagePrimitivesType.GetMethod("ParseUInt32")
+let private parseUInt64M = languagePrimitivesType.GetMethod("ParseUInt64")
+
+let parseInt32Expr argsP = Expression.Call(null, parseInt32M, argsP)
+let parseInt64Expr argsP = Expression.Call(null, parseInt64M, argsP)
+let parseUInt32Expr argsP = Expression.Call(null, parseUInt32M, argsP)
+let parseUInt64Expr argsP = Expression.Call(null, parseUInt64M, argsP)
+
+let parseSByteExpr argsP = Expression.Convert(Expression.Call(null, parseInt32M, argsP), typeof<sbyte>)
+let parseInt16Expr argsP = Expression.Convert(Expression.Call(null, parseInt32M, argsP), typeof<int16>)
+let parseByteExpr argsP = Expression.Convert(Expression.Call(null, parseUInt32M, argsP), typeof<byte>)
+let parseUInt16Expr argsP = Expression.Convert(Expression.Call(null, parseUInt32M, argsP), typeof<uint16>)
+
+let private parseSingleM = typeof<float32>.GetMethod("Parse", [|typeof<string>; typeof<Globalization.NumberStyles>; typeof<IFormatProvider>|])
+let private parseDoubleM = typeof<float>.GetMethod("Parse", [|typeof<string>; typeof<Globalization.NumberStyles>; typeof<IFormatProvider>|])
+let private parseDecimalM = typeof<decimal>.GetMethod("Parse", [|typeof<string>; typeof<Globalization.NumberStyles>; typeof<IFormatProvider>|])
+
+let private numStyleConst = Expression.Constant(Globalization.NumberStyles.Float) :> Expression
+let private providerConst = Expression.Constant(Globalization.CultureInfo.InvariantCulture) :> Expression
+
+let parseSingleExpr (argsExprs: Expression[]) =
+    let argsExprs =
+        [| yield! argsExprs
+           yield numStyleConst
+           yield providerConst |]
+    Expression.Call(null, parseSingleM, argsExprs)
+let parseDoubleExpr (argsExprs: Expression[]) =
+    let argsExprs =
+        [| yield! argsExprs
+           yield numStyleConst
+           yield providerConst |]
+    Expression.Call(null, parseDoubleM, argsExprs)
+let parseDecimalExpr (argsExprs: Expression[]) =
+    let argsExprs =
+        [| yield! argsExprs
+           yield numStyleConst
+           yield providerConst |]
+    Expression.Call(null, parseDecimalM, argsExprs)
+
+let private parseCharM = typeof<char>.GetMethod("Parse")
+
+let parseCharExpr argsP = Expression.Call(null, parseCharM, argsP)
