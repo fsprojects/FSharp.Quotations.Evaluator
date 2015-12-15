@@ -1,5 +1,4 @@
 @echo off
-cls
 
 IF NOT EXIST packages\FAKE\tools\FAKE.exe  (
   .nuget\nuget.exe install FAKE -OutputDirectory packages -ExcludeVersion
