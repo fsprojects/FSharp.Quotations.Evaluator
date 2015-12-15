@@ -6,11 +6,9 @@
 namespace FSharp.Quotations.Evaluator
 
 open System
-open System.Linq
 open System.Collections.Generic
 open System.Linq.Expressions
 open System.Reflection
-open System.Reflection.Emit
 open Microsoft.FSharp
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations
@@ -22,7 +20,6 @@ module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
 module QuotationEvaluationTypes = 
-    open HelperTypes
     open Tools
 
     type This = 
