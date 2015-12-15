@@ -6,22 +6,20 @@
 namespace FSharp.Quotations.Evaluator
 
 open System
-open System.Linq
 open System.Collections.Generic
 open System.Linq.Expressions
 open System.Reflection
-open System.Reflection.Emit
 open Microsoft.FSharp
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Quotations.DerivedPatterns
+open FSharp.Quotations.Evaluator.Tools
 
 module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
 module QuotationEvaluationTypes = 
-    open HelperTypes
     open Tools
 
     type This = 
@@ -84,8 +82,12 @@ module QuotationEvaluationTypes =
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
     let LinqExpressionHelper (x:'T) : Expression<'T> = failwith ""
-    
-    let showAll = BindingFlags.Public ||| BindingFlags.NonPublic 
+
+#if PORTABLE
+    let showAll = true
+#else
+    let showAll = BindingFlags.Public ||| BindingFlags.NonPublic    
+#endif
 
     let wrapVoid (e:#Expression) =
         if e.Type <> typeof<System.Void> then e |> asExpr
@@ -202,7 +204,24 @@ module QuotationEvaluationTypes =
                 let e1 = ConvExpr env x1
                 let e2 = ConvExpr env x2
 
-                if e1.Type.IsPrimitive || env.eraseEquality then
+                let isPrimitive = 
+                    let ty = e1.Type
+                    (ty = typeof<Boolean>) ||
+                    (ty = typeof<Byte>) ||
+                    (ty = typeof<SByte>) ||
+                    (ty = typeof<Int16>) ||
+                    (ty = typeof<UInt16>) ||
+                    (ty = typeof<Int32>) ||
+                    (ty = typeof<UInt32>) ||
+                    (ty = typeof<Int64>) ||
+                    (ty = typeof<UInt64>) ||
+                    (ty = typeof<IntPtr>) ||
+                    (ty = typeof<UIntPtr>) ||
+                    (ty = typeof<Char>) ||
+                    (ty = typeof<Double>) ||
+                    (ty = typeof<Single>) 
+
+                if isPrimitive || env.eraseEquality then
                     exprErasedConstructor(e1,e2) |> asExpr
                 else 
                     exprConstructor(e1, e2, false, intrinsic.MakeGenericMethod([|x1.Type|])) |> asExpr
@@ -424,9 +443,13 @@ module QuotationEvaluationTypes =
                 let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
                 let tyargs = [| v.Type; body.Type |]
                 let bodyP = ConvExpr env body
+#if PORTABLE 
+                failwith "argument counts > 19 not supported when using the portable version of FSharp.Quotations.Evaluator"
+#else
                 let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
                 let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpression
                 Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
+#endif
             else
                 let stateType, makeStateConstructor =
                     match capturedVars |> List.map (fun v -> v.Type) |> List.toArray with

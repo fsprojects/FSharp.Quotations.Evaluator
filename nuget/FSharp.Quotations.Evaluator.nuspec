@@ -18,6 +18,10 @@
   </metadata>
   <files>
     <file src="..\bin\FSharp.Quotations.Evaluator.dll" target="lib/net40" />
+    <file src="..\bin\FSharp.Quotations.Evaluator.xml" target="lib/net40" />
     <file src="..\bin\FSharp.Quotations.Evaluator.pdb" target="lib/net40" />
+    <file src="..\bin\profile7\FSharp.Quotations.Evaluator.dll" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" />
+    <file src="..\bin\profile7\FSharp.Quotations.Evaluator.xml" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" />
+    <file src="..\bin\profile7\FSharp.Quotations.Evaluator.pdb" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" />
   </files>
 </package>

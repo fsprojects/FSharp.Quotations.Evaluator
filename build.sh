@@ -1,10 +1,9 @@
 #!/bin/bash
 
-mono .nuget/NuGet.exe install FAKE -OutputDirectory packages -ExcludeVersion
-mono .nuget/NuGet.exe install SourceLink.Fake -OutputDirectory packages -ExcludeVersion
-
-if [ ! -e build.fsx ]; then 
-  mono packages/FAKE/tools/FAKE.exe init.fsx
+if [ ! -f packages/FAKE/tools/FAKE.exe ]; then
+  mono .nuget/NuGet.exe install FAKE -OutputDirectory packages -ExcludeVersion
 fi
 
-mono packages/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO build.fsx 
+mono .nuget/NuGet.exe install SourceLink.Fake -OutputDirectory packages -ExcludeVersion
+
+mono packages/FAKE/tools/FAKE.exe build.fsx $@ --fsiargs --define:MONO 

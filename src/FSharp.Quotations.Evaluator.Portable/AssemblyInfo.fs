@@ -1,7 +1,7 @@
 ﻿namespace System
 open System.Reflection
 
-[<assembly: AssemblyTitleAttribute("FSharp.Quotations.Evaluator")>]
+[<assembly: AssemblyTitleAttribute("FSharp.Quotations.Evaluator.Portable")>]
 [<assembly: AssemblyProductAttribute("FSharp.Quotations.Evaluator")>]
 [<assembly: AssemblyDescriptionAttribute("A quotations evaluator for F# based on LINQ expression tree compilation")>]
 [<assembly: AssemblyVersionAttribute("1.0.7")>]

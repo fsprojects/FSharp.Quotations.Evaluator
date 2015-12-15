@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1F1B4F0F-2998-4D74-865B-9122611C2B14}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,6 +37,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED8079DD
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Quotations.Evaluator.Tests", "tests\FSharp.Quotations.Evaluator.Tests\FSharp.Quotations.Evaluator.Tests.fsproj", "{E789C72A-5CFD-436B-8EF1-61AA2852A89F}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Quotations.Evaluator.Portable", "src\FSharp.Quotations.Evaluator.Portable\FSharp.Quotations.Evaluator.Portable.fsproj", "{23E65C80-0BB3-4054-B112-14F554F4AB73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,12 @@ Global
 		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Performance|Any CPU.Build.0 = Performance|Any CPU
 		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Performance|Any CPU.ActiveCfg = Release|Any CPU
+		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Performance|Any CPU.Build.0 = Release|Any CPU
+		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
