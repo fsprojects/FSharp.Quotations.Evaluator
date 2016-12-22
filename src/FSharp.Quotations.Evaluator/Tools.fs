@@ -244,103 +244,120 @@ let getFuncType (args:Type[])  =
         | 21 -> typedefof<FuncHelper<_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_>>.MakeGenericType args
         | _ -> raise <| NotSupportedException "Quotation expressions with statements or closures containing more then 20 free variables may not be translated in this release of the F# PowerPack. This is due to limitations in the variable binding expression forms available in LINQ expression trees"
             
-type FuncFSharp<'state,'a> (f:Func<'state,'a>) =
+type FuncFSharp<'state,'a> (func:Func<'state,'a>) =
     inherit FSharpFunc<unit, 'a>()
     [<Core.DefaultValue false>] val mutable State : 'state
-    override this.Invoke _ = f.Invoke this.State
+    member __.Function = func
+    override this.Invoke _ = func.Invoke this.State
 
-type FuncFSharp<'state,'a,'b> (f:Func<'state,'a,'b>) =
+type FuncFSharp<'state,'a,'b> (func:Func<'state,'a,'b>) =
     inherit FSharpFunc<'a,'b>()
     [<Core.DefaultValue false>] val mutable State : 'state
-    override this.Invoke a = f.Invoke (this.State,a)
+    member __.Function = func
+    override this.Invoke a = func.Invoke (this.State,a)
 
-type FuncFSharp<'state,'a,'b,'c> (f:Func<'state,'a,'b,'c>) =
+type FuncFSharp<'state,'a,'b,'c> (func:Func<'state,'a,'b,'c>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c>()
     [<Core.DefaultValue false>] val mutable State : 'state
-    override this.Invoke (a,b) = f.Invoke (this.State,a,b)
-    override this.Invoke a = fun b -> f.Invoke (this.State,a,b)
+    override this.Invoke (a,b) = func.Invoke (this.State,a,b)
+    member __.Function = func
+    override this.Invoke a = fun b -> func.Invoke (this.State,a,b)
 
-type FuncFSharp<'state,'a,'b,'c,'d> (f:Func<'state,'a,'b,'c,'d>) =
+type FuncFSharp<'state,'a,'b,'c,'d> (func:Func<'state,'a,'b,'c,'d>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d>()
     [<Core.DefaultValue false>] val mutable State : 'state
-    override this.Invoke (a,b,c) = f.Invoke (this.State,a,b,c)
-    override this.Invoke a = fun b c -> f.Invoke (this.State,a,b,c)
+    member __.Function = func
+    override this.Invoke (a,b,c) = func.Invoke (this.State,a,b,c)
+    override this.Invoke a = fun b c -> func.Invoke (this.State,a,b,c)
 
-type FuncFSharp<'state,'a,'b,'c,'d,'e> (f:Func<'state,'a,'b,'c,'d,'e>) =
+type FuncFSharp<'state,'a,'b,'c,'d,'e> (func:Func<'state,'a,'b,'c,'d,'e>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e>()
     [<Core.DefaultValue false>] val mutable State : 'state
-    override this.Invoke (a,b,c,d) = f.Invoke (this.State,a,b,c,d)
-    override this.Invoke a = fun b c d -> f.Invoke (this.State,a,b,c,d)
+    member __.Function = func
+    override this.Invoke (a,b,c,d) = func.Invoke (this.State,a,b,c,d)
+    override this.Invoke a = fun b c d -> func.Invoke (this.State,a,b,c,d)
 
-type FuncFSharp<'state,'a,'b,'c,'d,'e,'f> (f:Func<'state,'a,'b,'c,'d,'e,'f>) =
+type FuncFSharp<'state,'a,'b,'c,'d,'e,'f> (func:Func<'state,'a,'b,'c,'d,'e,'f>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f>()
     [<Core.DefaultValue false>] val mutable State : 'state
-    override this.Invoke (a,b,c,d,e) = f.Invoke (this.State,a,b,c,d,e)
-    override this.Invoke a = fun b c d e -> f.Invoke (this.State,a,b,c,d,e)
+    member __.Function = func
+    override this.Invoke (a,b,c,d,e) = func.Invoke (this.State,a,b,c,d,e)
+    override this.Invoke a = fun b c d e -> func.Invoke (this.State,a,b,c,d,e)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f -> func.Invoke (this.State,a,b,c,d,e,f)
     override this.Invoke a = fun b c d e f -> func.Invoke (this.State,a,b,c,d,e,f)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g -> func.Invoke (this.State,a,b,c,d,e,f,g)
     override this.Invoke a = fun b c d e f g -> func.Invoke (this.State,a,b,c,d,e,f,g)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h -> func.Invoke (this.State,a,b,c,d,e,f,g,h)
     override this.Invoke a = fun b c d e f g h -> func.Invoke (this.State,a,b,c,d,e,f,g,h)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i)
     override this.Invoke a = fun b c d e f g h i -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j)
     override this.Invoke a = fun b c d e f g h i j -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k)
     override this.Invoke a = fun b c d e f g h i j k -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l)
     override this.Invoke a = fun b c d e f g h i j k l -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l m -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m)
     override this.Invoke a = fun b c d e f g h i j k l m -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n)
     override this.Invoke a = fun b c d e f g h i j k l m n -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p> (func:Func<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o->'p>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n o -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o)
     override this.Invoke a = fun b c d e f g h i j k l m n o -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q> (func:FuncHelper<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o->'p->'q>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n o p -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p)
     override this.Invoke a = fun b c d e f g h i j k l m n o p -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p)
 
@@ -353,12 +370,14 @@ type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q,'r> (f
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q,'r,'s> (func:FuncHelper<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q,'r,'s>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o->'p->'q->'r->'s>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n o p q r -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r)
     override this.Invoke a = fun b c d e f g h i j k l m n o p q r -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r)
 
 type FuncFSharp<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q,'r,'s,'t> (func:FuncHelper<'state,'a,'b,'c,'d,'e,'f,'g,'h,'i,'j,'k,'l,'m,'n,'o,'p,'q,'r,'s,'t>) =
     inherit OptimizedClosures.FSharpFunc<'a,'b,'c,'d,'e,'f->'g->'h->'i->'j->'k->'l->'m->'n->'o->'p->'q->'r->'s->'t>()
     [<Core.DefaultValue false>] val mutable State : 'state
+    member __.Function = func
     override this.Invoke (a,b,c,d,e) = fun f g h i j k l m n o p q r s -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s)
     override this.Invoke a = fun b c d e f g h i j k l m n o p q r s -> func.Invoke (this.State,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s)
 

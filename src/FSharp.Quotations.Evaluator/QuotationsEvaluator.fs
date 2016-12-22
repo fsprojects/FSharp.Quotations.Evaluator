@@ -37,7 +37,7 @@ module QuotationEvaluationTypes =
 
     type ConvEnv = {
         eraseEquality : bool
-        varEnv        : Map<Var,Expression>
+        varEnv        : Map<Var,Expression*option<Type>>
     }
 
     type ConvResult =
@@ -126,7 +126,7 @@ module QuotationEvaluationTypes =
         // Generic cases 
         | Patterns.Var(v) -> 
                 try
-                    Map.find v env.varEnv |> asExpr
+                    fst (Map.find v env.varEnv) |> asExpr
                 with
                 |   :? KeyNotFoundException when v.Name = "this" ->
                         let message = 
@@ -303,45 +303,104 @@ module QuotationEvaluationTypes =
                 let argsP = ConvExprs env args 
                 Expression.Call(ConvObjArg env objOpt None, minfo, argsP) |> wrapVoid
 
-        // f x1 x2 x3 x4 --> InvokeFast4
-        | Patterns.Application(Patterns.Application(Patterns.Application(Patterns.Application(f,arg1),arg2),arg3),arg4) -> 
-            let domainTy1, rangeTy = getFunctionType f.Type
-            let domainTy2, rangeTy = getFunctionType rangeTy
-            let domainTy3, rangeTy = getFunctionType rangeTy
-            let domainTy4, rangeTy = getFunctionType rangeTy
-            let (-->) ty1 ty2 = Reflection.FSharpType.MakeFunctionType(ty1,ty2)
-            let ty = domainTy1 --> domainTy2 
-            let meth = (ty.GetMethods() |> Array.find (fun minfo -> minfo.Name = "InvokeFast" && minfo.GetParameters().Length = 5)).MakeGenericMethod [| domainTy3; domainTy4; rangeTy |]
-            let argsP = ConvExprs env [f; arg1;arg2;arg3; arg4]
-            Expression.Call((null:Expression), meth, argsP) |> asExpr
+        | Patterns.Application(_) as application ->
+            // with Applications we first try to determine if the FSharpFunc is an internally created
+            // one, and if it is, then we call the linq compiled function directly. Otherwise we
+            // drop back to the InvokeFast calls, and finally just to the Invoke.
 
-        // f x1 x2 x3 --> InvokeFast3
-        | Patterns.Application(Patterns.Application(Patterns.Application(f,arg1),arg2),arg3) -> 
-            let domainTy1, rangeTy = getFunctionType f.Type
-            let domainTy2, rangeTy = getFunctionType rangeTy
-            let domainTy3, rangeTy = getFunctionType rangeTy
-            let (-->) ty1 ty2 = Reflection.FSharpType.MakeFunctionType(ty1,ty2)
-            let ty = domainTy1 --> domainTy2 
-            let meth = (ty.GetMethods() |> Array.find (fun minfo -> minfo.Name = "InvokeFast" && minfo.GetParameters().Length = 4)).MakeGenericMethod [| domainTy3; rangeTy |]
-            let argsP = ConvExprs env [f; arg1;arg2;arg3]
-            Expression.Call((null:Expression), meth, argsP) |> asExpr
+            let c = ConvExpr env
+            let rec getApplications args applicationExpression =
+                match applicationExpression with 
+                | Patterns.Application (Patterns.Application(_) as f, arg) ->
+                    getApplications ((c arg)::args) f
+                | Patterns.Application (Patterns.Var v, arg) ->
+                    let linqExpr, ``type`` = Map.find v env.varEnv
+                    Some (linqExpr, ``type``, (c arg)::args)
+                | Patterns.Application (e, arg) ->
+                    let linqExpr = ConvExpr env e
+                    Some (linqExpr, Some linqExpr.Type, (c arg)::args)
+                | _ -> None
 
-        // f x1 x2 --> InvokeFast2
-        | Patterns.Application(Patterns.Application(f,arg1),arg2) -> 
-            let domainTy1, rangeTy = getFunctionType f.Type
-            let domainTy2, rangeTy = getFunctionType rangeTy
-            let (-->) ty1 ty2 = Reflection.FSharpType.MakeFunctionType(ty1,ty2)
-            let ty = domainTy1 --> domainTy2 
-            let meth = (ty.GetMethods() |> Array.find (fun minfo -> minfo.Name = "InvokeFast" && minfo.GetParameters().Length = 3)).MakeGenericMethod [| rangeTy |]
-            let argsP = ConvExprs env [f; arg1;arg2]
-            Expression.Call((null:Expression), meth, argsP) |> asExpr
+            let nativeFunctionDetails = 
+                getApplications [] application
+                |> Option.bind (fun (e, t, args) ->
+                    match e, t with
+                    | f, Some funcType when args.Length > -1 ->
+                        let func = funcType.GetProperty ("Function", BindingFlags.NonPublic ||| BindingFlags.Instance)
+                        let state = funcType.GetField ("State", BindingFlags.NonPublic ||| BindingFlags.Instance)
+                        if funcType.GetGenericArguments().Length = args.Length + 2 && func <> null && state <> null 
+                            then Some (f, args, funcType, func, state)
+                            else None
+                    | _-> None)
 
-        // f x1 --> Invoke
-        | Patterns.Application(f,arg) -> 
-            let fP = ConvExpr env f
-            let argP = ConvExpr env arg
-            let meth = f.Type.GetMethod("Invoke")
-            Expression.Call(fP, meth, [| argP |]) |> asExpr
+            match nativeFunctionDetails with
+            | Some (f, args, funcType, func, state) ->
+                let asFuncType = Expression.Variable(funcType)
+
+                let invokeArgs =
+                    seq { yield Expression.Field(asFuncType, state) |> asExpression
+                          yield! args }
+                    |> Seq.map (fun e ->
+                        if e.Type = typeof<Unit>
+                            then Expression.Constant(null, typeof<Unit>) |> asExpression
+                            else e)
+
+                let invoke = 
+                    Expression.Block(
+                        [ asFuncType ],
+                        [
+                            Expression.Assign(
+                                asFuncType,
+                                Expression.Convert(f, funcType)) |> asExpression;
+                            Expression.Invoke(
+                                Expression.Property(asFuncType, func),
+                                invokeArgs) |> asExpression
+                        ])
+
+                invoke |> asExpr
+            | _ ->
+            match application with
+            // f x1 x2 x3 x4 --> InvokeFast4
+            | Patterns.Application(Patterns.Application(Patterns.Application(Patterns.Application(f,arg1),arg2),arg3),arg4) -> 
+                let domainTy1, rangeTy = getFunctionType f.Type
+                let domainTy2, rangeTy = getFunctionType rangeTy
+                let domainTy3, rangeTy = getFunctionType rangeTy
+                let domainTy4, rangeTy = getFunctionType rangeTy
+                let (-->) ty1 ty2 = Reflection.FSharpType.MakeFunctionType(ty1,ty2)
+                let ty = domainTy1 --> domainTy2 
+                let meth = (ty.GetMethods() |> Array.find (fun minfo -> minfo.Name = "InvokeFast" && minfo.GetParameters().Length = 5)).MakeGenericMethod [| domainTy3; domainTy4; rangeTy |]
+                let argsP = ConvExprs env [f; arg1;arg2;arg3; arg4]
+                Expression.Call((null:Expression), meth, argsP) |> asExpr
+
+            // f x1 x2 x3 --> InvokeFast3
+            | Patterns.Application(Patterns.Application(Patterns.Application(f,arg1),arg2),arg3) -> 
+                let domainTy1, rangeTy = getFunctionType f.Type
+                let domainTy2, rangeTy = getFunctionType rangeTy
+                let domainTy3, rangeTy = getFunctionType rangeTy
+                let (-->) ty1 ty2 = Reflection.FSharpType.MakeFunctionType(ty1,ty2)
+                let ty = domainTy1 --> domainTy2 
+                let meth = (ty.GetMethods() |> Array.find (fun minfo -> minfo.Name = "InvokeFast" && minfo.GetParameters().Length = 4)).MakeGenericMethod [| domainTy3; rangeTy |]
+                let argsP = ConvExprs env [f; arg1;arg2;arg3]
+                Expression.Call((null:Expression), meth, argsP) |> asExpr
+
+            // f x1 x2 --> InvokeFast2
+            | Patterns.Application(Patterns.Application(f,arg1),arg2) -> 
+                let domainTy1, rangeTy = getFunctionType f.Type
+                let domainTy2, rangeTy = getFunctionType rangeTy
+                let (-->) ty1 ty2 = Reflection.FSharpType.MakeFunctionType(ty1,ty2)
+                let ty = domainTy1 --> domainTy2 
+                let meth = (ty.GetMethods() |> Array.find (fun minfo -> minfo.Name = "InvokeFast" && minfo.GetParameters().Length = 3)).MakeGenericMethod [| rangeTy |]
+                let argsP = ConvExprs env [f; arg1; arg2]
+                Expression.Call((null:Expression), meth, argsP) |> asExpr
+
+            // f x1 --> Invoke
+            | Patterns.Application(f,arg) -> 
+                let fP = ConvExpr env f
+                let argP = ConvExpr env arg
+                let meth = fP.Type.GetMethod("Invoke", [|argP.Type|])
+                Expression.Call(fP, meth, [| argP |]) |> asExpr
+
+            | _ -> failwith "should only be a Patterns.Application"
 
         // Expr.New*
         | Patterns.NewRecord(recdTy,args) -> 
@@ -376,7 +435,7 @@ module QuotationEvaluationTypes =
 
         | Patterns.NewDelegate(dty,vs,b) -> 
             let vsP = List.map ConvVar vs 
-            let env = {env with varEnv = List.foldBack2 (fun (v:Var) vP -> Map.add v (vP |> asExpression)) vs vsP env.varEnv }
+            let env = {env with varEnv = List.foldBack2 (fun (v:Var) vP -> Map.add v (vP |> asExpression, None)) vs vsP env.varEnv }
             let bodyP = ConvExpr env b
             Expression.Lambda(dty, bodyP, vsP) |> asExpr 
 
@@ -406,13 +465,13 @@ module QuotationEvaluationTypes =
             let eP = ConvExpr env e
             let assign = Expression.Assign (vP, eP) |> asExpression
 
-            let env = { env with varEnv = env.varEnv |> Map.add v (vP |> asExpression) } 
+            let env = { env with varEnv = env.varEnv |> Map.add v (vP |> asExpression, Some eP.Type) } 
             let bodyP = ConvExpr env b 
 
             Expression.Block ([vP], [assign; bodyP]) |> asExpr
 
         | Patterns.VarSet (variable, value) ->
-            let linqVariable = Map.find variable env.varEnv
+            let linqVariable = fst <| Map.find variable env.varEnv
             let linqValue = ConvExpr env value
             Expression.Assign (linqVariable, linqValue)|> asExpr
 
@@ -440,7 +499,7 @@ module QuotationEvaluationTypes =
                 let v, body = firstVar, firstBody
 
                 let vP = ConvVar v
-                let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
+                let env = { env with varEnv = Map.add v (vP |> asExpression, None) env.varEnv }
                 let tyargs = [| v.Type; body.Type |]
                 let bodyP = ConvExpr env body
 #if PORTABLE 
@@ -461,31 +520,31 @@ module QuotationEvaluationTypes =
 
                 let stateEnvironment =
                     match capturedVars with
-                    | v1 :: [] -> [v1, stateParameter |> asExpression]
-                    | _ -> List.mapi (fun idx var -> var, getExpressionFromTuple stateParameter idx) capturedVars
+                    | v1 :: [] -> [v1, stateParameter |> asExpression, (snd <| Map.find v1 env.varEnv)]
+                    | _ -> List.mapi (fun idx var -> var, (getExpressionFromTuple stateParameter idx), (snd <| Map.find var env.varEnv)) capturedVars
 
                 let varParameters =
                     arguments
-                    |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name))
+                    |> List.map (fun var -> var, Expression.Parameter (var.Type, var.Name), None)
 
                 let lambdaEnv =
                     { env with
                          varEnv =
                             let environmentVariables =
                                 varParameters
-                                |> List.map (fun (v,p) -> v, p |> asExpression)
+                                |> List.map (fun (v,p,t) -> v, p |> asExpression, t)
                                 |> List.append stateEnvironment
 
                             (env.varEnv, environmentVariables)
-                            ||> List.fold (fun varEnv (var, parameter) ->
+                            ||> List.fold (fun varEnv (var, parameter, t) ->
                                 varEnv
-                                |> Map.add var parameter) }
+                                |> Map.add var (parameter, t)) }
 
                 let linqBody = ConvExpr lambdaEnv body
 
                 let parameters = 
                     [ yield stateParameter
-                      yield! varParameters |> List.map snd ]
+                      yield! varParameters |> List.map (fun (_,e,_) -> e) ]
 
                 let funcTypes =
                     [| yield! parameters |> List.map (fun p -> p.Type )
@@ -500,7 +559,7 @@ module QuotationEvaluationTypes =
 
                 let parameterTypes =
                     [|  yield stateType
-                        yield! varParameters |> List.map (fun (vars,_) -> vars.Type)
+                        yield! varParameters |> List.map (fun (vars,_,_) -> vars.Type)
                         yield linqBody.Type |]
                   
                 let ``type`` = funcFSharp.MakeGenericType parameterTypes
@@ -523,7 +582,7 @@ module QuotationEvaluationTypes =
                         let getVar var =
                             if Some var = letrec
                                 then theFuncObject |> asExpression
-                                else Map.find var env.varEnv
+                                else fst <| Map.find var env.varEnv
 
                         match capturedVars with
                         | v1 :: [] -> getVar v1
@@ -576,7 +635,7 @@ module QuotationEvaluationTypes =
             let linqAssignLower = Expression.Assign (linqIndexer, linqLowerValue)
             let linqCondition = Expression.LessThanOrEqual (linqIndexer, linqUpperValue)
             
-            let envInner = { env with varEnv = Map.add indexer (linqIndexer |> asExpression) env.varEnv }
+            let envInner = { env with varEnv = Map.add indexer (linqIndexer |> asExpression, None) env.varEnv }
 
             let linqIteration = 
                 Expression.Block (
@@ -625,7 +684,7 @@ module QuotationEvaluationTypes =
                         (env.varEnv, variablesAsLinq)
                         ||> List.fold (fun varEnv (v,vP,_) ->
                             varEnv
-                            |> Map.add v (vP |> asExpression)) }
+                            |> Map.add v (vP |> asExpression, None)) }
 
             let bindingAsLinq =
                 variablesAsLinq

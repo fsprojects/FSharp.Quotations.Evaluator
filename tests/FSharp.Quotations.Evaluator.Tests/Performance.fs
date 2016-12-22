@@ -585,7 +585,7 @@ let ``Test many captures and parameters 1`` () =
 let ``Time many captures and parameters 1`` () =
     timeFunction <@ ``many captures and parameters 1`` @>
 
-[<ReflectedDefinition; TimeAllowance 3.5>]
+[<ReflectedDefinition; TimeAllowance 1.6>]
 let ``many captures and parameters 2`` () =
     let ff a b c d e f g h i j k l m n o =
         let gg a' = a' * a + a' * b - a' * c + a' * d - a' * e + a' * f - a' * g + a' * h - a' * i + a' * j - a' * k + a' * l - a' * m + a' * n - a' * o
