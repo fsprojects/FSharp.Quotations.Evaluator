@@ -9,6 +9,7 @@ open Fake.Git
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open System
+open System.IO
 #if MONO
 #else
 #load "packages/SourceLink.Fake/Tools/Fake.fsx"
@@ -63,6 +64,7 @@ let gitRaw = environVarOrDefault "gitRaw" "https://raw.github.com/fsprojects"
 // --------------------------------------------------------------------------------------
 // END TODO: The rest of the file includes standard build steps 
 // --------------------------------------------------------------------------------------
+let srcDotnetStandard = "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
 
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -89,6 +91,15 @@ let genCSAssemblyInfo (projectPath) =
         Attribute.Description summary
         Attribute.Version release.AssemblyVersion
         Attribute.FileVersion release.AssemblyVersion ] 
+
+let assertExitCodeZero x = 
+    if x = 0 then () else 
+    failwithf "Command failed with exit code %i" x
+
+let runCmdIn workDir exe = 
+    Printf.ksprintf (fun args -> 
+        tracefn "%s %s" exe args
+        Shell.Exec(exe, args, workDir) |> assertExitCodeZero)
 
 // Generate assembly info files with the right version & up-to-date information
 Target "AssemblyInfo" (fun _ ->
@@ -206,6 +217,59 @@ Target "Release" (fun _ ->
     Branches.pushTag "" "origin" release.NugetVersion
 )
 
+// --------------------------------------------------------------------------------------
+// dotnet core part
+
+Target "DotnetRestore" (fun _ ->
+    !! srcDotnetStandard
+    |> Seq.iter (fun proj ->
+        DotNetCli.Restore (fun c ->
+            { c with
+                Project = proj
+                //This makes sure that Proj2 references the correct version of Proj1
+                AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
+            })
+))
+
+Target "DotnetBuild" (fun _ ->
+    !! srcDotnetStandard
+    |> Seq.iter (fun proj ->
+        DotNetCli.Build (fun c ->
+            { c with
+                Project = proj
+                //This makes sure that Proj2 references the correct version of Proj1
+                AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
+            })
+))
+
+// --------------------------------------------------------------------------------------
+// Merge .NET Core package in the current NuGet package
+Target "MergeDotnetCoreIntoNuget" (fun _ ->
+
+    let nupkg = "bin" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
+    let netcoreNupkg =  "bin" </> sprintf "FSharp.Quotations.Evaluator.NetStandard.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
+
+    let runTool = runCmdIn "src/FSharp.Quotations.Evaluator.NetStandard" "dotnet"
+    
+    runTool """mergenupkg --source "%s" --other "%s" --framework netstandard1.6 """ nupkg netcoreNupkg
+)
+
+Target "DotnetPack" (fun _ ->
+    !! srcDotnetStandard
+    |> Seq.iter (fun proj ->
+        DotNetCli.Pack (fun c ->
+            { c with
+                Project = proj
+                Configuration = "Release"
+                OutputPath = IO.Directory.GetCurrentDirectory() @@ "bin"
+                AdditionalArgs =
+                    [
+                        sprintf "/p:PackageVersion=%s" release.NugetVersion
+                    ]
+            })
+    )
+)
+
 Target "BuildPackage" DoNothing
 
 // --------------------------------------------------------------------------------------
@@ -222,7 +286,7 @@ Target "All" DoNothing
   ==> "GenerateDocs"
   ==> "All"
 
-"All" 
+"All"
   ==> "ReleaseDocs"
 
 "All" 
@@ -232,11 +296,15 @@ Target "All" DoNothing
 #endif
   ==> "NuGet"
   ==> "BuildPackage"
+  ==> "DotnetRestore"
+  ==> "DotnetBuild"
+  ==> "DotnetPack"
+  =?> ("MergeDotnetCoreIntoNuget", not <| hasBuildParam "DISABLE_NETCORE" && not <| hasBuildParam "SkipNuGet")
 
 "ReleaseDocs"
-    ==> "Release"
+  ==> "Release"
 
 "BuildPackage"
-    ==> "Release"
+  ==> "Release"
 
 RunTargetOrDefault "All"
