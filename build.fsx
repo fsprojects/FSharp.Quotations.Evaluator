@@ -263,19 +263,15 @@ Target "MergeDotnetCoreIntoNuget" (fun _ ->
 )
 
 Target "DotnetPack" (fun _ ->
-    !! srcDotnetStandard
-    |> Seq.iter (fun proj ->
-        DotNetCli.Pack (fun c ->
-            { c with
-                Project = proj
-                Configuration = "Release"
-                OutputPath = IO.Directory.GetCurrentDirectory() @@ "bin"
-                AdditionalArgs =
-                    [
-                        sprintf "/p:PackageVersion=%s" release.NugetVersion
-                    ]
-            })
-    )
+    DotNetCli.Pack (fun c ->
+        { c with
+            Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
+            Configuration = "Release"
+            AdditionalArgs =
+                [
+                    sprintf "/p:PackageVersion=%s" release.NugetVersion
+                ]
+        })
 )
 
 Target "BuildPackage" DoNothing
