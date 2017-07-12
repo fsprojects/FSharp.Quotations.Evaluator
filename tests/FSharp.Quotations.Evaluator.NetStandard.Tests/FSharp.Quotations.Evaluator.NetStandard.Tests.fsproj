@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <DefineConstants>FX_NO_DEFAULT_DECIMAL_ROUND</DefineConstants>
+    <DefineConstants Condition=" '$(PerfomanceTests)' == 'true' " >INCLUDE_TIMING_TESTS;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
