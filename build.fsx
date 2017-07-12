@@ -61,6 +61,12 @@ let gitName = "FSharp.Quotations.Evaluator"
 // The url for the raw files hosted
 let gitRaw = environVarOrDefault "gitRaw" "https://raw.github.com/fsprojects"
 
+let dotnetcliVersion = "1.0.4"
+
+let dotnetSDKPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) </> "dotnetcore" |> FullName
+
+let mutable dotnetExePath = "dotnet"
+
 // --------------------------------------------------------------------------------------
 // END TODO: The rest of the file includes standard build steps 
 // --------------------------------------------------------------------------------------
@@ -91,6 +97,10 @@ let genCSAssemblyInfo (projectPath) =
         Attribute.Description summary
         Attribute.Version release.AssemblyVersion
         Attribute.FileVersion release.AssemblyVersion ] 
+
+Target "InstallDotNetCore" (fun _ ->
+    dotnetExePath <- DotNetCli.InstallDotNetSDK dotnetcliVersion
+)
 
 let assertExitCodeZero x = 
     if x = 0 then () else 
