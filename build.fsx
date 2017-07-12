@@ -243,6 +243,13 @@ Target "DotnetBuild" (fun _ ->
             Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
             Configuration = "Release"
             AdditionalArgs = [ "/v:n" ]
+        })
+)
+
+Target "DotnetTest" (fun _ ->
+    DotNetCli.Test (fun c ->
+        { c with
+            Project = "tests/FSharp.Quotations.Evaluator.NetStandard.Tests/FSharp.Quotations.Evaluator.NetStandard.Tests.fsproj"
             Configuration = "Release"
         })
 )
@@ -298,6 +305,7 @@ Target "All" DoNothing
   ==> "NuGet"
   ==> "DotnetRestore"
   ==> "DotnetBuild"
+  ==> "DotnetTest"
   ==> "DotnetPack"
   =?> ("MergeDotnetCoreIntoNuget", not <| hasBuildParam "DISABLE_NETCORE" && not <| hasBuildParam "SkipNuGet")
   ==> "BuildPackage"
