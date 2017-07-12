@@ -12,7 +12,7 @@ open System
 open System.IO
 #if MONO
 #else
-#load "packages/SourceLink.Fake/Tools/Fake.fsx"
+#load "packages/SourceLink.Fake/tools/Fake.fsx"
 open SourceLink
 #endif
 
@@ -61,10 +61,15 @@ let gitName = "FSharp.Quotations.Evaluator"
 // The url for the raw files hosted
 let gitRaw = environVarOrDefault "gitRaw" "https://raw.github.com/fsprojects"
 
+let dotnetcliVersion = "1.0.4"
+
+let dotnetSDKPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) </> "dotnetcore" |> FullName
+
+let mutable dotnetExePath = "dotnet"
+
 // --------------------------------------------------------------------------------------
 // END TODO: The rest of the file includes standard build steps 
 // --------------------------------------------------------------------------------------
-let srcDotnetStandard = "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
 
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -91,6 +96,10 @@ let genCSAssemblyInfo (projectPath) =
         Attribute.Description summary
         Attribute.Version release.AssemblyVersion
         Attribute.FileVersion release.AssemblyVersion ] 
+
+Target "InstallDotNetCore" (fun _ ->
+    dotnetExePath <- DotNetCli.InstallDotNetSDK dotnetcliVersion
+)
 
 let assertExitCodeZero x = 
     if x = 0 then () else 
@@ -153,6 +162,7 @@ Target "SourceLink" (fun _ ->
     let baseUrl = sprintf "%s/%s/{0}/%%var2%%" gitRaw (project.ToLower())
     use repo = new GitRepo(__SOURCE_DIRECTORY__)
     !! "src/**/*.fsproj"
+    -- "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
     |> Seq.iter (fun f ->
         let proj = VsProj.LoadRelease f
         logfn "source linking %s" proj.OutputFilePdb
@@ -221,33 +231,35 @@ Target "Release" (fun _ ->
 // dotnet core part
 
 Target "DotnetRestore" (fun _ ->
-    !! srcDotnetStandard
-    |> Seq.iter (fun proj ->
-        DotNetCli.Restore (fun c ->
-            { c with
-                Project = proj
-                //This makes sure that Proj2 references the correct version of Proj1
-                AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
-            })
-))
+    DotNetCli.Restore (fun c ->
+        { c with
+            Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
+        })
+)
 
 Target "DotnetBuild" (fun _ ->
-    !! srcDotnetStandard
-    |> Seq.iter (fun proj ->
-        DotNetCli.Build (fun c ->
-            { c with
-                Project = proj
-                //This makes sure that Proj2 references the correct version of Proj1
-                AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
-            })
-))
+    DotNetCli.Build (fun c ->
+        { c with
+            Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
+            Configuration = "Release"
+            AdditionalArgs = [ "/v:n" ]
+        })
+)
+
+Target "DotnetTest" (fun _ ->
+    DotNetCli.Test (fun c ->
+        { c with
+            Project = "tests/FSharp.Quotations.Evaluator.NetStandard.Tests/FSharp.Quotations.Evaluator.NetStandard.Tests.fsproj"
+            Configuration = "Release"
+        })
+)
 
 // --------------------------------------------------------------------------------------
 // Merge .NET Core package in the current NuGet package
 Target "MergeDotnetCoreIntoNuget" (fun _ ->
 
     let nupkg = "bin" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
-    let netcoreNupkg =  "bin" </> sprintf "FSharp.Quotations.Evaluator.NetStandard.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
+    let netcoreNupkg =  "src" </> "FSharp.Quotations.Evaluator.NetStandard" </> "bin" </> "Release" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
 
     let runTool = runCmdIn "src/FSharp.Quotations.Evaluator.NetStandard" "dotnet"
     
@@ -255,19 +267,15 @@ Target "MergeDotnetCoreIntoNuget" (fun _ ->
 )
 
 Target "DotnetPack" (fun _ ->
-    !! srcDotnetStandard
-    |> Seq.iter (fun proj ->
-        DotNetCli.Pack (fun c ->
-            { c with
-                Project = proj
-                Configuration = "Release"
-                OutputPath = IO.Directory.GetCurrentDirectory() @@ "bin"
-                AdditionalArgs =
-                    [
-                        sprintf "/p:PackageVersion=%s" release.NugetVersion
-                    ]
-            })
-    )
+    DotNetCli.Pack (fun c ->
+        { c with
+            Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
+            Configuration = "Release"
+            AdditionalArgs =
+                [
+                    sprintf "/p:PackageVersion=%s" release.NugetVersion
+                ]
+        })
 )
 
 Target "BuildPackage" DoNothing
@@ -295,11 +303,12 @@ Target "All" DoNothing
   =?> ("SourceLink", Pdbstr.tryFind().IsSome )
 #endif
   ==> "NuGet"
-  ==> "BuildPackage"
   ==> "DotnetRestore"
   ==> "DotnetBuild"
+  ==> "DotnetTest"
   ==> "DotnetPack"
-  =?> ("MergeDotnetCoreIntoNuget", not <| hasBuildParam "DISABLE_NETCORE" && not <| hasBuildParam "SkipNuGet")
+  ==> "MergeDotnetCoreIntoNuget"
+  ==> "BuildPackage"
 
 "ReleaseDocs"
   ==> "Release"

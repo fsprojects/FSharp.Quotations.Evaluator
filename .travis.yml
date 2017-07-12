@@ -1,6 +1,14 @@
 language: csharp
 
 sudo: false  # use the new container-based Travis infrastructure 
+dist: trusty #ubuntu 14.04 requierd by .net sdk 1.0
+
+os:
+  - linux
+  - osx
+
+dotnet: 1.0.4
+mono: 4.8.1
 
 script: 
-  - ./build.sh All
+  - ./build.sh BuildPackage
