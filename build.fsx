@@ -163,6 +163,7 @@ Target "SourceLink" (fun _ ->
     let baseUrl = sprintf "%s/%s/{0}/%%var2%%" gitRaw (project.ToLower())
     use repo = new GitRepo(__SOURCE_DIRECTORY__)
     !! "src/**/*.fsproj"
+    -- "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
     |> Seq.iter (fun f ->
         let proj = VsProj.LoadRelease f
         logfn "source linking %s" proj.OutputFilePdb
