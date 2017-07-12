@@ -307,7 +307,7 @@ Target "All" DoNothing
   ==> "DotnetBuild"
   ==> "DotnetTest"
   ==> "DotnetPack"
-  =?> ("MergeDotnetCoreIntoNuget", not <| hasBuildParam "DISABLE_NETCORE" && not <| hasBuildParam "SkipNuGet")
+  ==> "MergeDotnetCoreIntoNuget"
   ==> "BuildPackage"
 
 "ReleaseDocs"
