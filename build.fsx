@@ -255,7 +255,7 @@ Target "DotnetBuild" (fun _ ->
 Target "MergeDotnetCoreIntoNuget" (fun _ ->
 
     let nupkg = "bin" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
-    let netcoreNupkg =  "bin" </> sprintf "FSharp.Quotations.Evaluator.NetStandard.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
+    let netcoreNupkg =  "src" </> "FSharp.Quotations.Evaluator.NetStandard" </> "bin" </> "Release" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
 
     let runTool = runCmdIn "src/FSharp.Quotations.Evaluator.NetStandard" "dotnet"
     
