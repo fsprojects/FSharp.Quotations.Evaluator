@@ -70,7 +70,6 @@ let mutable dotnetExePath = "dotnet"
 // --------------------------------------------------------------------------------------
 // END TODO: The rest of the file includes standard build steps 
 // --------------------------------------------------------------------------------------
-let srcDotnetStandard = "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
 
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
@@ -163,7 +162,7 @@ Target "SourceLink" (fun _ ->
     let baseUrl = sprintf "%s/%s/{0}/%%var2%%" gitRaw (project.ToLower())
     use repo = new GitRepo(__SOURCE_DIRECTORY__)
     !! "src/**/*.fsproj"
-    -- srcDotnetStandard
+    -- "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
     |> Seq.iter (fun f ->
         let proj = VsProj.LoadRelease f
         logfn "source linking %s" proj.OutputFilePdb
@@ -265,8 +264,8 @@ Target "MergeDotnetCoreIntoNuget" (fun _ ->
 Target "DotnetPack" (fun _ ->
     DotNetCli.Pack (fun c ->
         { c with
-            Project = srcDotnetStandard
             Configuration = "Release"
+            Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
             AdditionalArgs =
                 [
                     sprintf "/p:PackageVersion=%s" release.NugetVersion
