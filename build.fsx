@@ -242,6 +242,7 @@ Target "DotnetBuild" (fun _ ->
         { c with
             Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
             Configuration = "Release"
+            AdditionalArgs = [ "/v:n" ]
             Configuration = "Release"
         })
 )
