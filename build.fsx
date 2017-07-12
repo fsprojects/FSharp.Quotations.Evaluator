@@ -296,11 +296,11 @@ Target "All" DoNothing
   =?> ("SourceLink", Pdbstr.tryFind().IsSome )
 #endif
   ==> "NuGet"
-  ==> "BuildPackage"
   ==> "DotnetRestore"
   ==> "DotnetBuild"
   ==> "DotnetPack"
   =?> ("MergeDotnetCoreIntoNuget", not <| hasBuildParam "DISABLE_NETCORE" && not <| hasBuildParam "SkipNuGet")
+  ==> "BuildPackage"
 
 "ReleaseDocs"
   ==> "Release"
