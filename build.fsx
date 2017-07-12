@@ -234,8 +234,6 @@ Target "DotnetRestore" (fun _ ->
     DotNetCli.Restore (fun c ->
         { c with
             Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
-            //This makes sure that Proj2 references the correct version of Proj1
-            AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
         })
 )
 
@@ -244,8 +242,6 @@ Target "DotnetBuild" (fun _ ->
         { c with
             Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
             Configuration = "Release"
-            //This makes sure that Proj2 references the correct version of Proj1
-            AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
         })
 )
 
