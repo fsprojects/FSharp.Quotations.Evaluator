@@ -241,15 +241,14 @@ Target "DotnetRestore" (fun _ ->
 )
 
 Target "DotnetBuild" (fun _ ->
-    !! srcDotnetStandard
-    |> Seq.iter (fun proj ->
-        DotNetCli.Build (fun c ->
-            { c with
-                Project = proj
-                //This makes sure that Proj2 references the correct version of Proj1
-                AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
-            })
-))
+    DotNetCli.Build (fun c ->
+        { c with
+            Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
+            Configuration = "Release"
+            //This makes sure that Proj2 references the correct version of Proj1
+            AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
+        })
+)
 
 // --------------------------------------------------------------------------------------
 // Merge .NET Core package in the current NuGet package
