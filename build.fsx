@@ -163,7 +163,7 @@ Target "SourceLink" (fun _ ->
     let baseUrl = sprintf "%s/%s/{0}/%%var2%%" gitRaw (project.ToLower())
     use repo = new GitRepo(__SOURCE_DIRECTORY__)
     !! "src/**/*.fsproj"
-    -- "src/FSharp.Quotations.Evaluator.NetStandard/*.fsproj"
+    -- srcDotnetStandard
     |> Seq.iter (fun f ->
         let proj = VsProj.LoadRelease f
         logfn "source linking %s" proj.OutputFilePdb
@@ -265,7 +265,7 @@ Target "MergeDotnetCoreIntoNuget" (fun _ ->
 Target "DotnetPack" (fun _ ->
     DotNetCli.Pack (fun c ->
         { c with
-            Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
+            Project = srcDotnetStandard
             Configuration = "Release"
             AdditionalArgs =
                 [
