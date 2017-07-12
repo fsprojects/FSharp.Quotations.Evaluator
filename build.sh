@@ -6,4 +6,5 @@ fi
 
 mono .nuget/NuGet.exe install SourceLink.Fake -OutputDirectory packages -ExcludeVersion
 
-mono packages/FAKE/tools/FAKE.exe build.fsx $@ --fsiargs --define:MONO 
+set -x
+mono packages/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO build.fsx
