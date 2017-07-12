@@ -242,6 +242,7 @@ Target "DotnetBuild" (fun _ ->
         { c with
             Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
             Configuration = "Release"
+            Configuration = "Release"
         })
 )
 
@@ -260,8 +261,8 @@ Target "MergeDotnetCoreIntoNuget" (fun _ ->
 Target "DotnetPack" (fun _ ->
     DotNetCli.Pack (fun c ->
         { c with
-            Configuration = "Release"
             Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
+            Configuration = "Release"
             AdditionalArgs =
                 [
                     sprintf "/p:PackageVersion=%s" release.NugetVersion
