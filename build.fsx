@@ -232,15 +232,13 @@ Target "Release" (fun _ ->
 // dotnet core part
 
 Target "DotnetRestore" (fun _ ->
-    !! srcDotnetStandard
-    |> Seq.iter (fun proj ->
-        DotNetCli.Restore (fun c ->
-            { c with
-                Project = proj
-                //This makes sure that Proj2 references the correct version of Proj1
-                AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
-            })
-))
+    DotNetCli.Restore (fun c ->
+        { c with
+            Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
+            //This makes sure that Proj2 references the correct version of Proj1
+            AdditionalArgs = [sprintf "/p:PackageVersion=%s" release.NugetVersion]
+        })
+)
 
 Target "DotnetBuild" (fun _ ->
     !! srcDotnetStandard
