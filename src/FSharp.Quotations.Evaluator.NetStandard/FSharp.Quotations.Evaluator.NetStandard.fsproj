@@ -1,6 +1,7 @@
 ﻿<Project Sdk="FSharp.NET.Sdk;Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>FSharp.Quotations.Evaluator</AssemblyName>
     <TargetFramework>netstandard1.6</TargetFramework>
     <DefineConstants>TRACE;PORTABLE</DefineConstants>
   </PropertyGroup>
