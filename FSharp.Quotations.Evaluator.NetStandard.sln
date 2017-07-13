@@ -5,11 +5,11 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CC59864A-7DC5-443A-A829-4C0D8375929E}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.NetStandard", "src\FSharp.Quotations.Evaluator.NetStandard\FSharp.Quotations.Evaluator.NetStandard.fsproj", "{BB3E0839-740F-421B-BC70-1005622323C5}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.NetStandard", "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj", "{BB3E0839-740F-421B-BC70-1005622323C5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8A80C120-B451-49E9-BF59-1C0E73C7BB59}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.NetStandard.Tests", "tests\FSharp.Quotations.Evaluator.NetStandard.Tests\FSharp.Quotations.Evaluator.NetStandard.Tests.fsproj", "{2D394C52-8A75-4154-A904-04844A1ADC2E}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.NetStandard.Tests", "tests/FSharp.Quotations.Evaluator.NetStandard.Tests/FSharp.Quotations.Evaluator.NetStandard.Tests.fsproj", "{2D394C52-8A75-4154-A904-04844A1ADC2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
