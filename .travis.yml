@@ -10,5 +10,9 @@ os:
 dotnet: 1.0.4
 mono: 4.8.1
 
+matrix:
+  allow_failures:
+    - os: linux
+
 script: 
   - ./build.sh BuildPackage
