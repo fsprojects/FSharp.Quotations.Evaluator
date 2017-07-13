@@ -19,9 +19,9 @@
   <files>
     <file src="..\bin\FSharp.Quotations.Evaluator.dll" target="lib/net40" />
     <file src="..\bin\FSharp.Quotations.Evaluator.xml" target="lib/net40" />
-    <file src="..\bin\FSharp.Quotations.Evaluator.pd*" target="lib/net40" />
+    <file src="..\bin\FSharp.Quotations.Evaluator.pd*" target="lib/net40" exclude="*.pdb.srcsrv" />
     <file src="..\bin\profile7\FSharp.Quotations.Evaluator.dll" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" />
     <file src="..\bin\profile7\FSharp.Quotations.Evaluator.xml" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" />
-    <file src="..\bin\profile7\FSharp.Quotations.Evaluator.pd*" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" />
+    <file src="..\bin\profile7\FSharp.Quotations.Evaluator.pd*" target="lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1" exclude="*.pdb.srcsrv" />
   </files>
 </package>
