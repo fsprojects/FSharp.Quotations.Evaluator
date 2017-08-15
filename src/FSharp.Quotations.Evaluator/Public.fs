@@ -1,6 +1,7 @@
 ﻿namespace FSharp.Quotations.Evaluator
 
 [<assembly:System.Runtime.CompilerServices.InternalsVisibleTo("FSharp.Quotations.Evaluator.Tests")>]
+[<assembly:System.Runtime.CompilerServices.InternalsVisibleTo("FSharp.Quotations.Evaluator.NetStandard.Tests")>]
 do ()
 
 /// A set of types used for implementing quotation conversions.
