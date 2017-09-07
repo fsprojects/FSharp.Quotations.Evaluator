@@ -17,6 +17,7 @@ See http://fsprojects.github.io/FSharp.Quotations.Evaluator/
 ### Maintainer(s)
 
 - [@manofstick](https://github.com/manofstick) - Paul Westcott
+- [@eiriktsarpalis](https://github.com/eiriktsarpalis) - Eirik Tsarpalis
 
 The default maintainer account for projects under "fsprojects" is [@fsprojectsgit](https://github.com/fsprojectsgit) - F# Community Project Incubation Space (repo management)
 
