@@ -137,6 +137,10 @@ type GUnion10<'a> = Case1 of 'a | Case2
 
 type PointRecord = { field1 : int; field2 : int }
 
+type ClassWithField =
+    val mutable field : int
+    new (init) = { field = init }
+
 [<Test>]
 let FloatTests() = 
 
@@ -1233,6 +1237,15 @@ let MutableLetTests() =
             x @>
 
     checkEval "ml1" ml1 2
+
+[<Test>]
+let MutableFieldTests() = 
+    let mf1 = 
+        <@  let c = new ClassWithField(init = 1)
+            c.field <- c.field + 1
+            c.field @>
+
+    checkEval "mf1" mf1 2
 
 [<Test>]
 let WhileLoopTests() = 
