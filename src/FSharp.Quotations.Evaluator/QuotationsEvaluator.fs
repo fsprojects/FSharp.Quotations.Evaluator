@@ -184,6 +184,14 @@ module QuotationEvaluationTypes =
             let minfo = propInfo.GetSetMethod(true)
             Expression.Call(ConvObjArg env objOpt None, minfo,argsP) |> wrapVoid
 
+        | Patterns.FieldSet(_,fieldInfo,_) when fieldInfo.IsInitOnly || fieldInfo.IsLiteral -> 
+            raise <| new NotSupportedException("Field-set expressions not supported for readonly or literal fields")
+
+        | Patterns.FieldSet(objOpt,fieldInfo,v) ->
+            let fieldExpr = Expression.Field(ConvObjArg env objOpt None, fieldInfo)
+            let vP = ConvExpr env v
+            Expression.Assign(fieldExpr, vP) |> asExpr
+
         // Expr.(Call,Application)
         | Patterns.Call(objOpt,minfo,args) -> 
             let unary x1 f     = f (ConvExpr env x1) |> asExpr
@@ -684,7 +692,6 @@ module QuotationEvaluationTypes =
 
         | Patterns.AddressOf _ -> raise <| new NotSupportedException("Address-of expressions may not be converted to LINQ expressions")
         | Patterns.AddressSet _ -> raise <| new NotSupportedException("Address-set expressions may not be converted to LINQ expressions")
-        | Patterns.FieldSet _ -> raise <| new NotSupportedException("Field-set expressions may not be converted to LINQ expressions")
 
         | _ -> 
             raise <| new NotSupportedException(sprintf "Could not convert the following F# Quotation to a LINQ Expression Tree\n--------\n%A\n-------------\n" inp)
