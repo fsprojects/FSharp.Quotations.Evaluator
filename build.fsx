@@ -243,6 +243,7 @@ Target "DotnetBuild" (fun _ ->
         { c with
             Project = "FSharp.Quotations.Evaluator.NetStandard.sln"
             Configuration = "Release"
+            Output = "..\\..\\bin\\netstandard"
             AdditionalArgs = [ "/v:n" ]
         })
 )
@@ -260,7 +261,8 @@ Target "DotnetTest" (fun _ ->
 Target "MergeDotnetCoreIntoNuget" (fun _ ->
 
     let nupkg = "bin" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
-    let netcoreNupkg =  "src" </> "FSharp.Quotations.Evaluator.NetStandard" </> "bin" </> "Release" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
+    // let netcoreNupkg =  "src" </> "FSharp.Quotations.Evaluator.NetStandard" </> "bin" </> "Release" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
+    let netcoreNupkg =  "bin" </> "netstandard" </> sprintf "FSharp.Quotations.Evaluator.%s.nupkg" (release.NugetVersion) |> Path.GetFullPath
 
     let runTool = runCmdIn "src/FSharp.Quotations.Evaluator.NetStandard" "dotnet"
     
@@ -268,15 +270,31 @@ Target "MergeDotnetCoreIntoNuget" (fun _ ->
 )
 
 Target "DotnetPack" (fun _ ->
-    DotNetCli.Pack (fun c ->
-        { c with
-            Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
-            Configuration = "Release"
-            AdditionalArgs =
-                [
-                    sprintf "/p:PackageVersion=%s" release.NugetVersion
-                ]
-        })
+    NuGet (fun p -> 
+        { p with   
+            Authors = authors
+            Project = project
+            Summary = summary
+            Description = description
+            Version = release.NugetVersion
+            ReleaseNotes = String.Join(Environment.NewLine, release.Notes)
+            Tags = tags
+            OutputPath = "bin\\netstandard"
+            WorkingDir = "nuget"
+            AccessKey = getBuildParamOrDefault "nugetkey" ""
+            Publish = hasBuildParam "nugetkey"
+            Dependencies = [] })
+        ("nuget/FSharp.Quotations.Evaluator.NetStandard.nuspec")
+
+    // DotNetCli.Pack (fun c ->
+    //     { c with
+    //         Project = "src/FSharp.Quotations.Evaluator.NetStandard/FSharp.Quotations.Evaluator.NetStandard.fsproj"
+    //         Configuration = "Release"
+    //         AdditionalArgs =
+    //             [
+    //                 sprintf "/p:PackageVersion=%s" release.NugetVersion
+    //             ]
+    //     })
 )
 
 Target "BuildPackage" DoNothing

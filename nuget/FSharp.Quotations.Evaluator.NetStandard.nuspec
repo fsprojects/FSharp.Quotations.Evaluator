@@ -14,12 +14,17 @@
     <releaseNotes>@releaseNotes@</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>@tags@</tags>
-    <dependencies />
+    <dependencies>
+      <group targetFramework="netstandard1.6">
+        <dependency id="FSharp.Quotations.Evaluator" version="@build.number@" exclude="Build,Analyzers" />
+        <dependency id="FSharp.Quotations.Evaluator" version="@build.number@" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
   </metadata>
-  <files>
-    <file src="..\bin\FSharp.Quotations.Evaluator.dll" target="lib/net40" />
-    <file src="..\bin\FSharp.Quotations.Evaluator.xml" target="lib/net40" />
-    <file src="..\bin\FSharp.Quotations.Evaluator.pd*" target="lib/net40" exclude="..\**\*.pdb.srcsrv" />
-    <file src="..\bin\FSharp.Quotations.Evaluator.Hacks.dll" target="lib/net40" />
-  </files>
+    <files>
+      <file src="..\bin\FSharp.Quotations.Evaluator.dll" target="lib/netstandard1.6" />
+      <file src="..\bin\FSharp.Quotations.Evaluator.xml" target="lib/netstandard1.6" />
+      <file src="..\bin\FSharp.Quotations.Evaluator.pd*" target="lib/netstandard1.6" exclude="..\**\*.pdb.srcsrv" />
+      <file src="..\bin\FSharp.Quotations.Evaluator.Hacks.dll" target="lib/netstandard1.6" />
+    </files>
 </package>
