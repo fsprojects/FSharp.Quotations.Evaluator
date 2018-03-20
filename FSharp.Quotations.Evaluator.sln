@@ -15,7 +15,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60BC93-E09B-4E5F-9D85-95A519479D54}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.travis.yml = .travis.yml
+		appveyor.yml = appveyor.yml
+		build.cmd = build.cmd
 		build.fsx = build.fsx
+		build.sh = build.sh
 		README.md = README.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
@@ -38,7 +42,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0C33F28E-EA3C-4925-AB7E-4193887544F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Quotations.Evaluator.Hacks", "src\FSharp.Quotations.Evaluator.Hacks\FSharp.Quotations.Evaluator.Hacks.csproj", "{873B1965-02FC-410D-98EA-CC8D88F2373D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FSharp.Quotations.Evaluator.Hacks", "src\FSharp.Quotations.Evaluator.Hacks\FSharp.Quotations.Evaluator.Hacks.csproj", "{873B1965-02FC-410D-98EA-CC8D88F2373D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

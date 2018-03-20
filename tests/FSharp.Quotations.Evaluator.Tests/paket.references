@@ -2,3 +2,4 @@ group Tests
   FSharp.Core
   NUnit
   NUnit3TestAdapter
+  Microsoft.NET.Test.Sdk

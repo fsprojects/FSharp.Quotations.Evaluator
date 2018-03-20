@@ -12,7 +12,6 @@
     <Compile Include="Tests.fs" />
     <Compile Include="Performance.fs" />
     <Compile Include="Main.fs" />
-    <None Include="App.config" />
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
