@@ -16,6 +16,8 @@ open Microsoft.FSharp.Quotations.Patterns
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open FSharp.Quotations.Evaluator.Tools
 
+#nowarn "1204"
+
 module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
@@ -81,7 +83,7 @@ module QuotationEvaluationTypes =
 
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
-    let LinqExpressionHelper (x:'T) : Expression<'T> = failwith ""
+    let LinqExpressionHelper (_:'T) : Expression<'T> = failwith ""
 
 #if PORTABLE
     let showAll = true
@@ -292,7 +294,7 @@ module QuotationEvaluationTypes =
             | Λ ``-> checked.uint32`` (_,_,[x1]) -> convertCheckedOrParse x1 typeof<uint32> parseUInt32Expr
             | Λ ``-> checked.uint64`` (_,_,[x1]) -> convertCheckedOrParse x1 typeof<uint64> parseUInt64Expr
 
-            | Λ ``-> getArray``  (_, [|ArrayTypeQ(elemTy);_;_|],[x1;x2]) -> 
+            | Λ ``-> getArray``  (_, [|ArrayTypeQ(_elemTy);_;_|],[x1;x2]) -> 
                 Expression.ArrayIndex(ConvExpr env x1, ConvExpr env x2) |> asExpr
 
             | Λ ``-> setArray``  (_, [|ArrayTypeQ(elemTy);_;_|],[arr;idx;elem]) -> 

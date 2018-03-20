@@ -210,16 +210,16 @@ let createTuple<'a> types =
 
 let unitNull = Expression.Constant(null, typeof<unit>) :> Expression
 
-let rec createGenericTupleType types =
-    match types with
-    | [||]                      -> typeof<Unit>, (fun _ -> unitNull)
-    | [|t1|]                    -> createTuple<Tuple<_>>             types
-    | [|t1;t2|]                 -> createTuple<Tuple<_,_>>           types
-    | [|t1;t2;t3|]              -> createTuple<Tuple<_,_,_>>         types
-    | [|t1;t2;t3;t4|]           -> createTuple<Tuple<_,_,_,_>>       types
-    | [|t1;t2;t3;t4;t5|]        -> createTuple<Tuple<_,_,_,_,_>>     types
-    | [|t1;t2;t3;t4;t5;t6|]     -> createTuple<Tuple<_,_,_,_,_,_>>   types
-    | [|t1;t2;t3;t4;t5;t6;t7|]  -> createTuple<Tuple<_,_,_,_,_,_,_>> types
+let rec createGenericTupleType (types : Type[]) =
+    match types.Length with
+    | 0 -> typeof<Unit>, (fun _ -> unitNull)
+    | 1 -> createTuple<Tuple<_>>             types
+    | 2 -> createTuple<Tuple<_,_>>           types
+    | 3 -> createTuple<Tuple<_,_,_>>         types
+    | 4 -> createTuple<Tuple<_,_,_,_>>       types
+    | 5 -> createTuple<Tuple<_,_,_,_,_>>     types
+    | 6 -> createTuple<Tuple<_,_,_,_,_,_>>   types
+    | 7 -> createTuple<Tuple<_,_,_,_,_,_,_>> types
     | _ ->
         let slice = types.[7..]
         let innerTuple, create = createGenericTupleType slice

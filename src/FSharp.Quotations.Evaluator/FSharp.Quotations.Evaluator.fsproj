@@ -9,7 +9,7 @@
     <WarningLevel>5</WarningLevel>
     <NoWarn>52,1178</NoWarn>
     <OtherFlags>--warnon:1182</OtherFlags>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
   
