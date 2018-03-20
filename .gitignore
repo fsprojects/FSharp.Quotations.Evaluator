@@ -181,3 +181,6 @@ nuget/*.nupkg
 
 # paket
 paket-files/
+
+# Visual Studio
+.vs/

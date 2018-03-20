@@ -16,6 +16,7 @@ NUGET
     FSharp.Core (3.0.2)
 
 GROUP Tests
+REDIRECTS: FORCE
 RESTRICTION: || (== net461) (== netcoreapp2.0)
 NUGET
   remote: https://api.nuget.org/v3/index.json

@@ -12,6 +12,7 @@ group NetClassic
 group Tests
   source https://api.nuget.org/v3/index.json
   framework: net461, netcoreapp2.0
+  redirects: force
 
   nuget FSharp.Core >= 4.3
   nuget NUnit ~> 3.0

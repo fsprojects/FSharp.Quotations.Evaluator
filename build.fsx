@@ -2,8 +2,8 @@
 // FAKE build script 
 // --------------------------------------------------------------------------------------
 
-#r @"packages/FAKE/tools/NuGet.Core.dll"
-#r @"packages/FAKE/tools/FakeLib.dll"
+//#r @"packages/build/FAKE/tools/NuGet.Core.dll"
+#r @"packages/build/FAKE/tools/FakeLib.dll"
 open Fake
 open Fake.Git
 open Fake.AssemblyInfoFile

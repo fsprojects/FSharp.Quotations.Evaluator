@@ -23,6 +23,10 @@
   <ItemGroup>
     <None Include="paket.references" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Quotations.Evaluator.Hacks\FSharp.Quotations.Evaluator.Hacks.csproj" />
+  </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
