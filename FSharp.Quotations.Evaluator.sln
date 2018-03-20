@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -39,6 +39,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Quotations.Evaluator
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Quotations.Evaluator.Portable", "src\FSharp.Quotations.Evaluator.Portable\FSharp.Quotations.Evaluator.Portable.fsproj", "{23E65C80-0BB3-4054-B112-14F554F4AB73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Quotations.Evaluator.Hacks", "src\FSharp.Quotations.Evaluator.Hacks\FSharp.Quotations.Evaluator.Hacks.csproj", "{873B1965-02FC-410D-98EA-CC8D88F2373D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,12 @@ Global
 		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Performance|Any CPU.Build.0 = Release|Any CPU
 		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23E65C80-0BB3-4054-B112-14F554F4AB73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{873B1965-02FC-410D-98EA-CC8D88F2373D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{873B1965-02FC-410D-98EA-CC8D88F2373D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{873B1965-02FC-410D-98EA-CC8D88F2373D}.Performance|Any CPU.ActiveCfg = Debug|Any CPU
+		{873B1965-02FC-410D-98EA-CC8D88F2373D}.Performance|Any CPU.Build.0 = Debug|Any CPU
+		{873B1965-02FC-410D-98EA-CC8D88F2373D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{873B1965-02FC-410D-98EA-CC8D88F2373D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

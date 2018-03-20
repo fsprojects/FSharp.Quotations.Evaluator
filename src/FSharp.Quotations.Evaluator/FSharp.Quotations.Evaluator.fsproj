@@ -49,6 +49,12 @@
     <Compile Include="QuotationsEvaluator.fsi" />
     <Compile Include="QuotationsEvaluator.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Quotations.Evaluator.Hacks\FSharp.Quotations.Evaluator.Hacks.csproj">
+      <Project>{873b1965-02fc-410d-98ea-cc8d88f2373d}</Project>
+      <Name>FSharp.Quotations.Evaluator.Hacks</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
