@@ -106,6 +106,8 @@ Target "CleanDocs" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
+Target "DotNetRestore" (fun _ -> DotNetCli.Restore id)
+
 Target "Build" (fun _ ->
     !! solutionFile
     |> MSBuild "" "Build" ["Configuration", "Release"; "SourceLinkCreate", "true"]
@@ -183,6 +185,7 @@ Target "Release" DoNothing
 
 "Clean"
   ==> "AssemblyInfo"
+  ==> "DotNetRestore"
   ==> "Build"
   ==> "RunTests"
   ==> "All"
