@@ -1,0 +1,24 @@
+source https://api.nuget.org/v3/index.json
+framework: netstandard2.0
+
+nuget FSharp.Core >= 4.3 lowest_matching: true
+
+group NetClassic
+  source https://api.nuget.org/v3/index.json
+  framework: net45
+
+  nuget FSharp.Core >= 3.0 lowest_matching: true
+
+group Tests
+  source https://api.nuget.org/v3/index.json
+  framework: net461, netcoreapp2.0
+
+  nuget FSharp.Core >= 4.3
+  nuget NUnit ~> 3.0
+  nuget NUnit3TestAdapter ~> 3.0
+
+group Build
+  source https://api.nuget.org/v3/index.json
+  framework: net461
+
+  group FAKE ~> 4.0

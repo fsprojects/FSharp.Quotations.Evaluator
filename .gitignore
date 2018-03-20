@@ -178,3 +178,6 @@ nuget/*.nupkg
 
 # Fake build files
 .fake/
+
+# paket
+paket-files/
