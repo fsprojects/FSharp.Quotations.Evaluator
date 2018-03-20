@@ -245,12 +245,12 @@ let getFuncType (args:Type[])  =
         | _ -> raise <| NotSupportedException "Quotation expressions with statements or closures containing more then 20 free variables may not be translated in this release of the F# PowerPack. This is due to limitations in the variable binding expression forms available in LINQ expression trees"
             
 type FuncFSharp<'state,'a> (f:Func<'state,'a>) =
-    inherit FSharpFunc<unit, 'a>()
+    inherit Hacks.FSharpFunk<unit, 'a>()
     [<Core.DefaultValue false>] val mutable State : 'state
     override this.Invoke _ = f.Invoke this.State
 
 type FuncFSharp<'state,'a,'b> (f:Func<'state,'a,'b>) =
-    inherit FSharpFunc<'a,'b>()
+    inherit Hacks.FSharpFunk<'a,'b>()
     [<Core.DefaultValue false>] val mutable State : 'state
     override this.Invoke a = f.Invoke (this.State,a)
 

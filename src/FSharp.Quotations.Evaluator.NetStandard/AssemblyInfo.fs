@@ -10,4 +10,8 @@ open System.Reflection
 do ()
 
 module internal AssemblyVersionInformation =
-    let [<Literal>] Version = "1.0.7"
+    let [<Literal>] AssemblyTitle = "FSharp.Quotations.Evaluator.NetStandard"
+    let [<Literal>] AssemblyProduct = "FSharp.Quotations.Evaluator"
+    let [<Literal>] AssemblyDescription = "A quotations evaluator for F# based on LINQ expression tree compilation"
+    let [<Literal>] AssemblyVersion = "1.0.7"
+    let [<Literal>] AssemblyFileVersion = "1.0.7"
