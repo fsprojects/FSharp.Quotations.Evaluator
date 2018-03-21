@@ -210,16 +210,16 @@ let createTuple<'a> types =
 
 let unitNull = Expression.Constant(null, typeof<unit>) :> Expression
 
-let rec createGenericTupleType types =
-    match types with
-    | [||]                      -> typeof<Unit>, (fun _ -> unitNull)
-    | [|t1|]                    -> createTuple<Tuple<_>>             types
-    | [|t1;t2|]                 -> createTuple<Tuple<_,_>>           types
-    | [|t1;t2;t3|]              -> createTuple<Tuple<_,_,_>>         types
-    | [|t1;t2;t3;t4|]           -> createTuple<Tuple<_,_,_,_>>       types
-    | [|t1;t2;t3;t4;t5|]        -> createTuple<Tuple<_,_,_,_,_>>     types
-    | [|t1;t2;t3;t4;t5;t6|]     -> createTuple<Tuple<_,_,_,_,_,_>>   types
-    | [|t1;t2;t3;t4;t5;t6;t7|]  -> createTuple<Tuple<_,_,_,_,_,_,_>> types
+let rec createGenericTupleType (types : Type[]) =
+    match types.Length with
+    | 0 -> typeof<Unit>, (fun _ -> unitNull)
+    | 1 -> createTuple<Tuple<_>>             types
+    | 2 -> createTuple<Tuple<_,_>>           types
+    | 3 -> createTuple<Tuple<_,_,_>>         types
+    | 4 -> createTuple<Tuple<_,_,_,_>>       types
+    | 5 -> createTuple<Tuple<_,_,_,_,_>>     types
+    | 6 -> createTuple<Tuple<_,_,_,_,_,_>>   types
+    | 7 -> createTuple<Tuple<_,_,_,_,_,_,_>> types
     | _ ->
         let slice = types.[7..]
         let innerTuple, create = createGenericTupleType slice
@@ -245,12 +245,12 @@ let getFuncType (args:Type[])  =
         | _ -> raise <| NotSupportedException "Quotation expressions with statements or closures containing more then 20 free variables may not be translated in this release of the F# PowerPack. This is due to limitations in the variable binding expression forms available in LINQ expression trees"
             
 type FuncFSharp<'state,'a> (f:Func<'state,'a>) =
-    inherit FSharpFunc<unit, 'a>()
+    inherit Hacks.FSharpFunk<unit, 'a>()
     [<Core.DefaultValue false>] val mutable State : 'state
     override this.Invoke _ = f.Invoke this.State
 
 type FuncFSharp<'state,'a,'b> (f:Func<'state,'a,'b>) =
-    inherit FSharpFunc<'a,'b>()
+    inherit Hacks.FSharpFunk<'a,'b>()
     [<Core.DefaultValue false>] val mutable State : 'state
     override this.Invoke a = f.Invoke (this.State,a)
 

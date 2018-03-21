@@ -7,8 +7,8 @@ os:
   - linux
   - osx
 
-dotnet: 1.0.4
-mono: 4.8.1
+mono: latest
+dotnet: 2.0.0
 
 matrix:
   allow_failures:
