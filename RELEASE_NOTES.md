@@ -1,3 +1,7 @@
+### 1.1.0 - Support NetStandard2.0
+* Add support for NetStandard2.0
+* Add support for FieldSet expressions.
+
 ### 1.0.7 - Add portable profile 7 support
 * Add portable profile 7, allowing use on .NET Core
 
@@ -21,11 +25,3 @@
 ### 1.0 - Initial release 
 * Source code from F# Power Pack Dec2012 release
 * Added SourceLink for Source Indexing PDB
-
-
-
-
-
-
-
-
