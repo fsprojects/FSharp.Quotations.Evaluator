@@ -30,13 +30,13 @@ excludeddependencies
 files
     bin/Release/net45/FSharp.Quotations.Evaluator.dll ==> lib/net45
     bin/Release/net45/FSharp.Quotations.Evaluator.pdb ==> lib/net45
-    bin/Release/net45/FSharp.Quotations.Evaluator.XML ==> lib/net45
+    bin/Release/net45/FSharp.Quotations.Evaluator.xml ==> lib/net45
     bin/Release/net45/FSharp.Quotations.Evaluator.Hacks.dll ==> lib/net45
     bin/Release/net45/FSharp.Quotations.Evaluator.Hacks.pdb ==> lib/net45
-    bin/Release/net45/FSharp.Quotations.Evaluator.Hacks.XML ==> lib/net45
+    bin/Release/net45/FSharp.Quotations.Evaluator.Hacks.xml ==> lib/net45
     bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.dll ==> lib/netstandard2.0
     bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.pdb ==> lib/netstandard2.0
-    bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.XML ==> lib/netstandard2.0
+    bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.xml ==> lib/netstandard2.0
     bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.Hacks.dll ==> lib/netstandard2.0
     bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.Hacks.pdb ==> lib/netstandard2.0
-    bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.Hacks.XML ==> lib/netstandard2.0
+    bin/Release/netstandard2.0/FSharp.Quotations.Evaluator.Hacks.xml ==> lib/netstandard2.0
