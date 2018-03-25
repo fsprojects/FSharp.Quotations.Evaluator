@@ -5,13 +5,13 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("FSharp.Quotations.Evaluator")>]
 [<assembly: AssemblyProductAttribute("FSharp.Quotations.Evaluator")>]
 [<assembly: AssemblyDescriptionAttribute("A quotations evaluator for F# based on LINQ expression tree compilation")>]
-[<assembly: AssemblyVersionAttribute("1.1.0")>]
-[<assembly: AssemblyFileVersionAttribute("1.1.0")>]
+[<assembly: AssemblyVersionAttribute("1.1.1")>]
+[<assembly: AssemblyFileVersionAttribute("1.1.1")>]
 do ()
 
 module internal AssemblyVersionInformation =
     let [<Literal>] AssemblyTitle = "FSharp.Quotations.Evaluator"
     let [<Literal>] AssemblyProduct = "FSharp.Quotations.Evaluator"
     let [<Literal>] AssemblyDescription = "A quotations evaluator for F# based on LINQ expression tree compilation"
-    let [<Literal>] AssemblyVersion = "1.1.0"
-    let [<Literal>] AssemblyFileVersion = "1.1.0"
+    let [<Literal>] AssemblyVersion = "1.1.1"
+    let [<Literal>] AssemblyFileVersion = "1.1.1"
