@@ -8,7 +8,7 @@
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
     <NoWarn>52,1178</NoWarn>
-    <OtherFlags>--warnon:1182</OtherFlags>
+    <OtherFlags>--warnon:1182 --staticlink:FSharp.Quotations.Evaluator.Hacks</OtherFlags>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
