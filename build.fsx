@@ -97,7 +97,7 @@ Target "AssemblyInfo" (fun _ ->
 // Clean build results & restore NuGet packages
 
 Target "Clean" (fun _ ->
-    CleanDirs ["bin"; "temp"]
+    CleanDirs ["bin"; "temp"; "nuget"]
 )
 
 Target "CleanDocs" (fun _ ->
@@ -184,23 +184,23 @@ Target "All" DoNothing
 Target "BuildPackage" DoNothing
 Target "Release" DoNothing
 
-//"Clean"
-//  ==> "AssemblyInfo"
-//  ==> "DotNetRestore"
-//  ==> "Build"
-//  ==> "RunTests"
-//  ==> "All"
+"Clean"
+  ==> "AssemblyInfo"
+  ==> "DotNetRestore"
+  ==> "Build"
+  ==> "RunTests"
+  ==> "All"
 
-//"All"
-//  ==> "CleanDocs"
-//  ==> "GenerateDocs"
-//  ==> "NuGet"
-//  ==> "BuildPackage"
+"All"
+  ==> "CleanDocs"
+  ==> "GenerateDocs"
+  ==> "NuGet"
+  ==> "BuildPackage"
 
-//"BuildPackage"
-//  ==> "ReleaseDocs"
-//  ==> "NuGetPush"
-//  ==> "ReleaseTag"
-//  ==> "Release"
+"BuildPackage"
+  ==> "ReleaseDocs"
+  ==> "NuGetPush"
+  ==> "ReleaseTag"
+  ==> "Release"
 
 RunTargetOrDefault "All"

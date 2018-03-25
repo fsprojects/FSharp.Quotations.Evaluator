@@ -1,3 +1,6 @@
+### 1.1.2 - Support NetStandard2.0
+* Fix packaging issue.
+
 ### 1.1.1 - Support NetStandard2.0
 * Fix packaging issue.
 
