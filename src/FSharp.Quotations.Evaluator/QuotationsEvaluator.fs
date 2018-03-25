@@ -84,12 +84,7 @@ module QuotationEvaluationTypes =
     let IsVoidType (ty:System.Type)  = (ty = typeof<System.Void>)
 
     let LinqExpressionHelper (_:'T) : Expression<'T> = failwith ""
-
-#if PORTABLE
-    let showAll = true
-#else
-    let showAll = BindingFlags.Public ||| BindingFlags.NonPublic    
-#endif
+    let showAll = BindingFlags.Public ||| BindingFlags.NonPublic
 
     let wrapVoid (e:#Expression) =
         if e.Type <> typeof<System.Void> then e |> asExpr
@@ -453,13 +448,9 @@ module QuotationEvaluationTypes =
                 let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
                 let tyargs = [| v.Type; body.Type |]
                 let bodyP = ConvExpr env body
-#if PORTABLE 
-                failwith "argument counts > 19 not supported when using the portable version of FSharp.Quotations.Evaluator"
-#else
                 let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
                 let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpression
                 Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
-#endif
             else
                 let stateType, makeStateConstructor =
                     match capturedVars |> List.map (fun v -> v.Type) |> List.toArray with

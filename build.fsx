@@ -86,9 +86,10 @@ Target "AssemblyInfo" (fun _ ->
     |> Seq.iter (fun (projFileName, projectName, folderName, attributes) ->
         match projFileName with
         | Fsproj -> CreateFSharpAssemblyInfo (folderName </> "AssemblyInfo.fs") attributes
-        | Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
-        | Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
-        | Shproj -> ()
+        | _ -> () // ignore AssemblyInfo creation for FSharp.Quotations.Evaluator.Hacks
+        //| Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
+        //| Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
+        //| Shproj -> ()
         )
 )
 
