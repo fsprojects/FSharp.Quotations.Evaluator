@@ -1467,3 +1467,16 @@ module ParseTests =
         test "parseUint16" (parseUint16 = 42us)
         test "parseUint32" (parseUint32 = 42u)
         test "parseUint64" (parseUint64 = 42UL)
+
+module GithubIssues =
+    [<Test>]
+    let ``[1](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/26)`` () =
+        let t = <@ fun () ->
+            ()
+            fun () -> () @>
+        t.Compile () |> ignore
+
+    [<Test>]
+    let ``[2](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/26)`` () =
+        let t = <@ sprintf "An int %d, a double %f" 10 50.50 @>
+        t.EvaluateUntyped() |> ignore
