@@ -448,7 +448,7 @@ module QuotationEvaluationTypes =
                 let env = { env with varEnv = Map.add v (vP |> asExpression) env.varEnv }
                 let tyargs = [| v.Type; body.Type |]
                 let bodyP = ConvExpr env body
-                let convType = typedefof<System.Converter<obj,obj>>.MakeGenericType tyargs
+                let convType = typedefof<System.Func<obj,obj>>.MakeGenericType tyargs
                 let convDelegate = Expression.Lambda(convType, bodyP, [| vP |]) |> asExpression
                 Expression.Call(typeof<FuncConvert>,"ToFSharpFunc",tyargs,[| convDelegate |]) |> asExpr
             else
