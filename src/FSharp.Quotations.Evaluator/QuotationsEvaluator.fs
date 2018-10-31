@@ -482,7 +482,20 @@ module QuotationEvaluationTypes =
                                 varEnv
                                 |> Map.add var parameter) }
 
-                let linqBody = ConvExpr lambdaEnv body
+                let linqBody =
+                    let rawLinqBody = ConvExpr lambdaEnv body
+
+                    let fsharpFuncType = typedefof<unit->unit>
+                    let rec tryFindfsharpFuncParent = function
+                    | null -> None
+                    | (t:Type) ->
+                        if t.IsGenericType && fsharpFuncType.Equals (t.GetGenericTypeDefinition ())
+                        then Some t
+                        else tryFindfsharpFuncParent t.BaseType
+
+                    match tryFindfsharpFuncParent rawLinqBody.Type with
+                    | None -> rawLinqBody
+                    | Some fsharpFuncType -> Expression.Convert (rawLinqBody, fsharpFuncType) :> Expression
 
                 let parameters = 
                     [ yield stateParameter
