@@ -1,3 +1,7 @@
+### 1.1.3 - Bug fix
+* Fix #26. Bug due to type arguments not being convariant, and thus
+  crashing on cast.
+
 ### 1.1.2 - Support NetStandard2.0
 * Fix packaging issue.
 
