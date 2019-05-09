@@ -1275,6 +1275,17 @@ let ForLoopTests() =
 
     checkEval "fl2" fl2 (Seq.sum [0..10])
     
+
+[<Test>]
+let QuoteTests() =
+    let quoteChar = <@ <@ 'a' @> @> |> eval
+    let quoteInt = <@ <@ 1 @> @> |> eval
+    let quoteQuoteInt = <@ <@ <@ 1 @> @> @> |> eval
+    test "quoteChar" (quoteChar = <@ 'a' @>)
+    test "quoteInt" (quoteInt = <@ 1 @>)
+    test "quoteQuoteInt" (quoteQuoteInt = <@ <@ 1 @> @>)
+
+
 module CheckedTests = 
     open Microsoft.FSharp.Core.Operators.Checked
           
@@ -1467,6 +1478,8 @@ module ParseTests =
         test "parseUint16" (parseUint16 = 42us)
         test "parseUint32" (parseUint32 = 42u)
         test "parseUint64" (parseUint64 = 42UL)
+
+
 
 module GithubIssues =
     [<Test>]
