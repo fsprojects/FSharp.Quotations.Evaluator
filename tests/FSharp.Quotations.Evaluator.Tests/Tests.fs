@@ -1479,8 +1479,6 @@ module ParseTests =
         test "parseUint32" (parseUint32 = 42u)
         test "parseUint64" (parseUint64 = 42UL)
 
-
-
 module GithubIssues =
     [<Test>]
     let ``[1](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/26)`` () =

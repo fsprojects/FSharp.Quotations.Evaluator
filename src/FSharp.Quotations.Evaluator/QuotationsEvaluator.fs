@@ -144,7 +144,7 @@ module QuotationEvaluationTypes =
         | DerivedPatterns.AndAlso(x1,x2) -> Expression.AndAlso(ConvExpr env x1, ConvExpr env x2) |> asExpr
         | DerivedPatterns.OrElse(x1,x2)  -> Expression.OrElse(ConvExpr env x1, ConvExpr env x2)  |> asExpr
         | Patterns.Value(x,ty)           -> Expression.Constant(x,ty)                            |> asExpr
-        
+
         // REVIEW: exact F# semantics for TypeAs and TypeIs
         | Patterns.Coerce(x,toTy)             -> Expression.TypeAs(ConvExpr env x,toTy) |> asExpr
         | Patterns.TypeTest(x,toTy)           -> Expression.TypeIs(ConvExpr env x,toTy) |> asExpr
