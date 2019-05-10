@@ -17,6 +17,7 @@ open Microsoft.FSharp.Quotations.DerivedPatterns
 open FSharp.Quotations.Evaluator.Tools
 
 #nowarn "1204"
+#nowarn "44"
 
 module ExtraHashCompare =
     let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
@@ -695,6 +696,15 @@ module QuotationEvaluationTypes =
                     yield! assignState;
                     yield bodyP;
                 ]) |> asExpr
+
+        | Patterns.Quote(x) -> 
+            let quoteType = inp.Type
+            if typeof<Expr> = quoteType then
+                //QuoteRaw
+                Expression.Constant(x,quoteType) |> asExpr
+            else   
+                //QuoteTyped
+                Expression.Constant(typeof<Expr>.GetMethod("Cast").MakeGenericMethod(x.Type).Invoke(null, [|x|]),quoteType) |> asExpr
 
         | Patterns.AddressOf _ -> raise <| new NotSupportedException("Address-of expressions may not be converted to LINQ expressions")
         | Patterns.AddressSet _ -> raise <| new NotSupportedException("Address-set expressions may not be converted to LINQ expressions")
