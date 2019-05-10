@@ -1,9 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FSharp.Quotations.Evaluator.Hacks.xml</DocumentationFile>
   </PropertyGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
-</Project>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.6.2" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+ </Project>
