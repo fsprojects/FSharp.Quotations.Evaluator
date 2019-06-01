@@ -1,7 +1,7 @@
 (*** hide ***)
-// This block of code is omitted in the generated HTML documentation. Use 
+// This block of code is omitted in the generated HTML documentation. Use
 // it to define helpers that you do not want to show in the documentation.
-#I "../../src/FSharp.Quotations.Evaluator/bin/Release/net45/"
+#I "../../src/FSharp.Quotations.Evaluator/bin/Release/netstandard2.0/"
 
 (**
 F# Quotations Evaluator Tutorial
@@ -28,9 +28,9 @@ To evaluate a weakly typed quotation, use `EvaluateUntyped`. An object is return
 you can cast to the expected type when it is known.
 *)
 
-let evalTuple n = 
+let evalTuple n =
     let v = Expr.NewTuple (List.replicate n (Expr.Value n)) // codegen (fun x -> (x,x))
-    v.EvaluateUntyped() 
+    v.EvaluateUntyped()
 
 evalTuple 4 // obj = (4,4,4,4)
 evalTuple 5 // obj = (5,5,5,5,5)
@@ -41,11 +41,11 @@ Compilation
 -----------
 
 All evaluation is currently done via compilation. In the future some evalaution may be done via interpretation.
-To force compilation, use "Compile".  
+To force compilation, use "Compile".
 
 *)
 
-let addPlusOne = QuotationEvaluator.Compile <@ fun x y -> x + y + 1 @> 
+let addPlusOne = QuotationEvaluator.Evaluate <@ fun x y -> x + y + 1 @>
 
 let nine = addPlusOne 3 5 // 9
 
@@ -69,7 +69,7 @@ You can generate lambdas and compile them dynamically:
 *)
 
 
-let tupler = 
+let tupler =
     let v = Var("x",typeof<int>)
     let v = Expr.Lambda(v, Expr.NewTuple [Expr.Var v; Expr.Var v]) // codegen (fun x -> (x,x))
     v.CompileUntyped() :?> (int -> (int * int))
@@ -80,15 +80,15 @@ tupler 78  // (78, 78)
 In this example, we generate a lambda (fun x -> (x,...,x)) for tuple size N:
 *)
 
-let invokeFunctionDynamic (f: obj) (x:obj) = 
+let invokeFunctionDynamic (f: obj) (x:obj) =
     // Invoke an F# function dynamically
     f.GetType().InvokeMember("Invoke",System.Reflection.BindingFlags.InvokeMethod,null,f,[| box x |])
 
-let makeTupler n = 
+let makeTupler n =
     let xVar = Var("x",typeof<int>)
     let lambdaExpr = Expr.Lambda(xVar, Expr.NewTuple (List.replicate n (Expr.Var xVar))) // codegen (fun x -> (x,...,x))
-    let compiledLambda = lambdaExpr.CompileUntyped() 
-    fun (v:int) -> 
+    let compiledLambda = lambdaExpr.CompileUntyped()
+    fun (v:int) ->
         // Invoke the function dynamically
         invokeFunctionDynamic compiledLambda v
 
