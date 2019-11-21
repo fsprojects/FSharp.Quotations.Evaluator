@@ -4,7 +4,7 @@ open System
 open System.Diagnostics
 open System.Reflection
 open System.Linq.Expressions
-open NUnit.Framework
+open Xunit
 open Microsoft.FSharp.Quotations
 open FSharp.Quotations.Evaluator.Unittests
 
@@ -57,8 +57,7 @@ let getTimeAllowanceMultiplier (``method``:MethodInfo) =
         then TimeAllowanceAttribute.DefaultMultiplier
         else timeAllowance.Multiplier
 
-#if INCLUDE_TIMING_TESTS
-// we probably have a lot of ceremony here for no particular reason, but it shouldn't hurt
+//// we probably have a lot of ceremony here for no particular reason, but it shouldn't hurt
 let timeFunction functionQuotation =
     let ``method``, compiledMethod, directlyCallMethod =
         getEntryPoints functionQuotation
@@ -97,16 +96,18 @@ let timeFunction functionQuotation =
 
     let allowedTime = directMs * timeAllowanceMultiplier
 
-    Assert.LessOrEqual (viaLinqMs, allowedTime,
-        "Took too long! linq={0:0} compiled={1:0} multiples of allowed time={2:0.00}",
-        viaLinqMs, directMs, viaLinqMs / allowedTime)
+    Assert.True(viaLinqMs <= allowedTime, 
+        sprintf "Took too long! linq=%g compiled=%g multiples of allowed time=%g" 
+            viaLinqMs directMs (viaLinqMs / allowedTime))
 
-    Assert.GreaterOrEqual (viaLinqMs, allowedTime * 0.75,
-        "Too fast; decrease the multiplier! linq={0:0} compiled={1:0} allowed multiples={2:0.00}-{3:0.00} actual multiples={4:0.00}", 
-        viaLinqMs, directMs, timeAllowanceMultiplier * 0.75, timeAllowanceMultiplier, viaLinqMs / directMs)
+    Assert.True (viaLinqMs >= allowedTime * 0.75, 
+        sprintf "Too fast; decrease the multiplier! linq=%g compiled=%g allowed multiples=%g-%g actual multiples=%g"
+            viaLinqMs directMs (timeAllowanceMultiplier * 0.75) timeAllowanceMultiplier (viaLinqMs / directMs))
+
+#if INCLUDE_TIMING_TESTS
+type TimeFactAttribute = FactAttribute
 #else
-let timeFunction _ =
-    Assert.Ignore "Ignoring timing tests. Set INCLUDE_TIMING_TESTS"
+type TimeFactAttribute() = inherit FactAttribute(Skip = "Ignoring timing tests. Set INCLUDE_TIMING_TESTS")
 #endif
 
 [<ReflectedDefinition; TestIterations 1000; TimeAllowance 1.25>]
@@ -118,11 +119,11 @@ let ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     Seq.iter (fun n -> ToggleNth n doors) [1..100]      // toggle the appropriate doors for each pass
     doors 
 
-[<Test>]
+[<Fact>]
 let ``Test [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     testFunction <@ ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time [answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answerDoors](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
@@ -134,11 +135,11 @@ let ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
         n = sqrt * sqrt
     [| for i in 1..100 do yield PerfectSquare i |]    
 
-[<Test>]
+[<Fact>]
 let ``Test [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     testFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time [answer2](http://rosettacode.org/wiki/100_doors#F.23)`` () =
     timeFunction <@ ``[answer2](http://rosettacode.org/wiki/100_doors#F.23)`` @>
 
@@ -160,11 +161,11 @@ let ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     |> Seq.takeWhile (fun (t,_) -> t <= b)
     |> Seq.toList
 
-[<Test>]
+[<Fact>]
 let ``Test [Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     testFunction <@ ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time [Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` () =
     timeFunction <@ ``[Euler_method](http://rosettacode.org/wiki/Euler_method#F.23)`` @>
 
@@ -183,11 +184,11 @@ let ``int Operators +-/*%`` () =
             result <- result + 1
     result
 
-[<Test>]
+[<Fact>]
 let ``Test int Operators +-/*%`` () =
     testFunction <@ ``int Operators +-/*%`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time int Operators +-/*%`` () =
     timeFunction <@ ``int Operators +-/*%`` @>
 
@@ -207,11 +208,11 @@ let ``int64 Operators +-/*%`` () =
             result <- result + 1L
     result
 
-[<Test>]
+[<Fact>]
 let ``Test int64 Operators +-/*%`` () =
     testFunction <@ ``int64 Operators +-/*%`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time int64 Operators +-/*%`` () =
     timeFunction <@ ``int64 Operators +-/*%`` @>
 
@@ -231,11 +232,11 @@ let ``float Operators +-/*%`` () =
             result <- result + 1.0
     result
 
-[<Test>]
+[<Fact>]
 let ``Test float Operators +-/*%`` () =
     testFunction <@ ``float Operators +-/*%`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time float Operators +-/*%`` () =
     timeFunction <@ ``float Operators +-/*%`` @>
 
@@ -257,11 +258,11 @@ let ``single Operators +-/*%`` () =
             result <- result + 1.0
     result
 
-[<Test>]
+[<Fact>]
 let ``Test single Operators +-/*%`` () =
     testFunction <@ ``single Operators +-/*%`` @>
 
-[<Test>]
+[<Fact>]
 let ``Time single Operators +-/*%`` () =
     timeFunction <@ ``single Operators +-/*%`` @>
 *)
@@ -287,11 +288,11 @@ let ``int Operators <>=`` () =
         if f <> g then result <- result - 3
     result
 
-[<Test>]
+[<Fact>]
 let ``Test int Operators <>=`` () =
     testFunction <@ ``int Operators <>=`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time int Operators <>=`` () =
     timeFunction <@ ``int Operators <>=`` @>
 
@@ -316,11 +317,11 @@ let ``int64 Operators <>=`` () =
         if f <> g then result <- result - 3
     result
 
-[<Test>]
+[<Fact>]
 let ``Test int64 Operators <>=`` () =
     testFunction <@ ``int64 Operators <>=`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time int64 Operators <>=`` () =
     timeFunction <@ ``int64 Operators <>=`` @>
 
@@ -345,11 +346,11 @@ let ``float Operators <>=`` () =
         if f <> g then result <- result - 3
     result
 
-[<Test>]
+[<Fact>]
 let ``Test float Operators <>=`` () =
     testFunction <@ ``float Operators <>=`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time float Operators <>=`` () =
     timeFunction <@ ``float Operators <>=`` @>
 
@@ -374,11 +375,11 @@ let ``single Operators <>=`` () =
         if f <> g then result <- result - 3
     result
 
-[<Test>]
+[<Fact>]
 let ``Test single Operators <>=`` () =
     testFunction <@ ``single Operators <>=`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time single Operators <>=`` () =
     timeFunction <@ ``single Operators <>=`` @>
 
@@ -391,11 +392,11 @@ let ``float cast`` () =
         total <- total + (float (rand.Next ()))
     total
 
-[<Test>]
+[<Fact>]
 let ``Test float cast`` () =
     testFunction <@ ``float cast`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time float cast`` () =
     timeFunction <@ ``float cast`` @>
 
@@ -408,11 +409,11 @@ let ``int64 cast`` () =
         total <- total + (int64 (rand.Next ()))
     total
 
-[<Test>]
+[<Fact>]
 let ``Test int64 cast`` () =
     testFunction <@ ``int64 cast`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time int64 cast`` () =
     timeFunction <@ ``int64 cast`` @>
 
@@ -425,11 +426,11 @@ let ``id function`` () =
         total <- id (rand.Next ())
     total
 
-[<Test>]
+[<Fact>]
 let ``Test id function`` () =
     testFunction <@ ``id function`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time id function`` () =
     timeFunction <@ ``id function`` @>
 
@@ -442,11 +443,11 @@ let ``operator |>`` () =
         total <- (rand.Next ()) |> id
     total
 
-[<Test>]
+[<Fact>]
 let ``Test operator |>`` () =
     testFunction <@ ``operator |>`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time operator |>`` () =
     timeFunction <@ ``operator |>`` @>
 
@@ -459,11 +460,11 @@ let ``operator <|`` () =
         total <- id <| (rand.Next ())
     total
 
-[<Test>]
+[<Fact>]
 let ``Test operator <|`` () =
     testFunction <@ ``operator <|`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time operator <|`` () =
     timeFunction <@ ``operator <|`` @>
 
@@ -474,11 +475,11 @@ let ``operator .. ..`` () =
         n <- float i
     n
 
-[<Test>]
+[<Fact>]
 let ``Test operator .. ..`` () =
     testFunction <@ ``operator .. ..`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time operator .. ..`` () =
     timeFunction <@ ``operator .. ..`` @>
 
@@ -496,11 +497,11 @@ let ``recursion is even or odd`` () =
     Seq.init 100 (fun _ -> if isEven (r.Next 10000) then 1 else -1)
     |> Seq.sum
 
-[<Test>]
+[<Fact>]
 let ``Test recursion is even or odd`` () =
     testFunction <@ ``recursion is even or odd`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time recursion is even or odd`` () =
     timeFunction <@ ``recursion is even or odd`` @>
 
@@ -514,11 +515,11 @@ let ``recursion fibonacci`` () =
     Seq.init 10 (fun _ -> float <| fib (r.Next 30))
     |> Seq.sum
 
-[<Test>]
+[<Fact>]
 let ``Test recursion fibonacci`` () =
     testFunction <@ ``recursion fibonacci`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time recursion fibonacci`` () =
     timeFunction <@ ``recursion fibonacci`` @>
 
@@ -538,11 +539,11 @@ let ``recursion type creation`` () =
 
     penny.Name + "&" + paul.Name = paul.Partner.Name + "&" + penny.Partner.Name
 
-[<Test; Ignore("Not currently supported")>]
+[<Fact(Skip = "Not currently supported")>]
 let ``Test recursion type creation`` () =
     testFunction <@ ``recursion type creation`` @>
 
-[<Test; Ignore("Not currently supported")>]
+[<TimeFact(Skip = "Not currently supported")>]
 let ``Time recursion type creation`` () =
     timeFunction <@ ``recursion type creation`` @>
 
@@ -555,11 +556,11 @@ let ``recursion tail`` () =
 
     count 0 100000
 
-[<Test; Ignore("Not currently supported - blows up")>]
+[<Fact(Skip = "Not currently supported - blows up")>]
 let ``Test recursion tail`` () =
     testFunction <@ ``recursion tail`` @>
 
-[<Test; Ignore("Not currently supported - blows up")>]
+[<TimeFact(Skip = "Not currently supported - blows up")>]
 let ``Time recursion tail`` () =
     timeFunction <@ ``recursion tail`` @>
 
@@ -577,11 +578,11 @@ let ``many captures and parameters 1`` () =
         total <- total + fff (x()) (x()) (x()) (x()) (x()) (x())
     total
 
-[<Test>]
+[<Fact>]
 let ``Test many captures and parameters 1`` () =
     testFunction <@ ``many captures and parameters 1`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time many captures and parameters 1`` () =
     timeFunction <@ ``many captures and parameters 1`` @>
 
@@ -598,11 +599,11 @@ let ``many captures and parameters 2`` () =
         total <- total + fff (x())
     total
 
-[<Test>]
+[<Fact>]
 let ``Test many captures and parameters 2`` () =
     testFunction <@ ``many captures and parameters 2`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time many captures and parameters 2`` () =
     timeFunction <@ ``many captures and parameters 2`` @>
 
@@ -620,11 +621,11 @@ let ``many captures and parameters 3`` () =
         total <- total + fff (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x()) (x())
     total
 
-[<Test>]
+[<Fact>]
 let ``Test many captures and parameters 3`` () =
     testFunction <@ ``many captures and parameters 3`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time many captures and parameters 3`` () =
     timeFunction <@ ``many captures and parameters 3`` @>
 
@@ -642,11 +643,11 @@ let ``many captures and parameters 4`` () =
         total <- total + fff (x()) (x()) (x()) (x())
     total
 
-[<Test>]
+[<Fact>]
 let ``Test many captures and parameters 4`` () =
     testFunction <@ ``many captures and parameters 4`` @>
 
-[<Test>]
+[<TimeFact>]
 let ``Time many captures and parameters 4`` () =
     timeFunction <@ ``many captures and parameters 4`` @>
 
@@ -655,11 +656,11 @@ let ``Time many captures and parameters 4`` () =
 [<ReflectedDefinition>]
 let ``[]()`` () =
 
-[<Test>]
+[<Fact>]
 let `` `` () =
     testFunction <@ `` `` @>
 
-[<Test>]
+[<Fact>]
 let `` `` () =
     timeFunction <@ `` `` @>
 *)

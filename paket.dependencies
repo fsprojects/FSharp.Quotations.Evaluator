@@ -19,8 +19,8 @@ group Tests
   storage: none
 
   nuget FSharp.Core >= 4.7
-  nuget NUnit ~> 3.12
-  nuget NUnit3TestAdapter ~> 3.12 version_in_path: true
+  nuget xunit ~> 2.4
+  nuget xunit.runner.visualstudio ~> 2.4.0
   nuget Microsoft.NET.Test.Sdk ~> 16.0
 
 group Build
