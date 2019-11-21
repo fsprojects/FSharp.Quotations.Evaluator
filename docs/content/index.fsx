@@ -1,7 +1,7 @@
 (*** hide ***)
 // This block of code is omitted in the generated HTML documentation. Use 
 // it to define helpers that you do not want to show in the documentation.
-#I "../../src/FSharp.Quotations.Evaluator/bin/Release/net45/"
+#I "../../src/FSharp.Quotations.Evaluator/bin/Release/netstandard2.0/"
 
 (**
 F# Quotations Evaluator
@@ -51,7 +51,7 @@ open FSharp.Quotations.Evaluator
 
 QuotationEvaluator.Evaluate <@ 1 + 1 @>
 
-let addPlusOne = QuotationEvaluator.Compile <@ fun x y -> x + y + 1 @> 
+let addPlusOne = QuotationEvaluator.Evaluate <@ fun x y -> x + y + 1 @> 
 
 let nine = addPlusOne 3 5  // gives 9
 
