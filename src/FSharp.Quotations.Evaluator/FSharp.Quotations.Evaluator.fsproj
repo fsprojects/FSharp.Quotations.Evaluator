@@ -2,13 +2,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\FSharp.Quotations.Evaluator.xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup>
     <WarningLevel>5</WarningLevel>
     <NoWarn>52,1178</NoWarn>
-    <OtherFlags>--warnon:1182 --staticlink:FSharp.Quotations.Evaluator.Hacks</OtherFlags>
+    <OtherFlags>--warnon:1182</OtherFlags>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
@@ -19,17 +21,10 @@
     <Compile Include="Tools.fs" />
     <Compile Include="QuotationsEvaluator.fsi" />
     <Compile Include="QuotationsEvaluator.fs" />
-    <None Include="paket.template" />
   </ItemGroup>
   
   <ItemGroup>
     <None Include="paket.references" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\FSharp.Quotations.Evaluator.Hacks\FSharp.Quotations.Evaluator.Hacks.csproj">
-      <Private>true</Private>
-    </ProjectReference>
   </ItemGroup>
 
   <Import Project="..\..\.paket\Paket.Restore.targets" />

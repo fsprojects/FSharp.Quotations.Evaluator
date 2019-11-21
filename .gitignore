@@ -184,3 +184,6 @@ paket-files/
 
 # Visual Studio
 .vs/
+
+# Nuget artifacts
+artifacts/

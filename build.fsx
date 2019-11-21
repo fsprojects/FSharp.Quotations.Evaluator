@@ -62,82 +62,49 @@ let gitRaw = environVarOrDefault "gitRaw" "https://raw.github.com/fsprojects"
 
 // Read additional information from the release notes document
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
+let configuration = environVarOrDefault "Configuration" "Release"
+let artifactsDir = "artifacts"
 let release = parseReleaseNotes (IO.File.ReadAllLines "RELEASE_NOTES.md")
-
-// Generate assembly info files with the right version & up-to-date information
-Target "AssemblyInfo" (fun _ ->
-    let getAssemblyInfoAttributes projectName =
-      [ Attribute.Title (projectName)
-        Attribute.Product project
-        Attribute.Description summary
-        Attribute.Version release.AssemblyVersion
-        Attribute.FileVersion release.AssemblyVersion ] 
-
-    let getProjectDetails projectPath =
-        let projectName = System.IO.Path.GetFileNameWithoutExtension projectPath
-        ( projectPath,
-          projectName,
-          System.IO.Path.GetDirectoryName projectPath,
-          getAssemblyInfoAttributes projectName
-        )
-
-    !! "src/**/*.??proj"
-    |> Seq.map getProjectDetails
-    |> Seq.iter (fun (projFileName, projectName, folderName, attributes) ->
-        match projFileName with
-        | Fsproj -> CreateFSharpAssemblyInfo (folderName </> "AssemblyInfo.fs") attributes
-        | _ -> () // ignore AssemblyInfo creation for FSharp.Quotations.Evaluator.Hacks
-        //| Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
-        //| Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
-        //| Shproj -> ()
-        )
-)
 
 // --------------------------------------------------------------------------------------
 // Clean build results & restore NuGet packages
 
 Target "Clean" (fun _ ->
-    CleanDirs ["bin"; "temp"; "nuget"]
-)
-
-Target "CleanDocs" (fun _ ->
-    CleanDirs ["docs/output"]
+    CleanDirs ["artifactsDir"; "docs/output"]
 )
 
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
-Target "DotNetRestore" (fun _ -> DotNetCli.Restore id)
-
 Target "Build" (fun _ ->
-    !! solutionFile
-    |> MSBuild "" "Build" ["Configuration", "Release"; "SourceLinkCreate", "true"]
-    |> ignore
+    DotNetCli.Build(fun c ->
+        { c with
+            Project = __SOURCE_DIRECTORY__
+            Configuration = configuration
+            AdditionalArgs = [ sprintf "-p:Version=%s" release.NugetVersion ]
+        })
 )
 
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 
 Target "RunTests" (fun _ ->
-    for proj in !! testProjects do
-        DotNetCli.Test (fun c ->
-            { c with
-                Project = proj
-                Configuration = "Release"
-                Framework =
-                    if EnvironmentHelper.isWindows then c.Framework
-                    else "netcoreapp2.0" })
+    DotNetCli.Test (fun c ->
+        { c with
+            Project = __SOURCE_DIRECTORY__
+            Configuration = configuration
+            AdditionalArgs = [ "--no-build" ] })
 )
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 
 Target "NuGet" (fun _ ->
-    Paket.Pack (fun p -> 
-        { p with
-            OutputPath = "nuget"
-            Version = release.NugetVersion
-            ReleaseNotes = toLines release.Notes })
+    DotNetCli.Pack (fun c ->
+        { c with
+            Project = __SOURCE_DIRECTORY__
+            OutputPath = artifactsDir
+            Configuration = configuration })
 )
 
 Target "NuGetPush" (fun _ ->
@@ -189,27 +156,24 @@ Target "ReleaseTag" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
-Target "All" DoNothing
-Target "BuildPackage" DoNothing
+Target "Default" DoNothing
+Target "Bundle" DoNothing
 Target "Release" DoNothing
 
 "Clean"
-  ==> "AssemblyInfo"
-  ==> "DotNetRestore"
   ==> "Build"
   ==> "RunTests"
-  ==> "All"
+  ==> "Default"
 
-"All"
-  ==> "CleanDocs"
+"Default"
   ==> "GenerateDocs"
   ==> "NuGet"
-  ==> "BuildPackage"
+  ==> "Bundle"
 
-"BuildPackage"
+"Bundle"
   ==> "ReleaseDocs"
   ==> "NuGetPush"
   ==> "ReleaseTag"
   ==> "Release"
 
-RunTargetOrDefault "All"
+RunTargetOrDefault "Default"
