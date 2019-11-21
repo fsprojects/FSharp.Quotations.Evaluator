@@ -184,18 +184,18 @@ Target "All" DoNothing
 Target "BuildPackage" DoNothing
 Target "Release" DoNothing
 
-//"Clean"
-//  ==> "AssemblyInfo"
-//  ==> "DotNetRestore"
-//  ==> "Build"
-//  ==> "RunTests"
-//  ==> "All"
+"Clean"
+  ==> "AssemblyInfo"
+  ==> "DotNetRestore"
+  ==> "Build"
+  ==> "RunTests"
+  ==> "All"
 
-//"All"
-//  ==> "CleanDocs"
-//  ==> "GenerateDocs"
-//  ==> "NuGet"
-//  ==> "BuildPackage"
+"All"
+  ==> "CleanDocs"
+  ==> "GenerateDocs"
+  ==> "NuGet"
+  ==> "BuildPackage"
 
 "BuildPackage"
   ==> "ReleaseDocs"

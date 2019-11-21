@@ -1,5 +1,5 @@
 FSharp.Core
-SourceLink.Create.CommandLine
+Microsoft.SourceLink.GitHub
 group NetClassic
   FSharp.Core
-  SourceLink.Create.CommandLine
+  Microsoft.SourceLink.GitHub
