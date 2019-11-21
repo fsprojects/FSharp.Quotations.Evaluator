@@ -149,7 +149,16 @@ Target "NuGetPush" (fun _ ->
 // Generate the documentation
 
 Target "GenerateDocs" (fun _ ->
-    executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"] [] |> ignore
+    // ugh, still need to use mono and legacy fsi for FSharp.Formatting
+    let path = __SOURCE_DIRECTORY__ @@ "packages/build/FSharp.Compiler.Tools/tools/fsi.exe"
+    let workingDir = "docs/tools"
+    let args = "--define:RELEASE generate.fsx"
+    let command, args = 
+        if EnvironmentHelper.isWindows then path, args
+        else "mono", sprintf "%s %s" path args
+
+    if Shell.Exec(command, args, workingDir) <> 0 then
+        failwith "failed to generate docs"
 )
 
 // --------------------------------------------------------------------------------------

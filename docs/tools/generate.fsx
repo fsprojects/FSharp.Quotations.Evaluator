@@ -22,21 +22,20 @@ let info =
 // For typical project, no changes are needed below
 // --------------------------------------------------------------------------------------
 
-#I "../../packages/build/FSharp.Formatting/lib/net40"
-#I "../../packages/build/FSharp.Compiler.Service/lib/net40"
-#I "../../packages/build/FSharpVSPowerTools.Core/lib/net45"
+#I "../../packages/build/FSharp.Compiler.Service/lib/net45"
+#I "../../packages/build/FSharp.Formatting/lib/net461"
 #r "../../packages/build/FAKE/tools/FakeLib.dll"
 #r "RazorEngine.dll"
-#r "FSharpVSPowerTools.Core.dll"
-#r "FSharp.Literate.dll"
 #r "FSharp.Markdown.dll"
+#r "FSharp.Literate.dll"
 #r "FSharp.CodeFormat.dll"
 #r "FSharp.MetadataFormat.dll"
+#r "FSharp.Formatting.Common.dll"
+#r "FSharp.Formatting.Razor.dll"
 open Fake
 open System.IO
-open Fake.FileHelper
 open FSharp.Literate
-open FSharp.MetadataFormat
+open FSharp.Formatting.Razor
 
 // When called from 'build.fsx', use the public project URL as <root>
 // otherwise, use the current 'output' directory.
@@ -73,7 +72,7 @@ let buildReference () =
   let binaries =
     referenceBinaries
     |> List.map (fun lib-> bin @@ lib)
-  MetadataFormat.Generate
+  RazorMetadataFormat.Generate
     ( binaries, output @@ "reference", layoutRoots, 
       parameters = ("root", root)::info,
       sourceRepo = githubLink @@ "tree/master",
@@ -85,7 +84,7 @@ let buildDocumentation () =
   let subdirs = Directory.EnumerateDirectories(content, "*", SearchOption.AllDirectories)
   for dir in Seq.append [content] subdirs do
     let sub = if dir.Length > content.Length then dir.Substring(content.Length + 1) else "."
-    Literate.ProcessDirectory
+    RazorLiterate.ProcessDirectory
       ( dir, docTemplate, output @@ sub, replacements = ("root", root)::info,
         layoutRoots = layoutRoots )
 

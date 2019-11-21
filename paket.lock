@@ -10,16 +10,34 @@ NUGET
       Microsoft.SourceLink.Common (>= 1.0.0-beta2-19554-01)
 
 GROUP Build
-RESTRICTION: == net461
+RESTRICTION: == net472
 NUGET
   remote: https://api.nuget.org/v3/index.json
     FAKE (4.64.17)
-    FSharp.Compiler.Service (2.0.0.6)
-    FSharp.Formatting (2.14.4)
-      FSharp.Compiler.Service (2.0.0.6)
-      FSharpVSPowerTools.Core (>= 2.3 < 2.4)
-    FSharpVSPowerTools.Core (2.3)
-      FSharp.Compiler.Service (>= 2.0.0.3)
+    FSharp.Compiler.Service (27.0.1)
+      FSharp.Core (>= 4.5.2)
+      System.Collections.Immutable (>= 1.5)
+      System.Reflection.Metadata (>= 1.6)
+      System.ValueTuple (>= 4.4)
+    FSharp.Compiler.Tools (10.2.3)
+    FSharp.Core (4.7)
+    FSharp.Formatting (3.1)
+      FSharp.Compiler.Service (>= 27.0.1 < 28.0)
+      Microsoft.AspNet.Razor (>= 3.2.7 < 4.0)
+      System.ValueTuple (>= 4.5 < 5.0)
+    Microsoft.AspNet.Razor (3.2.7)
+    System.Buffers (4.5)
+    System.Collections.Immutable (1.6)
+      System.Memory (>= 4.5.3)
+    System.Memory (4.5.3)
+      System.Buffers (>= 4.4)
+      System.Numerics.Vectors (>= 4.4)
+      System.Runtime.CompilerServices.Unsafe (>= 4.5.2)
+    System.Numerics.Vectors (4.5)
+    System.Reflection.Metadata (1.7)
+      System.Collections.Immutable (>= 1.6)
+    System.Runtime.CompilerServices.Unsafe (4.6)
+    System.ValueTuple (4.5)
 
 GROUP NetClassic
 STORAGE: NONE
