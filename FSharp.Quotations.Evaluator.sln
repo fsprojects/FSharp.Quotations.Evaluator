@@ -1,19 +1,29 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29515.123
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{E5471B6B-69FA-47F1-8583-044B6C0EE665}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator", "src\FSharp.Quotations.Evaluator\FSharp.Quotations.Evaluator.fsproj", "{0A767BB8-BFC6-4622-8063-080188C9EBC4}" 
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.Tests", "tests\FSharp.Quotations.Evaluator.Tests\FSharp.Quotations.Evaluator.Tests.fsproj", "{5EEAE3E8-AE29-4411-B632-4D2E61043094}" 
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{B0B99A31-19B9-4970-B148-3CB7274FF231}" 
 	ProjectSection(SolutionItems) = preProject
-		paket.dependencies = paket.dependencies
-		paket.lock = paket.lock
+		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator", "src\FSharp.Quotations.Evaluator\FSharp.Quotations.Evaluator.fsproj", "{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60BC93-E09B-4E5F-9D85-95A519479D54}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4048BFB6-DC54-4910-9B9C-8F0574188931}" 
 	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{4B8CAB40-6140-49F2-AE4A-34B93AD09D8F}" 
+	ProjectSection(SolutionItems) = preProject
+		.paket\Paket.Restore.targets = .paket\Paket.Restore.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E137503-29B5-4DED-B543-D8DEF5B5A727}" 
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		.travis.yml = .travis.yml
 		appveyor.yml = appveyor.yml
@@ -21,58 +31,74 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60
 		build.fsx = build.fsx
 		build.sh = build.sh
 		Directory.Build.props = Directory.Build.props
+		docker-build.sh = docker-build.sh
+		Dockerfile = Dockerfile
+		LICENSE.txt = LICENSE.txt
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
 		README.md = README.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{83F16175-43B1-4C90-A1EE-8E351C33435D}"
-	ProjectSection(SolutionItems) = preProject
-		docs\tools\generate.fsx = docs\tools\generate.fsx
-		docs\tools\templates\template.cshtml = docs\tools\templates\template.cshtml
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3F4E116C-4942-4EE9-B531-414EA2925B87}" 
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8E6D5255-776D-4B61-85F9-73C37AA1FB9A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8BBA847E-24E1-4F06-AB21-3822CB3EF44C}" 
 	ProjectSection(SolutionItems) = preProject
 		docs\content\index.fsx = docs\content\index.fsx
 		docs\content\tutorial.fsx = docs\content\tutorial.fsx
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED8079DD-2B06-4030-9F0F-DC548F98E1C4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{3EEF6D0B-E365-4E96-85E5-8D05F1B729E9}" 
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.Tests", "tests\FSharp.Quotations.Evaluator.Tests\FSharp.Quotations.Evaluator.Tests.fsproj", "{E789C72A-5CFD-436B-8EF1-61AA2852A89F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{8A491320-622E-4175-9381-37CCC40AC2A7}" 
+	ProjectSection(SolutionItems) = preProject
+		docs\files\img\logo.pdn = docs\files\img\logo.pdn
+		docs\files\img\logo.png = docs\files\img\logo.png
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0C33F28E-EA3C-4925-AB7E-4193887544F8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8}" 
+	ProjectSection(SolutionItems) = preProject
+		docs\tools\generate.fsx = docs\tools\generate.fsx
+		docs\tools\packages.config = docs\tools\packages.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{2AE853ED-C926-4FE5-BD51-57F15953D3A0}" 
+	ProjectSection(SolutionItems) = preProject
+		docs\tools\templates\template.cshtml = docs\tools\templates\template.cshtml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EAB93A09-6903-4D0C-ADEE-A2E673FD0240}" 
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ECE849FE-B377-4D05-8DA9-81C35305D540}" 
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Performance|Any CPU = Performance|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}.Performance|Any CPU.ActiveCfg = Release|Any CPU
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}.Performance|Any CPU.Build.0 = Release|Any CPU
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Performance|Any CPU.ActiveCfg = Release|Any CPU
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Performance|Any CPU.Build.0 = Release|Any CPU
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A767BB8-BFC6-4622-8063-080188C9EBC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A767BB8-BFC6-4622-8063-080188C9EBC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A767BB8-BFC6-4622-8063-080188C9EBC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A767BB8-BFC6-4622-8063-080188C9EBC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EEAE3E8-AE29-4411-B632-4D2E61043094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EEAE3E8-AE29-4411-B632-4D2E61043094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EEAE3E8-AE29-4411-B632-4D2E61043094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EEAE3E8-AE29-4411-B632-4D2E61043094}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{7E90D6CE-A10B-4858-A5BC-41DF7250CBCA} = {0C33F28E-EA3C-4925-AB7E-4193887544F8}
-		{83F16175-43B1-4C90-A1EE-8E351C33435D} = {A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}
-		{8E6D5255-776D-4B61-85F9-73C37AA1FB9A} = {A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}
-		{E789C72A-5CFD-436B-8EF1-61AA2852A89F} = {ED8079DD-2B06-4030-9F0F-DC548F98E1C4}
+		{8BBA847E-24E1-4F06-AB21-3822CB3EF44C} = {3F4E116C-4942-4EE9-B531-414EA2925B87}
+		{3EEF6D0B-E365-4E96-85E5-8D05F1B729E9} = {3F4E116C-4942-4EE9-B531-414EA2925B87}
+		{8A491320-622E-4175-9381-37CCC40AC2A7} = {3EEF6D0B-E365-4E96-85E5-8D05F1B729E9}
+		{9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8} = {3F4E116C-4942-4EE9-B531-414EA2925B87}
+		{2AE853ED-C926-4FE5-BD51-57F15953D3A0} = {9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8}
+		{0A767BB8-BFC6-4622-8063-080188C9EBC4} = {EAB93A09-6903-4D0C-ADEE-A2E673FD0240}
+		{5EEAE3E8-AE29-4411-B632-4D2E61043094} = {ECE849FE-B377-4D05-8DA9-81C35305D540}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {F5B6E28A-120B-4AD3-A1D8-00C936982833}
+		SolutionGuid = {E1E38BB0-7AB3-49FD-B548-0AB537261987}
 	EndGlobalSection
 EndGlobal

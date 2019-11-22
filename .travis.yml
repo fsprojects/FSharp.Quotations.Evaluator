@@ -1,8 +1,8 @@
-language: csharp
+os: linux
+language: bash
 
-sudo: false  # use the new container-based Travis infrastructure 
-dotnet: 3.0.0
-mono: latest
+services:
+  - docker
 
-script: 
-  - ./build.sh -t Bundle
+script:
+  - ./docker-build.sh Bundle
