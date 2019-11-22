@@ -12,7 +12,7 @@ group Tests
 
   nuget FSharp.Core >= 4.7
   nuget xunit ~> 2.4
-  nuget xunit.runner.visualstudio ~> 2.4.0
+  nuget xunit.runner.visualstudio ~> 2.4
   nuget Microsoft.NET.Test.Sdk ~> 16.0
 
 group Build

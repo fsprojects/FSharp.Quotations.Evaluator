@@ -4,7 +4,8 @@ open System.Linq.Expressions
 open System
 open HelperTypes
 open System.Reflection
-open Microsoft.FSharp.Quotations
+open FSharp.Quotations
+
 let rec getExpressionFromTuple (tuple:Expression) idx =
     if idx >= 7
         then getExpressionFromTuple (Expression.Property(tuple, "Rest")) (idx-7)

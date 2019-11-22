@@ -26,7 +26,7 @@ Overview
 This component is an F# quotations evaluator, implemented by compiling to LINQ expression trees.
 
 For simple expression-based scenarios you may be able to simply use the method
-```Microsoft.FSharp.Linq.RuntimeHelpers.LeafExpressionConverter.EvaluateQuotation``` from ```FSharp.Core.dll``.
+```FSharp.Linq.RuntimeHelpers.LeafExpressionConverter.EvaluateQuotation``` from ```FSharp.Core.dll``.
 
 However that component has restrictions in the quotations accepted - for example, statements such as
 while-loops are not accepted.  This component accepts more quotations (including those involving statements), 

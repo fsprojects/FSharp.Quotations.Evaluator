@@ -1,26 +1,14 @@
-
-#if INTERACTIVE
-#r @"..\..\bin\FSharp.Quotations.Evaluator.dll"
-#r @"..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll"
-#else
 module FSharp.Quotations.Evaluator.Unittests
-#endif
 
 open Xunit
-open Microsoft.FSharp.Quotations
+open FSharp.Quotations
 open FSharp.Quotations.Evaluator
-open FSharp.Quotations.Evaluator.QuotationEvaluationExtensions
-open Microsoft.FSharp.Quotations
-open Microsoft.FSharp.Quotations.Patterns
-open Microsoft.FSharp.Quotations.DerivedPatterns
-open Microsoft.FSharp.Quotations.ExprShape
+open FSharp.Quotations.Patterns
+open FSharp.Quotations.DerivedPatterns
+open FSharp.Quotations.ExprShape
 
-
-#nowarn "40"
-#nowarn "57"
 #nowarn "67" // This type test or downcast will always hold
 #nowarn "1204"
-
     
 [<Measure>] type kg
 [<Measure>] type m
@@ -315,10 +303,7 @@ let DecimalTests() =
      let x1d : decimal = <@ ceil 4.4M   @> |> eval
      let x1h : decimal = <@ floor 4.4M   @> |> eval
      //let x1l : decimal = <@ pown 4.4M 3  @> |> eval
-#if FX_NO_DEFAULT_DECIMAL_ROUND
-#else
      let x1m : decimal = <@ round 4.4M   @> |> eval
-#endif
      let x1n : int = <@ sign 4.4M   @> |> eval
 
      //let x11d : decimal<1> = <@ ceil 4.4M<1> 
@@ -899,10 +884,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
         checkEval "vrewoinrv09c" (<@ ceil 2.0 @>) (ceil 2.0)
         checkEval "vrewoinrv09v" (<@ sqrt 2.0 @>) (sqrt 2.0)
         checkEval "vrewoinrv09b" (<@ sign 2.0 @>) (sign 2.0)
-#if FX_NO_TRUNCATE
-#else
         checkEval "vrewoinrv09n" (<@ truncate 2.3 @>) (truncate 2.3)
-#endif
         checkEval "vrewoinrv09m" (<@ floor 2.3 @>) (floor 2.3)
         checkEval "vrewoinrv09Q" (<@ round 2.3 @>) (round 2.3)
         checkEval "vrewoinrv09W" (<@ log 2.3 @>) (log 2.3)
@@ -920,10 +902,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
         checkEval "vrewoinrv09D" (<@ ceil 2.0f @>) (ceil 2.0f)
         checkEval "vrewoinrv09F" (<@ sqrt 2.0f @>) (sqrt 2.0f)
         checkEval "vrewoinrv09G" (<@ sign 2.0f @>) (sign 2.0f)
-#if FX_NO_TRUNCATE
-#else
         checkEval "vrewoinrv09H" (<@ truncate 2.3f @>) (truncate 2.3f)
-#endif
         checkEval "vrewoinrv09J" (<@ floor 2.3f @>) (floor 2.3f)
         checkEval "vrewoinrv09K" (<@ round 2.3f @>) (round 2.3f)
         checkEval "vrewoinrv09L" (<@ log 2.3f @>) (log 2.3f)
@@ -933,10 +912,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
 
         checkEval "vrewoinrv09V" (<@ ceil 2.0M @>) (ceil 2.0M)
         checkEval "vrewoinrv09B" (<@ sign 2.0M @>) (sign 2.0M)
-#if FX_NO_TRUNCATE
-#else
         checkEval "vrewoinrv09N" (<@ truncate 2.3M @>) (truncate 2.3M)
-#endif
         checkEval "vrewoinrv09M" (<@ floor 2.3M @>) (floor 2.3M)
 
         checkEval "vrewoinrv09QQ" (<@ sign -2 @>) (sign -2)
@@ -952,13 +928,9 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
         checkEval "vrewoinrv09PP" (<@ [ 0uy .. 10uy ] @>) [ 0uy .. 10uy ]
         checkEval "vrewoinrv09AA" (<@ [ 0us .. 10us ] @>) [ 0us .. 10us ]
         checkEval "vrewoinrv09SS" (<@ [ 0UL .. 10UL ] @>) [ 0UL .. 10UL ]
-        
-
-#if FX_NO_DEFAULT_DECIMAL_ROUND
-#else        
+       
         // Round dynamic dispatch on Decimal
         checkEval "vrewoinrv09FF" (<@ round 2.3M @>) (round 2.3M)
-#endif
 
         // Measure stuff:
         checkEval "vrewoinrv09GG" (<@ atan2 3.0 4.0 @>) (atan2 3.0 4.0 )
@@ -990,9 +962,9 @@ let QuotationTests() =
         let (|FinalFor|_|) = function SpecificCall <@ Seq.map @>(_, [_;_],[Lambda(v,e);sq]) -> Some (v,sq,e) | _ -> None
         let (|OuterFor|_|) = function SpecificCall <@ Seq.collect @>(_, [_;_;_],[Lambda(v,e);sq]) -> Some (v,sq,e) | _ -> None
         let (|Yield|_|) = function SpecificCall <@ Seq.singleton @>(_, [_],[e]) -> Some (e) | _ -> None
-        let (|While|_|) = function SpecificCall <@ Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateWhile @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
-        let (|TryFinally|_|) = function SpecificCall <@ Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateThenFinally @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
-        let (|Using|_|) = function SpecificCall <@ Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateUsing @>(_, _,[e1;Lambda(v1,e2)]) -> Some (v1,e1,e2) | _ -> None
+        let (|While|_|) = function SpecificCall <@ FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateWhile @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
+        let (|TryFinally|_|) = function SpecificCall <@ FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateThenFinally @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
+        let (|Using|_|) = function SpecificCall <@ FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateUsing @>(_, _,[e1;Lambda(v1,e2)]) -> Some (v1,e1,e2) | _ -> None
         let (|Empty|_|) = function SpecificCall <@ Seq.empty @>(_,_,_) -> Some () | _ -> None
         test "vrenjkr90kj1" 
            (match <@ seq { for x in [1] -> x } @> with 
@@ -1287,7 +1259,7 @@ let QuoteTests() =
 
 
 module CheckedTests = 
-    open Microsoft.FSharp.Core.Operators.Checked
+    open FSharp.Core.Operators.Checked
           
     [<Fact>]
     let FloatCheckedTests() = 

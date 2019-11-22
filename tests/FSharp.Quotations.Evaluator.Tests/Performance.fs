@@ -5,10 +5,8 @@ open System.Diagnostics
 open System.Reflection
 open System.Linq.Expressions
 open Xunit
-open Microsoft.FSharp.Quotations
+open FSharp.Quotations
 open FSharp.Quotations.Evaluator.Unittests
-
-open Microsoft.FSharp.Quotations
 
 type TestIterationsAttribute (count) =
     inherit Attribute ()
@@ -241,7 +239,7 @@ let ``Time float Operators +-/*%`` () =
     timeFunction <@ ``float Operators +-/*%`` @>
 
 (*
-fails to run compiled version; I think because of Microsoft.FSharp.Core.ExtraTopLevelOperators.ToSingle
+fails to run compiled version; I think because of FSharp.Core.ExtraTopLevelOperators.ToSingle
 
 [<ReflectedDefinition; TestIterations 100; TimeAllowance 30.0>]
 let ``single Operators +-/*%`` () =

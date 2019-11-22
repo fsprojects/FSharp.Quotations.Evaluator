@@ -18,22 +18,22 @@ namespace FSharp.Quotations.Evaluator
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
-        static member ToLinqExpression : Microsoft.FSharp.Quotations.Expr -> System.Linq.Expressions.Expression
+        static member ToLinqExpression : FSharp.Quotations.Expr -> System.Linq.Expressions.Expression
 
         /// Compile the quotation expression by first converting to LINQ expression trees
         /// The expression is currently always compiled.
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
-        static member CompileUntyped : Microsoft.FSharp.Quotations.Expr -> obj
+        static member CompileUntyped : FSharp.Quotations.Expr -> obj
 
         /// Compile the quotation expression by first converting to LINQ expression trees
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
-        static member EvaluateUntyped : Microsoft.FSharp.Quotations.Expr -> obj
+        static member EvaluateUntyped : FSharp.Quotations.Expr -> obj
 
-        static member internal EvaluateUntypedUsingQueryApproximations : Microsoft.FSharp.Quotations.Expr -> obj
+        static member internal EvaluateUntypedUsingQueryApproximations : FSharp.Quotations.Expr -> obj
     
         /// Compile the quotation expression by first converting to LINQ expression trees
         /// The expression is currently always compiled.
@@ -41,13 +41,13 @@ namespace FSharp.Quotations.Evaluator
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
         [<Obsolete("Use Evaluate")>]
-        static member Compile : Microsoft.FSharp.Quotations.Expr<'T> -> 'T
+        static member Compile : FSharp.Quotations.Expr<'T> -> 'T
 
         /// Evaluate the quotation expression by first converting to LINQ expression trees
         ///
         /// Exceptions: InvalidArgumentException will be raised if the input expression is
         /// not in the subset that can be converted to a LINQ expression tree
-        static member Evaluate : Microsoft.FSharp.Quotations.Expr<'T> -> 'T
+        static member Evaluate : FSharp.Quotations.Expr<'T> -> 'T
         
     /// This module provides Compile and Eval extension members
     /// for F# quotation values, implemented by translating to LINQ
@@ -55,14 +55,14 @@ namespace FSharp.Quotations.Evaluator
     [<AutoOpen>]
     module QuotationEvaluationExtensions =
 
-        type Microsoft.FSharp.Quotations.Expr with 
+        type FSharp.Quotations.Expr with 
               /// Convert the quotation expression to a LINQ expression tree.
               ///
               /// Exceptions: InvalidArgumentException will be raised if the input expression is
               /// not in the subset that can be converted to a LINQ expression tree
               member ToLinqExpressionUntyped : unit -> Expression
 
-        type Microsoft.FSharp.Quotations.Expr<'T> with 
+        type FSharp.Quotations.Expr<'T> with 
 
               /// Compile and evaluate the quotation expression by first converting to LINQ expression trees.
               /// The expression is currently always compiled.
@@ -78,7 +78,7 @@ namespace FSharp.Quotations.Evaluator
               /// not in the subset that can be converted to a LINQ expression tree
               member Evaluate : unit -> 'T
 
-        type Microsoft.FSharp.Quotations.Expr with 
+        type FSharp.Quotations.Expr with 
 
               /// Compile and evaluate the quotation expression by first converting to LINQ expression trees.
               ///

@@ -12,7 +12,7 @@ To reference the library:
 *)
 #r "FSharp.Quotations.Evaluator.dll"
 open FSharp.Quotations.Evaluator
-open Microsoft.FSharp.Quotations
+open FSharp.Quotations
 
 (**
 Evaluation
