@@ -5,4 +5,4 @@ dotnet: 3.0.0
 mono: latest
 
 script: 
-  - ./build.sh Bundle
+  - ./build.sh -t Bundle

@@ -22,9 +22,9 @@ let info =
 // For typical project, no changes are needed below
 // --------------------------------------------------------------------------------------
 
-#I "../../packages/build/FSharp.Compiler.Service/lib/net45"
-#I "../../packages/build/FSharp.Formatting/lib/net461"
-#r "../../packages/build/FAKE/tools/FakeLib.dll"
+#I "../../packages/docs/FSharp.Compiler.Service/lib/net45"
+#I "../../packages/docs/FSharp.Formatting/lib/net461"
+#r "../../packages/docs/FAKE/tools/FakeLib.dll"
 #r "RazorEngine.dll"
 #r "FSharp.Markdown.dll"
 #r "FSharp.Literate.dll"
@@ -34,7 +34,6 @@ let info =
 #r "FSharp.Formatting.Razor.dll"
 open Fake
 open System.IO
-open FSharp.Literate
 open FSharp.Formatting.Razor
 
 // When called from 'build.fsx', use the public project URL as <root>
@@ -51,7 +50,7 @@ let content    = __SOURCE_DIRECTORY__ @@ "../content"
 let output     = __SOURCE_DIRECTORY__ @@ "../output"
 let files      = __SOURCE_DIRECTORY__ @@ "../files"
 let templates  = __SOURCE_DIRECTORY__ @@ "templates"
-let formatting = __SOURCE_DIRECTORY__ @@ "../../packages/build/FSharp.Formatting/"
+let formatting = __SOURCE_DIRECTORY__ @@ "../../packages/docs/FSharp.Formatting/"
 let docTemplate = formatting @@ "templates/docpage.cshtml"
 
 // Where to look for *.csproj templates (in this order)

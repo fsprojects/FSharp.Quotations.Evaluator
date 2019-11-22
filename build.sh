@@ -1,11 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-dotnet tool restore
-dotnet paket restore
+FAKE_FILE=build.fsx
 
-if [ "X$OS" = "XWindows_NT" ] ; then
-  # use .Net
-  packages/build/FAKE/tools/FAKE.exe $@ --fsiargs build.fsx 
-else
-  mono packages/build/FAKE/tools/FAKE.exe $@ --fsiargs -d:MONO build.fsx 
-fi
+set -eu
+cd `dirname $0`
+
+dotnet tool restore && \
+dotnet paket restore && \
+dotnet fake run $FAKE_FILE "$@"
