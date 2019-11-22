@@ -1,4 +1,4 @@
-F# Quotations Evaluator [![NuGet Status](http://img.shields.io/nuget/v/FSharp.Quotations.Evaluator.svg?style=flat)](https://www.nuget.org/packages/FSharp.Quotations.Evaluator/)
+F# Quotations Evaluator [![NuGet Status](http://img.shields.io/nuget/v/FSharp.Quotations.Evaluator.svg?style=flat)](https://www.nuget.org/packages/FSharp.Quotations.Evaluator/) [![Docker Build Status](https://travis-ci.org/fsprojects/FSharp.Quotations.Evaluator.svg?branch=master)](https://travis-ci.org/fsprojects/FSharp.Quotations.Evaluator)
 =======================
 
 See http://fsprojects.github.io/FSharp.Quotations.Evaluator/
