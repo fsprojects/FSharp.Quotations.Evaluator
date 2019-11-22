@@ -6,6 +6,7 @@
 
   <!-- NuGet Metadata -->
   <PropertyGroup>
+    <PackageIcon>logo.png</PackageIcon>
     <Description>A quotations evaluator for F# based on LINQ expression tree compilation. Some constructs are not supported and performance may be slower than F# compiled code. Based on the old F# 2.0 PowerPack code.</Description>
     <Authors>F# Software Foundation</Authors>
     <Copyright>2019</Copyright>
@@ -21,4 +22,7 @@
     <!--<IncludeSymbols>true</IncludeSymbols>-->
     <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)docs\files\img\logo.png" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>
