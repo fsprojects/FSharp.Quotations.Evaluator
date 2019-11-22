@@ -1,27 +1,27 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2002
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29515.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator", "src\FSharp.Quotations.Evaluator\FSharp.Quotations.Evaluator.fsproj", "{0A767BB8-BFC6-4622-8063-080188C9EBC4}" 
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator", "src\FSharp.Quotations.Evaluator\FSharp.Quotations.Evaluator.fsproj", "{0A767BB8-BFC6-4622-8063-080188C9EBC4}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.Tests", "tests\FSharp.Quotations.Evaluator.Tests\FSharp.Quotations.Evaluator.Tests.fsproj", "{5EEAE3E8-AE29-4411-B632-4D2E61043094}" 
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FSharp.Quotations.Evaluator.Tests", "tests\FSharp.Quotations.Evaluator.Tests\FSharp.Quotations.Evaluator.Tests.fsproj", "{5EEAE3E8-AE29-4411-B632-4D2E61043094}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{B0B99A31-19B9-4970-B148-3CB7274FF231}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{B0B99A31-19B9-4970-B148-3CB7274FF231}"
 	ProjectSection(SolutionItems) = preProject
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4048BFB6-DC54-4910-9B9C-8F0574188931}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4048BFB6-DC54-4910-9B9C-8F0574188931}"
 	ProjectSection(SolutionItems) = preProject
 		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{4B8CAB40-6140-49F2-AE4A-34B93AD09D8F}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{4B8CAB40-6140-49F2-AE4A-34B93AD09D8F}"
 	ProjectSection(SolutionItems) = preProject
 		.paket\Paket.Restore.targets = .paket\Paket.Restore.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E137503-29B5-4DED-B543-D8DEF5B5A727}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E137503-29B5-4DED-B543-D8DEF5B5A727}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
@@ -31,6 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.fsx = build.fsx
 		build.sh = build.sh
 		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		docker-build.sh = docker-build.sh
 		Dockerfile = Dockerfile
 		LICENSE.txt = LICENSE.txt
@@ -40,36 +41,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3F4E116C-4942-4EE9-B531-414EA2925B87}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3F4E116C-4942-4EE9-B531-414EA2925B87}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8BBA847E-24E1-4F06-AB21-3822CB3EF44C}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8BBA847E-24E1-4F06-AB21-3822CB3EF44C}"
 	ProjectSection(SolutionItems) = preProject
 		docs\content\index.fsx = docs\content\index.fsx
 		docs\content\tutorial.fsx = docs\content\tutorial.fsx
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{3EEF6D0B-E365-4E96-85E5-8D05F1B729E9}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{3EEF6D0B-E365-4E96-85E5-8D05F1B729E9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{8A491320-622E-4175-9381-37CCC40AC2A7}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{8A491320-622E-4175-9381-37CCC40AC2A7}"
 	ProjectSection(SolutionItems) = preProject
 		docs\files\img\logo.pdn = docs\files\img\logo.pdn
 		docs\files\img\logo.png = docs\files\img\logo.png
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8}"
 	ProjectSection(SolutionItems) = preProject
 		docs\tools\generate.fsx = docs\tools\generate.fsx
-		docs\tools\packages.config = docs\tools\packages.config
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{2AE853ED-C926-4FE5-BD51-57F15953D3A0}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{2AE853ED-C926-4FE5-BD51-57F15953D3A0}"
 	ProjectSection(SolutionItems) = preProject
 		docs\tools\templates\template.cshtml = docs\tools\templates\template.cshtml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EAB93A09-6903-4D0C-ADEE-A2E673FD0240}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EAB93A09-6903-4D0C-ADEE-A2E673FD0240}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ECE849FE-B377-4D05-8DA9-81C35305D540}" 
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ECE849FE-B377-4D05-8DA9-81C35305D540}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,13 +90,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{0A767BB8-BFC6-4622-8063-080188C9EBC4} = {EAB93A09-6903-4D0C-ADEE-A2E673FD0240}
+		{5EEAE3E8-AE29-4411-B632-4D2E61043094} = {ECE849FE-B377-4D05-8DA9-81C35305D540}
 		{8BBA847E-24E1-4F06-AB21-3822CB3EF44C} = {3F4E116C-4942-4EE9-B531-414EA2925B87}
 		{3EEF6D0B-E365-4E96-85E5-8D05F1B729E9} = {3F4E116C-4942-4EE9-B531-414EA2925B87}
 		{8A491320-622E-4175-9381-37CCC40AC2A7} = {3EEF6D0B-E365-4E96-85E5-8D05F1B729E9}
 		{9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8} = {3F4E116C-4942-4EE9-B531-414EA2925B87}
 		{2AE853ED-C926-4FE5-BD51-57F15953D3A0} = {9AD1FCE9-F3D1-4ECD-A31E-FC1A4FEE0CB8}
-		{0A767BB8-BFC6-4622-8063-080188C9EBC4} = {EAB93A09-6903-4D0C-ADEE-A2E673FD0240}
-		{5EEAE3E8-AE29-4411-B632-4D2E61043094} = {ECE849FE-B377-4D05-8DA9-81C35305D540}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1E38BB0-7AB3-49FD-B548-0AB537261987}

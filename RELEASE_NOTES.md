@@ -1,3 +1,6 @@
+### 2.0.0 - Support NetStandard2.0 only.
+* Deprecate net45 target.
+
 ### 1.1.3 - Bug fix
 * Fix #26. Bug due to type arguments not being convariant, and thus
   crashing on cast.

@@ -1,4 +1,4 @@
-<Project ToolsVersion="15.0">
+<Project>
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -22,7 +22,4 @@
     <!--<IncludeSymbols>true</IncludeSymbols>-->
     <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)docs\files\img\logo.png" Pack="true" PackagePath="" />
-  </ItemGroup>
 </Project>

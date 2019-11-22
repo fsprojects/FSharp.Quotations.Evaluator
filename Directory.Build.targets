@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)docs\files\img\logo.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+</Project>
