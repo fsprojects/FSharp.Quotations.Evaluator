@@ -1,26 +1,14 @@
-
-#if INTERACTIVE
-#r @"..\..\bin\FSharp.Quotations.Evaluator.dll"
-#r @"..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll"
-#else
 module FSharp.Quotations.Evaluator.Unittests
-#endif
 
-open NUnit.Framework
-open Microsoft.FSharp.Quotations
+open Xunit
+open FSharp.Quotations
 open FSharp.Quotations.Evaluator
-open FSharp.Quotations.Evaluator.QuotationEvaluationExtensions
-open Microsoft.FSharp.Quotations
-open Microsoft.FSharp.Quotations.Patterns
-open Microsoft.FSharp.Quotations.DerivedPatterns
-open Microsoft.FSharp.Quotations.ExprShape
+open FSharp.Quotations.Patterns
+open FSharp.Quotations.DerivedPatterns
+open FSharp.Quotations.ExprShape
 
-
-#nowarn "40"
-#nowarn "57"
 #nowarn "67" // This type test or downcast will always hold
 #nowarn "1204"
-
     
 [<Measure>] type kg
 [<Measure>] type m
@@ -29,12 +17,12 @@ open Microsoft.FSharp.Quotations.ExprShape
 type area = float<m ^ 2>
 
 let check nm (v1:'T) (v2:'T) = 
-    if v1 <> v2 then 
-        Assert.Fail("test failed: " + nm + sprintf "expected %A but got %A" v2 v1)
+    if v1 <> v2 then
+        Assert.True(false, "test failed: " + nm + sprintf "expected %A but got %A" v2 v1)
 
 let test nm b = 
     if not b then 
-        Assert.Fail("test failed: " + nm)
+        Assert.True(false, "test failed: " + nm)
 
 [<AutoOpen>]
 module Extensions = 
@@ -141,7 +129,7 @@ type ClassWithField =
     val mutable field : int
     new (init) = { field = init }
 
-[<Test>]
+[<Fact>]
 let FloatTests() = 
 
      // set up bindings
@@ -226,7 +214,7 @@ let FloatTests() =
      test "x22" (x22<m>() = typeof<float>)
       
 
-[<Test>]
+[<Fact>]
 let Float32Tests() = 
 
      let y1 = <@ 2.0f<kg> + 4.0f<kg>  @> |> eval
@@ -293,7 +281,7 @@ let Float32Tests() =
      test "y13a" (y13a = 6.5f<m^4>)
       
 
-[<Test>]
+[<Fact>]
 let DecimalTests() = 
 
      let z1 = <@ 2.0M<kg> + 4.0M<kg>  @> |> eval
@@ -315,10 +303,7 @@ let DecimalTests() =
      let x1d : decimal = <@ ceil 4.4M   @> |> eval
      let x1h : decimal = <@ floor 4.4M   @> |> eval
      //let x1l : decimal = <@ pown 4.4M 3  @> |> eval
-#if FX_NO_DEFAULT_DECIMAL_ROUND
-#else
      let x1m : decimal = <@ round 4.4M   @> |> eval
-#endif
      let x1n : int = <@ sign 4.4M   @> |> eval
 
      //let x11d : decimal<1> = <@ ceil 4.4M<1> 
@@ -355,7 +340,7 @@ let DecimalTests() =
 
 
 
-[<Test>]
+[<Fact>]
 let EvaluationTests() = 
 
         let f () = () 
@@ -531,7 +516,7 @@ let EvaluationTests() =
         checkEval "2ver9ewr43" <@ match v2 with (x,y) -> x + y @> 7
         checkEval "2ver9ewr44" <@ "1" = "2" @> false
 
-[<Test>]
+[<Fact>]
 let NonGenericRecdTests() = 
         let c1 = { Name="Don"; Data=6 }
         let c2 = { Name="Peter"; Data=7 }
@@ -542,7 +527,7 @@ let NonGenericRecdTests() =
         checkEval "2ver9e7rw4" (<@ { Name = "Don"; Data = 6 } @>) { Name="Don"; Data=6 }
         checkEval "2ver9e7rw5" (<@ { Name = "Don"; Data = 6 } @>) { Name="Don"; Data=6 }
 
-[<Test>]
+[<Fact>]
 let GenericRecdTests() = 
         let c1 : CustomerG<int> = { Name="Don"; Data=6 }
         let c2 : CustomerG<int> = { Name="Peter"; Data=7 }
@@ -555,7 +540,7 @@ let GenericRecdTests() =
         checkEval "2ver9e7rwW" (<@ c1.Name <- "Ali Baba" @>) ()
         checkEval "2ver9e7rwE" (<@ c1.Name  @>) "Ali Baba"
 
-[<Test>]
+[<Fact>]
 let ArrayTests() = 
         checkEval "2ver9e8rwR1" (<@ [| |]  @>) ([| |] : int array)
         checkEval "2ver9e8rwR2" (<@ [| 0 |]  @>) ([| 0 |] : int array)
@@ -563,7 +548,7 @@ let ArrayTests() =
         checkEval "2ver9e8rwR4" (<@ [| 1; 2  |].[0]  @>) 1
         checkEval "2ver9e8rwR5" (<@ [| 1; 2  |].[1]  @>) 2
 
-[<Test>]
+[<Fact>]
 let Array2DTests() = 
         checkEval "2ver9e8rwR6" (<@ (Array2D.init 3 4 (fun i j -> i + j)).[0,0] @>) 0
         checkEval "2ver9e8rwR7" (<@ (Array2D.init 3 4 (fun i j -> i + j)).[1,2] @>) 3
@@ -573,7 +558,7 @@ let Array2DTests() =
         checkEval "2ver9e8rwRW" (<@ (Array2D.init 3 4 (fun i j -> i + j)) |> Array2D.length2 @>) 4
 
 
-[<Test>]
+[<Fact>]
 let Array3DTests() = 
         checkEval "2ver9e8rwRE" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)).[0,0,0] @>) 0
         checkEval "2ver9e8rwRR" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j + k)).[1,2,3] @>) 6
@@ -581,7 +566,7 @@ let Array3DTests() =
         checkEval "2ver9e8rwRY" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)) |> Array3D.length2 @>) 4
         checkEval "2ver9e8rwRU" (<@ (Array3D.init 3 4 5 (fun i j k -> i + j)) |> Array3D.length3 @>) 5
 
-[<Test>]
+[<Fact>]
 let ExceptionTests() = 
         let c1 = E0
         let c2 = E1 "1"
@@ -613,7 +598,7 @@ let ExceptionTests() =
         checkEval "2ver9eQrwG" (<@ try raise c2 with E0 -> 2 | E1 "1" -> 3 @>) 3
         checkEval "2ver9eQrwH" (<@ try raise c2 with E1 "1" -> 3 | E0 -> 2  @>) 3
 
-[<Test>]
+[<Fact>]
 let TypeTests() = 
         let c1 = C0()
         let c2 = C1 "1"
@@ -627,7 +612,7 @@ let TypeTests() =
         checkEval "2ver9eQrwV" (<@ match box c2 with :? C1  -> 2 | :? C0 -> 1 | _ -> 3  @>) 2
         checkEval "2ver9eQrwN" (<@ match box c3 with :? C1  as c1 when c1.P = "2"  -> 2 | :? C0 -> 1 | _ -> 3  @>) 2
 
-[<Test>]
+[<Fact>]
 let NonGenericUnionTests0() = 
         let c1 = Union10.Case1 "meow"
         let c2 = Union10.Case2
@@ -637,14 +622,14 @@ let NonGenericUnionTests0() =
         checkEval "2ver9eWrw14" (<@ match c1 with Union10.Case1 s -> s | Union10.Case2 -> "woof" @>) "meow"
         checkEval "2ver9eErw15" (<@ match c2 with Union10.Case1 s -> s | Union10.Case2 -> "woof" @>) "woof"
 
-[<Test>]
+[<Fact>]
 let NonGenericUnionTests1() = 
         let c1 = Union1.Case1 "meow"
         checkEval "2ver9e8rw16" (<@ Union1.Case1 "sss" @>) (Union1.Case1 "sss")
         checkEval "2ver9eQrw17" (<@ match c1 with Union1.Case1 _ -> 2  @>) 2
         checkEval "2ver9eWrw18" (<@ match c1 with Union1.Case1 s -> s  @>) "meow"
 
-[<Test>]
+[<Fact>]
 let NonGenericUnionTests2() = 
         let c1 = Union11.Case1 "meow"
         let c2 = Union11.Case2 "woof"
@@ -654,7 +639,7 @@ let NonGenericUnionTests2() =
         checkEval "2ver9eWrw22" (<@ match c1 with Union11.Case1 s -> s | Union11.Case2 s -> s @>) "meow"
         checkEval "2ver9eErw23" (<@ match c2 with Union11.Case1 s -> s | Union11.Case2 s -> s @>) "woof"
 
-[<Test>]
+[<Fact>]
 let NonGenericUnionTests3() = 
         let c1 = Union1111.Case1 "meow"
         let c2 = Union1111.Case2 "woof"
@@ -665,7 +650,7 @@ let NonGenericUnionTests3() =
         checkEval "2ver9eErw28" (<@ match c2 with Union1111.Case1 s -> s | Union1111.Case2 s -> s | _ -> "bark" @>) "woof"
 
 
-[<Test>]
+[<Fact>]
 let GenericUnionTests() = 
         let c1 = GUnion10.Case1 "meow"
         let c2 = GUnion10<string>.Case2
@@ -675,7 +660,7 @@ let GenericUnionTests() =
         checkEval "2ver9eWrw32" (<@ match c1 with GUnion10.Case1 s -> s | GUnion10.Case2 -> "woof" @>) "meow"
         checkEval "2ver9eErw33" (<@ match c2 with GUnion10.Case1 s -> s | GUnion10.Case2 -> "woof" @>) "woof"
 
-[<Test>]
+[<Fact>]
 let InlinedOperationsStillDynamicallyAvailableTests() = 
 
         checkEval "vroievr093" (<@ LanguagePrimitives.GenericZero<sbyte> @>)  0y
@@ -899,10 +884,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
         checkEval "vrewoinrv09c" (<@ ceil 2.0 @>) (ceil 2.0)
         checkEval "vrewoinrv09v" (<@ sqrt 2.0 @>) (sqrt 2.0)
         checkEval "vrewoinrv09b" (<@ sign 2.0 @>) (sign 2.0)
-#if FX_NO_TRUNCATE
-#else
         checkEval "vrewoinrv09n" (<@ truncate 2.3 @>) (truncate 2.3)
-#endif
         checkEval "vrewoinrv09m" (<@ floor 2.3 @>) (floor 2.3)
         checkEval "vrewoinrv09Q" (<@ round 2.3 @>) (round 2.3)
         checkEval "vrewoinrv09W" (<@ log 2.3 @>) (log 2.3)
@@ -920,10 +902,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
         checkEval "vrewoinrv09D" (<@ ceil 2.0f @>) (ceil 2.0f)
         checkEval "vrewoinrv09F" (<@ sqrt 2.0f @>) (sqrt 2.0f)
         checkEval "vrewoinrv09G" (<@ sign 2.0f @>) (sign 2.0f)
-#if FX_NO_TRUNCATE
-#else
         checkEval "vrewoinrv09H" (<@ truncate 2.3f @>) (truncate 2.3f)
-#endif
         checkEval "vrewoinrv09J" (<@ floor 2.3f @>) (floor 2.3f)
         checkEval "vrewoinrv09K" (<@ round 2.3f @>) (round 2.3f)
         checkEval "vrewoinrv09L" (<@ log 2.3f @>) (log 2.3f)
@@ -933,10 +912,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
 
         checkEval "vrewoinrv09V" (<@ ceil 2.0M @>) (ceil 2.0M)
         checkEval "vrewoinrv09B" (<@ sign 2.0M @>) (sign 2.0M)
-#if FX_NO_TRUNCATE
-#else
         checkEval "vrewoinrv09N" (<@ truncate 2.3M @>) (truncate 2.3M)
-#endif
         checkEval "vrewoinrv09M" (<@ floor 2.3M @>) (floor 2.3M)
 
         checkEval "vrewoinrv09QQ" (<@ sign -2 @>) (sign -2)
@@ -952,13 +928,9 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
         checkEval "vrewoinrv09PP" (<@ [ 0uy .. 10uy ] @>) [ 0uy .. 10uy ]
         checkEval "vrewoinrv09AA" (<@ [ 0us .. 10us ] @>) [ 0us .. 10us ]
         checkEval "vrewoinrv09SS" (<@ [ 0UL .. 10UL ] @>) [ 0UL .. 10UL ]
-        
-
-#if FX_NO_DEFAULT_DECIMAL_ROUND
-#else        
+       
         // Round dynamic dispatch on Decimal
         checkEval "vrewoinrv09FF" (<@ round 2.3M @>) (round 2.3M)
-#endif
 
         // Measure stuff:
         checkEval "vrewoinrv09GG" (<@ atan2 3.0 4.0 @>) (atan2 3.0 4.0 )
@@ -971,7 +943,7 @@ let InlinedOperationsStillDynamicallyAvailableTests() =
 
         eval <@ Array.average [| 0.0 .. 1.0 .. 10000.0 |] @> |> ignore 
 
-[<Test>]
+[<Fact>]
 let LanguagePrimitiveCastingUnitsOfMeasure() = 
 
         checkEval "castingunits1" (<@ 2.5 |> LanguagePrimitives.FloatWithMeasure<m> |> float @>) 2.5
@@ -982,7 +954,7 @@ let LanguagePrimitiveCastingUnitsOfMeasure() =
         checkEval "castingunits6" (<@ 2s |> LanguagePrimitives.Int16WithMeasure<m> |> int16 @>) 2s
         checkEval "castingunits7" (<@ 2y |> LanguagePrimitives.SByteWithMeasure<m> |> sbyte @>) 2y
 
-[<Test>]
+[<Fact>]
 let QuotationTests() = 
         let (|Seq|_|) = function SpecificCall <@ seq @>(_, [_],[e]) -> Some e | _ -> None
         let (|Append|_|) = function SpecificCall <@ Seq.append @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
@@ -990,9 +962,9 @@ let QuotationTests() =
         let (|FinalFor|_|) = function SpecificCall <@ Seq.map @>(_, [_;_],[Lambda(v,e);sq]) -> Some (v,sq,e) | _ -> None
         let (|OuterFor|_|) = function SpecificCall <@ Seq.collect @>(_, [_;_;_],[Lambda(v,e);sq]) -> Some (v,sq,e) | _ -> None
         let (|Yield|_|) = function SpecificCall <@ Seq.singleton @>(_, [_],[e]) -> Some (e) | _ -> None
-        let (|While|_|) = function SpecificCall <@ Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateWhile @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
-        let (|TryFinally|_|) = function SpecificCall <@ Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateThenFinally @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
-        let (|Using|_|) = function SpecificCall <@ Microsoft.FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateUsing @>(_, _,[e1;Lambda(v1,e2)]) -> Some (v1,e1,e2) | _ -> None
+        let (|While|_|) = function SpecificCall <@ FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateWhile @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
+        let (|TryFinally|_|) = function SpecificCall <@ FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateThenFinally @>(_, [_],[e1;e2]) -> Some (e1,e2) | _ -> None
+        let (|Using|_|) = function SpecificCall <@ FSharp.Core.CompilerServices.RuntimeHelpers.EnumerateUsing @>(_, _,[e1;Lambda(v1,e2)]) -> Some (v1,e1,e2) | _ -> None
         let (|Empty|_|) = function SpecificCall <@ Seq.empty @>(_,_,_) -> Some () | _ -> None
         test "vrenjkr90kj1" 
            (match <@ seq { for x in [1] -> x } @> with 
@@ -1075,7 +1047,7 @@ let QuotationTests() =
 *)
 
 
-[<Test>]
+[<Fact>]
 let LargerAutomaticDiferentiationTest_FSharp_1_0_Bug_3498() = 
 
           let q = 
@@ -1104,7 +1076,7 @@ let LargerAutomaticDiferentiationTest_FSharp_1_0_Bug_3498() =
           test "vrknlwerwe90" (r = 17.0)
           test "cew90jkml0rv" (rd 0.1 = 0.8)
 
-[<Test>]
+[<Fact>]
 let FunkyMethodRepresentations() = 
         // The IsSome and IsNone properties are represented as static methods because
         // option uses 'null' as a representation
@@ -1113,7 +1085,7 @@ let FunkyMethodRepresentations() =
         checkEval "clkedw2" (<@ let x : int option = Some 1 in x.Value @>) 1
         //checkEval "clkedw3" (<@ let x : int option = Some 1 in x.ToString() @> |> eval  ) "Some(1)"
 
-[<Test>]
+[<Fact>]
 let Extensions() = 
 
         let v = new obj()
@@ -1151,61 +1123,61 @@ let Extensions() =
         checkEval "ecnweha" (<@ v2b.ExtensionIndexer2(3) <- 4 @>)  ()
 
 let testComparisonOnEqualValues v1 =
-    <@ v1 = v1 @>.Evaluate() |> Assert.IsTrue
-    <@ v1 <> v1 @>.Evaluate() |> Assert.IsFalse
-    <@ v1 < v1 @>.Evaluate() |> Assert.IsFalse
-    <@ v1 > v1 @>.Evaluate() |> Assert.IsFalse
-    <@ v1 <= v1 @>.Evaluate() |> Assert.IsTrue
-    <@ v1 >= v1 @>.Evaluate() |> Assert.IsTrue
+    <@ v1 = v1 @>.Evaluate() |> Assert.True
+    <@ v1 <> v1 @>.Evaluate() |> Assert.False
+    <@ v1 < v1 @>.Evaluate() |> Assert.False
+    <@ v1 > v1 @>.Evaluate() |> Assert.False
+    <@ v1 <= v1 @>.Evaluate() |> Assert.True
+    <@ v1 >= v1 @>.Evaluate() |> Assert.True
 
 let testComparisonOnOrderedValues v1 v2 =
-    <@ v1 = v2 @>.Evaluate() |> Assert.IsFalse
-    <@ v1 <> v2 @>.Evaluate() |> Assert.IsTrue
-    <@ v1 < v2 @>.Evaluate() |> Assert.IsTrue
-    <@ v1 > v2 @>.Evaluate() |> Assert.IsFalse
-    <@ v1 <= v2 @>.Evaluate() |> Assert.IsTrue
-    <@ v1 >= v2 @>.Evaluate() |> Assert.IsFalse
+    <@ v1 = v2 @>.Evaluate() |> Assert.False
+    <@ v1 <> v2 @>.Evaluate() |> Assert.True
+    <@ v1 < v2 @>.Evaluate() |> Assert.True
+    <@ v1 > v2 @>.Evaluate() |> Assert.False
+    <@ v1 <= v2 @>.Evaluate() |> Assert.True
+    <@ v1 >= v2 @>.Evaluate() |> Assert.False
 
     
-[<Test>]
+[<Fact>]
 let TestRecordEquality() =
         let value1 = { field1 = 1; field2 = 1; }
         testComparisonOnEqualValues value1
 
-[<Test>]
+[<Fact>]
 let TestRecordInequality() =
         let value1 = { field1 = 1; field2 = 1; }
         let value2 = { field1 = 1; field2 = 2; }
         testComparisonOnOrderedValues value1 value2
 
-[<Test>]
+[<Fact>]
 let TestStringEquality() =
         let value1 = "ABC"
         testComparisonOnEqualValues value1
 
-[<Test>]
+[<Fact>]
 let TestStringInequality() =
         let value1 = "ABC"
         let value2 = "ABD"
         testComparisonOnOrderedValues value1 value2
 
-[<Test>]
+[<Fact>]
 let TestValueTypeEquality() =
         let value1 = 1
         testComparisonOnEqualValues value1
 
-[<Test>]
+[<Fact>]
 let TestValueTypeInequality() =
         let value1 = 1
         let value2 = 2
         testComparisonOnOrderedValues value1 value2
 
-[<Test>]
+[<Fact>]
 let TestUnionEquality() =
         let value1 = Union1111.Case1 "ABC"
         testComparisonOnEqualValues value1
 
-[<Test>]
+[<Fact>]
 let TestUnionInequality() =
         let value1 = Union1111.Case1 "ABC"
         let value2 = Union1111.Case1 "XYZ"
@@ -1229,7 +1201,7 @@ module QuotationCompilation =
                 a := b + c + d + e ) @>
     check "qceva0" ((eval q) ()) ()
 
-[<Test>]
+[<Fact>]
 let MutableLetTests() = 
     let ml1 = 
         <@  let mutable x = 1
@@ -1238,7 +1210,7 @@ let MutableLetTests() =
 
     checkEval "ml1" ml1 2
 
-[<Test>]
+[<Fact>]
 let MutableFieldTests() = 
     let mf1 = 
         <@  let c = new ClassWithField(init = 1)
@@ -1247,7 +1219,7 @@ let MutableFieldTests() =
 
     checkEval "mf1" mf1 2
 
-[<Test>]
+[<Fact>]
 let WhileLoopTests() = 
     let wl1 = 
         <@  let mutable x = 1
@@ -1257,7 +1229,7 @@ let WhileLoopTests() =
 
     checkEval "ml1" wl1 10
     
-[<Test>]
+[<Fact>]
 let ForLoopTests() = 
     let fl1 = 
         <@  let mutable x = 0
@@ -1276,7 +1248,7 @@ let ForLoopTests() =
     checkEval "fl2" fl2 (Seq.sum [0..10])
     
 
-[<Test>]
+[<Fact>]
 let QuoteTests() =
     let quoteChar = <@ <@ 'a' @> @> |> eval
     let quoteInt = <@ <@ 1 @> @> |> eval
@@ -1287,9 +1259,9 @@ let QuoteTests() =
 
 
 module CheckedTests = 
-    open Microsoft.FSharp.Core.Operators.Checked
+    open FSharp.Core.Operators.Checked
           
-    [<Test>]
+    [<Fact>]
     let FloatCheckedTests() = 
 
          // set up bindings
@@ -1339,7 +1311,7 @@ module CheckedTests =
          test "x13a" (x13a = 6.5<m^2>)
           
 
-    [<Test>]
+    [<Fact>]
     let Float32CheckedTests() = 
 
 
@@ -1388,7 +1360,7 @@ module CheckedTests =
          test "y13a" (y13a = 6.5f<m^4>)
           
 
-    [<Test>]
+    [<Fact>]
     let DecimalCheckedTests() = 
 
          let z1 = <@ 2.0M<kg> + 4.0M<kg>  @> |> eval
@@ -1425,7 +1397,7 @@ module CheckedTests =
          test "z10" (z10 = 1)
           
 module ParseTests =
-    [<Test>]
+    [<Fact>]
     let ParseTests() =
         let parseChar = <@ char "a" @> |> eval
         let parseDecimal = <@ decimal "10.5" @> |> eval
@@ -1455,7 +1427,7 @@ module ParseTests =
         test "parseUint32" (parseUint32 = 42u)
         test "parseUint64" (parseUint64 = 42UL)
 
-    [<Test>]
+    [<Fact>]
     let ParseCheckedTests() =
         let parseChar = <@ Checked.char "a" @> |> eval
         let parseSbyte = <@ Checked.sbyte "42" @> |> eval
@@ -1480,14 +1452,14 @@ module ParseTests =
         test "parseUint64" (parseUint64 = 42UL)
 
 module GithubIssues =
-    [<Test>]
+    [<Fact>]
     let ``[1](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/26)`` () =
         let t = <@ fun () ->
             ()
             fun () -> () @>
         t.Compile () |> ignore
 
-    [<Test>]
+    [<Fact>]
     let ``[2](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/26)`` () =
         let t = <@ sprintf "An int %d, a double %f" 10 50.50 @>
         t.EvaluateUntyped() |> ignore

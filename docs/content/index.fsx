@@ -1,7 +1,7 @@
 (*** hide ***)
 // This block of code is omitted in the generated HTML documentation. Use 
 // it to define helpers that you do not want to show in the documentation.
-#I "../../src/FSharp.Quotations.Evaluator/bin/Release/net45/"
+#I "../../src/FSharp.Quotations.Evaluator/bin/Release/netstandard2.0/"
 
 (**
 F# Quotations Evaluator
@@ -26,7 +26,7 @@ Overview
 This component is an F# quotations evaluator, implemented by compiling to LINQ expression trees.
 
 For simple expression-based scenarios you may be able to simply use the method
-```Microsoft.FSharp.Linq.RuntimeHelpers.LeafExpressionConverter.EvaluateQuotation``` from ```FSharp.Core.dll``.
+```FSharp.Linq.RuntimeHelpers.LeafExpressionConverter.EvaluateQuotation``` from ```FSharp.Core.dll``.
 
 However that component has restrictions in the quotations accepted - for example, statements such as
 while-loops are not accepted.  This component accepts more quotations (including those involving statements), 
@@ -51,7 +51,7 @@ open FSharp.Quotations.Evaluator
 
 QuotationEvaluator.Evaluate <@ 1 + 1 @>
 
-let addPlusOne = QuotationEvaluator.Compile <@ fun x y -> x + y + 1 @> 
+let addPlusOne = QuotationEvaluator.Evaluate <@ fun x y -> x + y + 1 @> 
 
 let nine = addPlusOne 3 5  // gives 9
 

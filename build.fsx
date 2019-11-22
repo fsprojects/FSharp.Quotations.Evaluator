@@ -2,205 +2,163 @@
 // FAKE build script 
 // --------------------------------------------------------------------------------------
 
-//#r @"packages/build/FAKE/tools/NuGet.Core.dll"
-#r @"packages/build/FAKE/tools/FakeLib.dll"
-open Fake
-open Fake.Git
-open Fake.AssemblyInfoFile
-open Fake.ReleaseNotesHelper
+#r "paket: groupref build //"
+#load "./.fake/build.fsx/intellisense.fsx"
+
+open Fake.Core
+open Fake.Core.TargetOperators
+open Fake.DotNet
+open Fake.IO
+open Fake.IO.FileSystemOperators
+open Fake.IO.Globbing.Operators
+open Fake.Tools
 open System
-open System.IO
 
+Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
-// --------------------------------------------------------------------------------------
-// START TODO: Provide project-specific details below
-// --------------------------------------------------------------------------------------
-
-// Information about the project are used
-//  - for version and project name in generated AssemblyInfo file
-//  - by the generated NuGet package 
-//  - to run tests and to publish documentation on GitHub gh-pages
-//  - for documentation, you also need to edit info in "docs/tools/generate.fsx"
-
-// The name of the project 
-// (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "FSharp.Quotations.Evaluator"
-
-// Short summary of the project
-// (used as description in AssemblyInfo and as a short summary for NuGet package)
-let summary = "A quotations evaluator for F# based on LINQ expression tree compilation"
-
-// Longer description of the project
-// (used as a description for NuGet package; line breaks are automatically cleaned up)
-let description = "A quotations evaluator for F# based on LINQ expression tree compilation. Some constructs are not supported and performance may be slower than F# compiled code.  Based on the old F# 2.0 PowerPack code."
-
-// List of author names (for NuGet package)
-let authors = [ "F# Software Foundation" ]
-
-// Tags for your project (for NuGet package)
-let tags = "FSharp F# Quotations Evaluator"
-
-// File system information 
-let solutionFile  = "FSharp.Quotations.Evaluator.sln"
-
-// Pattern specifying assemblies to be tested using NUnit
-let testProjects = "tests/**/*.??proj"
-
-// Git configuration (used for publishing documentation in gh-pages branch)
-// The profile where the project is posted 
-let gitHome = "https://github.com/fsprojects"
-
-// The name of the project on GitHub
-let gitName = "FSharp.Quotations.Evaluator"
-
-// The url for the raw files hosted
-let gitRaw = environVarOrDefault "gitRaw" "https://raw.github.com/fsprojects"
-
-// --------------------------------------------------------------------------------------
-// END TODO: The rest of the file includes standard build steps 
-// --------------------------------------------------------------------------------------
+let gitRepoUrl = "https://github.com/fsprojects/FSharp.Quotations.Evaluator"
+let artifacts = __SOURCE_DIRECTORY__ @@ "artifacts"
 
 // Read additional information from the release notes document
-Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-let release = parseReleaseNotes (IO.File.ReadAllLines "RELEASE_NOTES.md")
+let release = ReleaseNotes.load "RELEASE_NOTES.md"
+let configuration = Environment.environVarOrDefault "Configuration" "Release"
 
-// Generate assembly info files with the right version & up-to-date information
-Target "AssemblyInfo" (fun _ ->
-    let getAssemblyInfoAttributes projectName =
-      [ Attribute.Title (projectName)
-        Attribute.Product project
-        Attribute.Description summary
-        Attribute.Version release.AssemblyVersion
-        Attribute.FileVersion release.AssemblyVersion ] 
+// --------------------------------------------------------------------------------------
+// Clean build results
 
-    let getProjectDetails projectPath =
-        let projectName = System.IO.Path.GetFileNameWithoutExtension projectPath
-        ( projectPath,
-          projectName,
-          System.IO.Path.GetDirectoryName projectPath,
-          getAssemblyInfoAttributes projectName
-        )
-
-    !! "src/**/*.??proj"
-    |> Seq.map getProjectDetails
-    |> Seq.iter (fun (projFileName, projectName, folderName, attributes) ->
-        match projFileName with
-        | Fsproj -> CreateFSharpAssemblyInfo (folderName </> "AssemblyInfo.fs") attributes
-        | _ -> () // ignore AssemblyInfo creation for FSharp.Quotations.Evaluator.Hacks
-        //| Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
-        //| Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
-        //| Shproj -> ()
-        )
+Target.create "Clean" (fun _ ->
+    Shell.cleanDirs [artifacts; "docs/output"]
 )
 
 // --------------------------------------------------------------------------------------
-// Clean build results & restore NuGet packages
+// Clean build results
 
-Target "Clean" (fun _ ->
-    CleanDirs ["bin"; "temp"; "nuget"]
-)
+Target.create "Build" (fun _ ->
+    DotNet.build (fun c ->
+        { c with
+            Configuration = DotNet.BuildConfiguration.fromString configuration
 
-Target "CleanDocs" (fun _ ->
-    CleanDirs ["docs/output"]
-)
+            MSBuildParams =
+            { c.MSBuildParams with
+                Properties = [("Version", release.NugetVersion)] }
 
-// --------------------------------------------------------------------------------------
-// Build library & test project
-
-Target "DotNetRestore" (fun _ -> DotNetCli.Restore id)
-
-Target "Build" (fun _ ->
-    !! solutionFile
-    |> MSBuild "" "Build" ["Configuration", "Release"; "SourceLinkCreate", "true"]
-    |> ignore
+        }) __SOURCE_DIRECTORY__
 )
 
 // --------------------------------------------------------------------------------------
-// Run the unit tests using test runner
+// Run the unit tests
 
-Target "RunTests" (fun _ ->
-    for proj in !! testProjects do
-        DotNetCli.Test (fun c ->
-            { c with
-                Project = proj
-                Configuration = "Release"
-                Framework =
-                    if EnvironmentHelper.isWindows then c.Framework
-                    else "netcoreapp2.0" })
+Target.create "RunTests" (fun _ ->
+    DotNet.test (fun c ->
+        { c with
+            Configuration = DotNet.BuildConfiguration.fromString configuration
+            NoBuild = true
+            Blame = true
+
+            MSBuildParams =
+                { c.MSBuildParams with
+                    Properties = [("ParallelizeAssemblies", "true"); ("ParallelizeTestCollections", "true")] }
+        }) __SOURCE_DIRECTORY__
 )
 
 // --------------------------------------------------------------------------------------
 // Build a NuGet package
 
-Target "NuGet" (fun _ ->
-    Paket.Pack (fun p -> 
-        { p with
-            OutputPath = "nuget"
-            Version = release.NugetVersion
-            ReleaseNotes = toLines release.Notes })
+Target.create "NuGet.Pack" (fun _ ->
+    let releaseNotes = String.toLines release.Notes |> System.Net.WebUtility.HtmlEncode
+    DotNet.pack (fun pack ->
+        { pack with
+            OutputPath = Some artifacts
+            Configuration = DotNet.BuildConfiguration.Release
+            MSBuildParams =
+                { pack.MSBuildParams with
+                    Properties = 
+                        [("Version", release.NugetVersion)
+                         ("PackageReleaseNotes", releaseNotes)] }
+        }) __SOURCE_DIRECTORY__
 )
 
-Target "NuGetPush" (fun _ ->
-    Paket.Push (fun p -> 
-        { p with WorkingDir = "nuget" })
+Target.create "NuGet.ValidateSourceLink" (fun _ ->
+    for nupkg in !! (artifacts @@ "*.nupkg") do
+        let p = DotNet.exec id "sourcelink" (sprintf "test %s" nupkg)
+        if not p.OK then failwithf "failed to validate sourcelink for %s" nupkg
+)
+
+Target.create "NuGet.Push" (fun _ ->
+    DotNet.nugetPush (fun opts ->
+        { opts with
+            PushParams =
+                { opts.PushParams with
+                    NoSymbols = true
+                    Source = Some "https://api.nuget.org/v3/index.json"
+                    ApiKey = Some (Environment.GetEnvironmentVariable "NUGET_KEY") }
+        }) (artifacts + "/*")
 )
 
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
-Target "GenerateDocs" (fun _ ->
-    executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"] [] |> ignore
+Target.create "GenerateDocs" (fun _ ->
+    // ugh, still need to use mono and legacy fsi for FSharp.Formatting
+    let path = __SOURCE_DIRECTORY__ @@ "packages/docs/FSharp.Compiler.Tools/tools/fsi.exe"
+    let workingDir = "docs/tools"
+    let args = "--define:RELEASE generate.fsx"
+    let command, args = 
+        if Environment.isWindows then path, args
+        else "mono", sprintf "%s %s" path args
+
+    if Shell.Exec(command, args, workingDir) <> 0 then
+        failwith "failed to generate docs"
 )
 
 // --------------------------------------------------------------------------------------
 // Release Scripts
 
-Target "ReleaseDocs" (fun _ ->
+Target.create "ReleaseDocs" (fun _ ->
     let tempDocsDir = "temp/gh-pages"
-    //CleanDir tempDocsDir
-    if not (System.IO.Directory.Exists tempDocsDir) then 
-        Repository.cloneSingleBranch "" (gitHome + "/" + gitName + ".git") "gh-pages" tempDocsDir
+    let outputDocsDir = "docs/output"
 
-    fullclean tempDocsDir
-    CopyRecursive "docs/output" tempDocsDir true |> tracefn "%A"
-    StageAll tempDocsDir
-    Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
-    Branches.push tempDocsDir
+    Directory.ensure outputDocsDir
+
+    Shell.cleanDir tempDocsDir
+    Git.Repository.cloneSingleBranch "" (gitRepoUrl + ".git") "gh-pages" tempDocsDir
+    Shell.copyRecursive outputDocsDir tempDocsDir true |> Trace.tracefn "%A"
+    Git.Staging.stageAll tempDocsDir
+    Git.Commit.exec tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
+    Git.Branches.push tempDocsDir
 )
 
-Target "ReleaseTag" (fun _ ->
-    StageAll ""
-    Commit "" (sprintf "Bump version to %s" release.NugetVersion)
-    Branches.push ""
+Target.create "ReleaseTag" (fun _ ->
+    Git.Staging.stageAll ""
+    Git.Commit.exec "" (sprintf "Bump version to %s" release.NugetVersion)
+    Git.Branches.push ""
 
-    Branches.tag "" release.NugetVersion
-    Branches.pushTag "" "origin" release.NugetVersion
+    Git.Branches.tag "" release.NugetVersion
+    Git.Branches.pushTag "" "origin" release.NugetVersion
 )
 
 // --------------------------------------------------------------------------------------
-// Run all targets by default. Invoke 'build <Target>' to override
+// Run all Target.creates by default. Invoke 'build <Target.create>' to override
 
-Target "All" DoNothing
-Target "BuildPackage" DoNothing
-Target "Release" DoNothing
+Target.create "Default" ignore
+Target.create "Bundle" ignore
+Target.create "Release" ignore
 
-//"Clean"
-//  ==> "AssemblyInfo"
-//  ==> "DotNetRestore"
-//  ==> "Build"
-//  ==> "RunTests"
-//  ==> "All"
+"Clean"
+  ==> "Build"
+  ==> "RunTests"
+  ==> "Default"
 
-//"All"
-//  ==> "CleanDocs"
-//  ==> "GenerateDocs"
-//  ==> "NuGet"
-//  ==> "BuildPackage"
+"Default"
+  ==> "GenerateDocs"
+  ==> "NuGet.Pack"
+  ==> "NuGet.ValidateSourceLink"
+  ==> "Bundle"
 
-"BuildPackage"
+"Bundle"
   ==> "ReleaseDocs"
-  ==> "NuGetPush"
+  ==> "NuGet.Push"
   ==> "ReleaseTag"
   ==> "Release"
 
-RunTargetOrDefault "All"
+Target.runOrDefault "Default"

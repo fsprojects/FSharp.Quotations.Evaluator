@@ -1,7 +1,4 @@
-[![Issue Stats](http://issuestats.com/github/fsprojects/FSharp.Quotations.Evaluator/badge/issue)](http://issuestats.com/github/fsprojects/FSharp.Quotations.Evaluator)
-[![Issue Stats](http://issuestats.com/github/fsprojects/FSharp.Quotations.Evaluator/badge/pr)](http://issuestats.com/github/fsprojects/FSharp.Quotations.Evaluator)
-
-F# Quotations Evaluator [![NuGet Status](http://img.shields.io/nuget/v/FSharp.Quotations.Evaluator.svg?style=flat)](https://www.nuget.org/packages/FSharp.Quotations.Evaluator/)
+F# Quotations Evaluator [![NuGet Status](http://img.shields.io/nuget/v/FSharp.Quotations.Evaluator.svg?style=flat)](https://www.nuget.org/packages/FSharp.Quotations.Evaluator/) [![Docker Build Status](https://travis-ci.org/fsprojects/FSharp.Quotations.Evaluator.svg?branch=master)](https://travis-ci.org/fsprojects/FSharp.Quotations.Evaluator)
 =======================
 
 See http://fsprojects.github.io/FSharp.Quotations.Evaluator/
@@ -9,10 +6,8 @@ See http://fsprojects.github.io/FSharp.Quotations.Evaluator/
 ### Build and Release
 
 - Open, edit, build and test using ``FSharp.Quotations.Evaluator.sln``
-- Build and test release binaries using ``build.cmd`` or ``build.sh `` 
-- Build and test release packages using ``build.cmd Release`` or ``build.sh Release`` 
-- Build and publish release docs using ``build.cmd ReleaseDocs`` or ``build.sh ReleaseDocs`` 
-- Publish packages using ``nuget/publish.cmd`` or ``.nuget\nuget.exe push bin\<package> <apikey>``
+- Build and test release binaries using ``build.cmd`` or ``build.sh`` 
+- Build and test release packages using ``build.cmd -t Release`` or ``build.sh -t Release`` 
 
 ### Maintainer(s)
 

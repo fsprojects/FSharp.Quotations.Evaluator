@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- NuGet Metadata -->
+  <PropertyGroup>
+    <PackageIcon>logo.png</PackageIcon>
+    <Description>A quotations evaluator for F# based on LINQ expression tree compilation. Some constructs are not supported and performance may be slower than F# compiled code. Based on the old F# 2.0 PowerPack code.</Description>
+    <Authors>F# Software Foundation</Authors>
+    <Copyright>2019</Copyright>
+    <PackageTags>FSharp F# Quotations Evaluator</PackageTags>
+    <RepositoryUrl>https://github.com/fsprojects/FSharp.Quotations.Evaluator</RepositoryUrl>
+    <PackageProjectUrl>http://fsprojects.github.io/FSharp.Quotations.Evaluator</PackageProjectUrl>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <!-- SourceLink Options -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <!--<IncludeSymbols>true</IncludeSymbols>-->
+    <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
+  </PropertyGroup>
+</Project>

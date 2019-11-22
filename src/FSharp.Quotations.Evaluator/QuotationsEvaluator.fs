@@ -9,21 +9,19 @@ open System
 open System.Collections.Generic
 open System.Linq.Expressions
 open System.Reflection
-open Microsoft.FSharp
-open Microsoft.FSharp.Reflection
-open Microsoft.FSharp.Quotations
-open Microsoft.FSharp.Quotations.Patterns
-open Microsoft.FSharp.Quotations.DerivedPatterns
+open FSharp.Reflection
+open FSharp.Quotations
+open FSharp.Quotations.Patterns
+open FSharp.Quotations.DerivedPatterns
 open FSharp.Quotations.Evaluator.Tools
 
 #nowarn "1204"
 #nowarn "44"
 
 module ExtraHashCompare =
-    let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (Microsoft.FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
+    let GenericNotEqualIntrinsic<'T> (x:'T) (y:'T) : bool = not (FSharp.Core.LanguagePrimitives.HashCompare.GenericEqualityIntrinsic<'T> x y)
 
 module QuotationEvaluationTypes = 
-    open Tools
 
     type This = 
         static member Assembly = typeof<This>.Assembly
@@ -786,14 +784,14 @@ module QuotationEvaluationTypes =
 module QuotationEvaluationExtensions =
     open QuotationEvaluationTypes
 
-    type Microsoft.FSharp.Quotations.Expr with 
+    type FSharp.Quotations.Expr with 
         member x.ToLinqExpressionUntyped() = Conv(x, false)
         member x.CompileUntyped() = 
             let f = Compile(x)  
             f() 
         member x.EvaluateUntyped() = Eval(x)
 
-    type Microsoft.FSharp.Quotations.Expr<'T> with 
+    type FSharp.Quotations.Expr<'T> with 
         member x.Compile() = 
             let f = Compile(x)  
             f() :?> 'T
@@ -803,12 +801,10 @@ open QuotationEvaluationTypes
 open QuotationEvaluationExtensions
   
 [<Sealed>]
-type QuotationEvaluator() = 
-    static member ToLinqExpression (e: Microsoft.FSharp.Quotations.Expr) = e.ToLinqExpressionUntyped()
-    static member CompileUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.CompileUntyped()
-    static member EvaluateUntyped (e : Microsoft.FSharp.Quotations.Expr) = e.EvaluateUntyped()
-    static member internal EvaluateUntypedUsingQueryApproximations (e: Microsoft.FSharp.Quotations.Expr) = CompileImpl(e, true) ()
-    static member Compile (e : Microsoft.FSharp.Quotations.Expr<'T>) = e.Compile()
-    static member Evaluate (e : Microsoft.FSharp.Quotations.Expr<'T>) = e.Evaluate()
-
-    
+type QuotationEvaluator = 
+    static member ToLinqExpression (e: FSharp.Quotations.Expr) = e.ToLinqExpressionUntyped()
+    static member CompileUntyped (e : FSharp.Quotations.Expr) = e.CompileUntyped()
+    static member EvaluateUntyped (e : FSharp.Quotations.Expr) = e.EvaluateUntyped()
+    static member internal EvaluateUntypedUsingQueryApproximations (e: FSharp.Quotations.Expr) = CompileImpl(e, true) ()
+    static member Compile (e : FSharp.Quotations.Expr<'T>) = e.Compile()
+    static member Evaluate (e : FSharp.Quotations.Expr<'T>) = e.Evaluate()
