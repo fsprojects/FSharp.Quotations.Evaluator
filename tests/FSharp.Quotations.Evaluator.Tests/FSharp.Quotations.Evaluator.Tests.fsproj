@@ -9,6 +9,9 @@
     <Compile Include="Tests.fs" />
     <Compile Include="Performance.fs" />
     <None Include="paket.references" />
+    <Content Include="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FSharp.Quotations.Evaluator\FSharp.Quotations.Evaluator.fsproj" />
