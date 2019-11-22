@@ -4,7 +4,7 @@
 // --------------------------------------------------------------------------------------
 
 // Binaries that have XML documentation (in a corresponding generated XML file)
-let referenceBinaries = [ "FSharp.Quotations.Evaluator.dll" ]
+let referenceProjects = [ "../../src/FSharp.Quotations.Evaluator" ]
 // Web site location for the generated documentation
 let website = "/FSharp.Quotations.Evaluator"
 
@@ -65,18 +65,20 @@ let copyFiles () =
   CopyRecursive (formatting @@ "styles") (output @@ "content") true 
     |> Log "Copying styles and scripts: "
 
+let getReferenceAssembliesForProject (proj : string) =
+    let projName = Path.GetFileName proj
+    !! (proj @@ "bin/Release/net*/" + projName + ".dll") |> Seq.head
+
 // Build API reference from XML comments
 let buildReference () =
-  CleanDir (output @@ "reference")
-  let binaries =
-    referenceBinaries
-    |> List.map (fun lib-> bin @@ lib)
-  RazorMetadataFormat.Generate
-    ( binaries, output @@ "reference", layoutRoots, 
-      parameters = ("root", root)::info,
-      sourceRepo = githubLink @@ "tree/master",
-      sourceFolder = __SOURCE_DIRECTORY__ @@ ".." @@ "..",
-      publicOnly = true )
+    CleanDir (output @@ "reference")
+    let binaries = referenceProjects |> List.map getReferenceAssembliesForProject
+    RazorMetadataFormat.Generate
+        ( binaries, output @@ "reference", layoutRoots, 
+          parameters = ("root", root)::info,
+          sourceRepo = githubLink @@ "tree/master",
+          sourceFolder = __SOURCE_DIRECTORY__ @@ ".." @@ "..",
+          publicOnly = true )
 
 // Build documentation from `fsx` and `md` files in `docs/content`
 let buildDocumentation () =
