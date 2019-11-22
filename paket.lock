@@ -816,18 +816,6 @@ NUGET
     System.Runtime.CompilerServices.Unsafe (4.6)
     System.ValueTuple (4.5)
 
-GROUP NetClassic
-STORAGE: NONE
-RESTRICTION: == net45
-NUGET
-  remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (3.0.2)
-    Microsoft.Build.Tasks.Git (1.0.0-beta2-19554-01) - copy_local: true
-    Microsoft.SourceLink.Common (1.0.0-beta2-19554-01) - copy_local: true
-    Microsoft.SourceLink.GitHub (1.0.0-beta2-19554-01) - copy_local: true
-      Microsoft.Build.Tasks.Git (>= 1.0.0-beta2-19554-01)
-      Microsoft.SourceLink.Common (>= 1.0.0-beta2-19554-01)
-
 GROUP Tests
 STORAGE: NONE
 RESTRICTION: || (== net472) (== netcoreapp3.0)

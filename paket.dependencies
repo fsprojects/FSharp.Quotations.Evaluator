@@ -5,14 +5,6 @@ storage: none
 nuget FSharp.Core >= 4.3 lowest_matching: true
 nuget Microsoft.SourceLink.GitHub prerelease copy_local: true
 
-group NetClassic
-  source https://api.nuget.org/v3/index.json
-  framework: net45
-  storage: none
-
-  nuget FSharp.Core >= 3.0 lowest_matching: true
-  nuget Microsoft.SourceLink.GitHub prerelease copy_local: true
-
 group Tests
   source https://api.nuget.org/v3/index.json
   framework: netcoreapp3.0, net472
