@@ -1463,3 +1463,8 @@ module GithubIssues =
     let ``[2](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/26)`` () =
         let t = <@ sprintf "An int %d, a double %f" 10 50.50 @>
         t.EvaluateUntyped() |> ignore
+
+    [<Fact>]
+    let ``[3](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/34)`` () =
+        let t = <@ fun () -> if true then () @>
+        t.EvaluateUntyped() |> ignore
