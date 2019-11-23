@@ -185,5 +185,8 @@
 # Visual Studio
 **/.vs/
 
+# Ionide
+**/.ionide/
+
 # Nuget artifacts
 **/artifacts/
