@@ -144,21 +144,21 @@ Target.create "Default" ignore
 Target.create "Bundle" ignore
 Target.create "Release" ignore
 
-"Clean"
-  ==> "Build"
-  ==> "RunTests"
-  ==> "Default"
+// "Clean"
+//   ==> "Build"
+//   ==> "RunTests"
+//   ==> "Default"
 
-"Default"
-  ==> "GenerateDocs"
-  ==> "NuGet.Pack"
-  ==> "NuGet.ValidateSourceLink"
-  ==> "Bundle"
+// "Default"
+//   ==> "GenerateDocs"
+//   ==> "NuGet.Pack"
+//   ==> "NuGet.ValidateSourceLink"
+//   ==> "Bundle"
 
-"Bundle"
-  ==> "ReleaseDocs"
-  ==> "NuGet.Push"
-  ==> "ReleaseTag"
-  ==> "Release"
+// "Bundle"
+//   ==> "ReleaseDocs"
+//   ==> "NuGet.Push"
+//   ==> "ReleaseTag"
+//   ==> "Release"
 
 Target.runOrDefault "Default"
