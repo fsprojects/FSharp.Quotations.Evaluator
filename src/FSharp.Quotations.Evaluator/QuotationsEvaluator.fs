@@ -85,12 +85,12 @@ module QuotationEvaluationTypes =
     let LinqExpressionHelper (_:'T) : Expression<'T> = failwith ""
     let showAll = BindingFlags.Public ||| BindingFlags.NonPublic
 
-    let wrapVoid (e:#Expression) =
-        if e.Type <> typeof<System.Void> then e |> asExpr
+    let wrapVoid (e:#Expression) : Expression =
+        if e.Type <> typeof<System.Void> then e :> _
         else 
             Expression.Block(
                 e,
-                Expression.Constant(null, typeof<Unit>)) |> asExpr
+                Expression.Constant(null, typeof<Unit>)) :> _
 
     let (|Λ|_|) (``method``:MethodInfo) = function
     | Patterns.Call (o, methodInfo, args) when methodInfo.Name = ``method``.Name ->
@@ -178,7 +178,7 @@ module QuotationEvaluationTypes =
             let args = (args @ [v])
             let argsP = ConvExprs env args 
             let minfo = propInfo.GetSetMethod(true)
-            Expression.Call(ConvObjArg env objOpt None, minfo,argsP) |> wrapVoid
+            Expression.Call(ConvObjArg env objOpt None, minfo,argsP) |> wrapVoid |> asExpr
 
         | Patterns.FieldSet(_,fieldInfo,_) when fieldInfo.IsInitOnly || fieldInfo.IsLiteral -> 
             raise <| new NotSupportedException("Field-set expressions not supported for readonly or literal fields")
@@ -305,7 +305,7 @@ module QuotationEvaluationTypes =
               /// ElementInit
             | _ -> 
                 let argsP = ConvExprs env args 
-                Expression.Call(ConvObjArg env objOpt None, minfo, argsP) |> wrapVoid
+                Expression.Call(ConvObjArg env objOpt None, minfo, argsP) |> wrapVoid |> asExpr
 
         // f x1 x2 x3 x4 --> InvokeFast4
         | Patterns.Application(Patterns.Application(Patterns.Application(Patterns.Application(f,arg1),arg2),arg3),arg4) -> 
@@ -482,9 +482,9 @@ module QuotationEvaluationTypes =
                                 |> Map.add var parameter) }
 
                 let linqBody =
-                    let rawLinqBody = ConvExpr lambdaEnv body
+                    let rawLinqBody = ConvExpr lambdaEnv body |> wrapVoid
 
-                    let fsharpFuncType = typedefof<unit->unit>
+                    let fsharpFuncType = typedefof<_->_>
                     let rec tryFindfsharpFuncParent = function
                     | null -> None
                     | (t:Type) ->
@@ -580,7 +580,7 @@ module QuotationEvaluationTypes =
                             Expression.Break breakLabel)),
                     breakLabel)
             
-            linqLoop |> wrapVoid
+            linqLoop |> wrapVoid |> asExpr
 
         | Patterns.ForIntegerRangeLoop(indexer, lowerValue, upperValue, iteration) ->
             let linqLowerValue = ConvExpr env lowerValue
