@@ -775,7 +775,8 @@ module QuotationEvaluationTypes =
            try 
              d.DynamicInvoke [| box () |]
            with :? System.Reflection.TargetInvocationException as exn -> 
-               raise exn.InnerException)
+               System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(exn.InnerException).Throw()
+               failwith "Unreachable")
 
     let Compile (e: #Expr) = CompileImpl(e,false)
 
