@@ -1,5 +1,6 @@
 module FSharp.Quotations.Evaluator.Unittests
 
+open System.Runtime.CompilerServices
 open Xunit
 open FSharp.Quotations
 open FSharp.Quotations.Evaluator
@@ -1257,6 +1258,16 @@ let QuoteTests() =
     test "quoteInt" (quoteInt = <@ 1 @>)
     test "quoteQuoteInt" (quoteQuoteInt = <@ <@ 1 @> @>)
 
+[<MethodImpl(MethodImplOptions.NoInlining)>] // to preserve stack trace
+let throwE0 () : unit = raise E0
+
+[<Fact>]
+let RethrowTests() =
+    let expr = <@ throwE0 () @>
+    let ex =
+        new System.Action(fun () -> expr.Evaluate())
+        |> Assert.Throws<E0>
+    Assert.Contains("FSharp.Quotations.Evaluator.Unittests.throwE0", ex.StackTrace)
 
 module CheckedTests = 
     open FSharp.Core.Operators.Checked
