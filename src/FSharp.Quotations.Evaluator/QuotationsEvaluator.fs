@@ -186,7 +186,8 @@ module QuotationEvaluationTypes =
         | Patterns.FieldSet(objOpt,fieldInfo,v) ->
             let fieldExpr = Expression.Field(ConvObjArg env objOpt None, fieldInfo)
             let vP = ConvExpr env v
-            Expression.Assign(fieldExpr, vP) |> asExpr
+            let assignment = Expression.Assign(fieldExpr, vP)
+            Expression.Block(assignment, Expression.Constant((), typeof<unit>)) |> asExpr
 
         // Expr.(Call,Application)
         | Patterns.Call(objOpt,minfo,args) -> 
@@ -418,7 +419,8 @@ module QuotationEvaluationTypes =
         | Patterns.VarSet (variable, value) ->
             let linqVariable = Map.find variable env.varEnv
             let linqValue = ConvExpr env value
-            Expression.Assign (linqVariable, linqValue)|> asExpr
+            let assignment = Expression.Assign (linqVariable, linqValue)
+            Expression.Block(assignment, Expression.Constant((), typeof<unit>)) |> asExpr
 
         | Patterns.Lambda (firstVar, firstBody) as lambda ->
             let rec getArguments args maybeBody = function

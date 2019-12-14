@@ -1479,3 +1479,18 @@ module GithubIssues =
     let ``[3](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/34)`` () =
         let t = <@ fun () -> if true then () @>
         t.EvaluateUntyped() |> ignore
+
+    type ClassWithField =
+        val mutable field : int
+        new() = { field = 0 }
+
+    [<Fact>]
+    let ``[4](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/37)`` () =
+        let c = new ClassWithField()
+        <@ c.field <- 42 @>.Evaluate()
+        Assert.Equal(42, c.field)
+
+    [<Fact>]
+    let ``[5](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/37)`` () =
+        let _f = <@ fun () -> let mutable x = 0 in x <- 42 @>.Evaluate()
+        ()
