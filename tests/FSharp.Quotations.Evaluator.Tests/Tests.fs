@@ -1494,3 +1494,8 @@ module GithubIssues =
     let ``[5](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/37)`` () =
         let _f = <@ fun () -> let mutable x = 0 in x <- 42 @>.Evaluate()
         ()
+
+    [<Fact>]
+    let ``[6](https://github.com/fsprojects/FSharp.Quotations.Evaluator/issues/39)`` () =
+        let t = <@ if 1 = 1 then () else (if 1 = 1 then ()) @>
+        Assert.Equal((), t.Evaluate())

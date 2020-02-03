@@ -397,9 +397,7 @@ module QuotationEvaluationTypes =
              build tupTy argsP |> asExpr
 
         | Patterns.IfThenElse(g,t,e) -> 
-            match e with
-            | Patterns.Value(o,_) when o = null -> Expression.IfThen (ConvExpr env g, ConvExpr env t)|> asExpr
-            | _ -> Expression.Condition(ConvExpr env g, ConvExpr env t,ConvExpr env e) |> asExpr
+            Expression.Condition(ConvExpr env g, ConvExpr env t,ConvExpr env e) |> asExpr
 
         | Patterns.Sequential (e1,e2) -> 
             let e1P = ConvExpr env e1
