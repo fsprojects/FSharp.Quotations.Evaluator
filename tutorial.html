@@ -32,8 +32,7 @@
       <hr />
       <div class="row">
         <div class="span9" id="main">
-          
-<h1>F# Quotations Evaluator Tutorial</h1>
+          <h1><a name="F-Quotations-Evaluator-Tutorial" class="anchor" href="#F-Quotations-Evaluator-Tutorial">F# Quotations Evaluator Tutorial</a></h1>
 <p>To reference the library:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -45,11 +44,11 @@
 </code></pre></td>
 </tr>
 </table>
-<h2>Evaluation</h2>
+<h2><a name="Evaluation" class="anchor" href="#Evaluation">Evaluation</a></h2>
 <p>To evaluate a strongly typed quotation:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="id">QuotationEvaluator</span><span class="pn">.</span><span class="id">Evaluate</span> <span class="pn">&lt;@</span> <span class="n">1</span> <span class="o">+</span> <span class="n">1</span> <span class="pn">@&gt;</span>  <span class="c">// 2</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="rt">QuotationEvaluator</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs5', 7)" onmouseover="showTip(event, 'fs5', 7)" class="id">Evaluate</span> <span class="pn">&lt;@</span> <span class="n">1</span> <span class="o">+</span> <span class="n">1</span> <span class="pn">@&gt;</span>  <span class="c">// 2</span>
 </code></pre></td>
 </tr>
 </table>
@@ -62,41 +61,41 @@ you can cast to the expected type when it is known.</p>
 <span class="l">5: </span>
 <span class="l">6: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 7)" onmouseover="showTip(event, 'fs5', 7)" class="fn">evalTuple</span> <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="id">n</span> <span class="o">=</span> 
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="id">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 10)" onmouseover="showTip(event, 'fs8', 10)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs9', 11)" onmouseover="showTip(event, 'fs9', 11)" class="id">NewTuple</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs10', 12)" onmouseover="showTip(event, 'fs10', 12)" class="m">List</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="id">replicate</span> <span onmouseout="hideTip(event, 'fs6', 14)" onmouseover="showTip(event, 'fs6', 14)" class="id">n</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs8', 15)" onmouseover="showTip(event, 'fs8', 15)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs12', 16)" onmouseover="showTip(event, 'fs12', 16)" class="id">Value</span> <span onmouseout="hideTip(event, 'fs6', 17)" onmouseover="showTip(event, 'fs6', 17)" class="id">n</span><span class="pn">)</span><span class="pn">)</span> <span class="c">// codegen (fun x -&gt; (x,x))</span>
-    <span onmouseout="hideTip(event, 'fs7', 18)" onmouseover="showTip(event, 'fs7', 18)" class="fn">v</span><span class="pn">.</span><span class="id">EvaluateUntyped</span><span class="pn">(</span><span class="pn">)</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="fn">evalTuple</span> <span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="id">n</span> <span class="o">=</span> 
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 10)" onmouseover="showTip(event, 'fs8', 10)" class="id">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 11)" onmouseover="showTip(event, 'fs9', 11)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs10', 12)" onmouseover="showTip(event, 'fs10', 12)" class="id">NewTuple</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs11', 13)" onmouseover="showTip(event, 'fs11', 13)" class="m">List</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs12', 14)" onmouseover="showTip(event, 'fs12', 14)" class="id">replicate</span> <span onmouseout="hideTip(event, 'fs7', 15)" onmouseover="showTip(event, 'fs7', 15)" class="id">n</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs9', 16)" onmouseover="showTip(event, 'fs9', 16)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs13', 17)" onmouseover="showTip(event, 'fs13', 17)" class="id">Value</span> <span onmouseout="hideTip(event, 'fs7', 18)" onmouseover="showTip(event, 'fs7', 18)" class="id">n</span><span class="pn">)</span><span class="pn">)</span> <span class="c">// codegen (fun x -&gt; (x,x))</span>
+    <span onmouseout="hideTip(event, 'fs8', 19)" onmouseover="showTip(event, 'fs8', 19)" class="fn">v</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs14', 20)" onmouseover="showTip(event, 'fs14', 20)" class="id">EvaluateUntyped</span><span class="pn">(</span><span class="pn">)</span> 
 
-<span onmouseout="hideTip(event, 'fs5', 19)" onmouseover="showTip(event, 'fs5', 19)" class="fn">evalTuple</span> <span class="n">4</span> <span class="c">// obj = (4,4,4,4)</span>
-<span onmouseout="hideTip(event, 'fs5', 20)" onmouseover="showTip(event, 'fs5', 20)" class="fn">evalTuple</span> <span class="n">5</span> <span class="c">// obj = (5,5,5,5,5)</span>
+<span onmouseout="hideTip(event, 'fs6', 21)" onmouseover="showTip(event, 'fs6', 21)" class="fn">evalTuple</span> <span class="n">4</span> <span class="c">// obj = (4,4,4,4)</span>
+<span onmouseout="hideTip(event, 'fs6', 22)" onmouseover="showTip(event, 'fs6', 22)" class="fn">evalTuple</span> <span class="n">5</span> <span class="c">// obj = (5,5,5,5,5)</span>
 </code></pre></td>
 </tr>
 </table>
-<h2>Compilation</h2>
+<h2><a name="Compilation" class="anchor" href="#Compilation">Compilation</a></h2>
 <p>All evaluation is currently done via compilation. In the future some evalaution may be done via interpretation.
 To force compilation, use "Compile".</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 21)" onmouseover="showTip(event, 'fs13', 21)" class="fn">addPlusOne</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 22)" onmouseover="showTip(event, 'fs4', 22)" class="id">QuotationEvaluator</span><span class="pn">.</span><span class="id">Evaluate</span> <span class="pn">&lt;@</span> <span class="k">fun</span> <span class="id">x</span> <span class="id">y</span> <span class="k">-&gt;</span> <span class="id">x</span> <span class="o">+</span> <span class="id">y</span> <span class="o">+</span> <span class="n">1</span> <span class="pn">@&gt;</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 23)" onmouseover="showTip(event, 'fs15', 23)" class="fn">addPlusOne</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 24)" onmouseover="showTip(event, 'fs4', 24)" class="rt">QuotationEvaluator</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs5', 25)" onmouseover="showTip(event, 'fs5', 25)" class="id">Evaluate</span> <span class="pn">&lt;@</span> <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs16', 26)" onmouseover="showTip(event, 'fs16', 26)" class="id">x</span> <span onmouseout="hideTip(event, 'fs17', 27)" onmouseover="showTip(event, 'fs17', 27)" class="id">y</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs16', 28)" onmouseover="showTip(event, 'fs16', 28)" class="id">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs17', 29)" onmouseover="showTip(event, 'fs17', 29)" class="id">y</span> <span class="o">+</span> <span class="n">1</span> <span class="pn">@&gt;</span> 
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 23)" onmouseover="showTip(event, 'fs14', 23)" class="id">nine</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs13', 24)" onmouseover="showTip(event, 'fs13', 24)" class="fn">addPlusOne</span> <span class="n">3</span> <span class="n">5</span> <span class="c">// 9</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 30)" onmouseover="showTip(event, 'fs18', 30)" class="id">nine</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 31)" onmouseover="showTip(event, 'fs15', 31)" class="fn">addPlusOne</span> <span class="n">3</span> <span class="n">5</span> <span class="c">// 9</span>
 </code></pre></td>
 </tr>
 </table>
-<h2>Extension methods</h2>
+<h2><a name="Extension-methods" class="anchor" href="#Extension-methods">Extension methods</a></h2>
 <p>Extension methods are available for compilation and evaluation:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 25)" onmouseover="showTip(event, 'fs15', 25)" class="id">onePlusOneExpression</span> <span class="o">=</span> <span class="pn">&lt;@</span> <span class="n">1</span> <span class="o">+</span> <span class="n">1</span> <span class="pn">@&gt;</span>  <span class="c">//  2</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 32)" onmouseover="showTip(event, 'fs19', 32)" class="id">onePlusOneExpression</span> <span class="o">=</span> <span class="pn">&lt;@</span> <span class="n">1</span> <span class="o">+</span> <span class="n">1</span> <span class="pn">@&gt;</span>  <span class="c">//  2</span>
 
-<span onmouseout="hideTip(event, 'fs15', 26)" onmouseover="showTip(event, 'fs15', 26)" class="fn">onePlusOneExpression</span><span class="pn">.</span><span class="id">Evaluate</span><span class="pn">(</span><span class="pn">)</span>
+<span onmouseout="hideTip(event, 'fs19', 33)" onmouseover="showTip(event, 'fs19', 33)" class="fn">onePlusOneExpression</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs20', 34)" onmouseover="showTip(event, 'fs20', 34)" class="id">Evaluate</span><span class="pn">(</span><span class="pn">)</span>
 </code></pre></td>
 </tr>
 </table>
-<h2>On-the-fly code generation</h2>
+<h2><a name="On-the-fly-code-generation" class="anchor" href="#On-the-fly-code-generation">On-the-fly code generation</a></h2>
 <p>You can generate lambdas and compile them dynamically:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -105,12 +104,12 @@ To force compilation, use "Compile".</p>
 <span class="l">5: </span>
 <span class="l">6: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs16', 27)" onmouseover="showTip(event, 'fs16', 27)" class="fn">tupler</span> <span class="o">=</span> 
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 28)" onmouseover="showTip(event, 'fs17', 28)" class="id">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 29)" onmouseover="showTip(event, 'fs18', 29)" class="rt">Var</span><span class="pn">(</span><span class="s">&quot;x&quot;</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs19', 30)" onmouseover="showTip(event, 'fs19', 30)" class="k">typeof</span><span class="pn">&lt;</span><span onmouseout="hideTip(event, 'fs20', 31)" onmouseover="showTip(event, 'fs20', 31)" class="vt">int</span><span class="pn">&gt;</span><span class="pn">)</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs7', 32)" onmouseover="showTip(event, 'fs7', 32)" class="id">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 33)" onmouseover="showTip(event, 'fs8', 33)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs21', 34)" onmouseover="showTip(event, 'fs21', 34)" class="id">Lambda</span><span class="pn">(</span><span onmouseout="hideTip(event, 'fs17', 35)" onmouseover="showTip(event, 'fs17', 35)" class="id">v</span><span class="pn">,</span> <span onmouseout="hideTip(event, 'fs8', 36)" onmouseover="showTip(event, 'fs8', 36)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs9', 37)" onmouseover="showTip(event, 'fs9', 37)" class="id">NewTuple</span> <span class="pn">[</span><span onmouseout="hideTip(event, 'fs8', 38)" onmouseover="showTip(event, 'fs8', 38)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs22', 39)" onmouseover="showTip(event, 'fs22', 39)" class="id">Var</span> <span onmouseout="hideTip(event, 'fs17', 40)" onmouseover="showTip(event, 'fs17', 40)" class="id">v</span><span class="pn">;</span> <span onmouseout="hideTip(event, 'fs8', 41)" onmouseover="showTip(event, 'fs8', 41)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs22', 42)" onmouseover="showTip(event, 'fs22', 42)" class="id">Var</span> <span onmouseout="hideTip(event, 'fs17', 43)" onmouseover="showTip(event, 'fs17', 43)" class="id">v</span><span class="pn">]</span><span class="pn">)</span> <span class="c">// codegen (fun x -&gt; (x,x))</span>
-    <span onmouseout="hideTip(event, 'fs7', 44)" onmouseover="showTip(event, 'fs7', 44)" class="fn">v</span><span class="pn">.</span><span class="id">CompileUntyped</span><span class="pn">(</span><span class="pn">)</span> <span class="o">:?&gt;</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs20', 45)" onmouseover="showTip(event, 'fs20', 45)" class="vt">int</span> <span class="k">-&gt;</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs20', 46)" onmouseover="showTip(event, 'fs20', 46)" class="vt">int</span> <span class="pn">*</span> <span onmouseout="hideTip(event, 'fs20', 47)" onmouseover="showTip(event, 'fs20', 47)" class="vt">int</span><span class="pn">)</span><span class="pn">)</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 35)" onmouseover="showTip(event, 'fs21', 35)" class="fn">tupler</span> <span class="o">=</span> 
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 36)" onmouseover="showTip(event, 'fs22', 36)" class="id">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs23', 37)" onmouseover="showTip(event, 'fs23', 37)" class="rt">Var</span><span class="pn">(</span><span class="s">&quot;x&quot;</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs24', 38)" onmouseover="showTip(event, 'fs24', 38)" class="k">typeof</span><span class="pn">&lt;</span><span onmouseout="hideTip(event, 'fs25', 39)" onmouseover="showTip(event, 'fs25', 39)" class="vt">int</span><span class="pn">&gt;</span><span class="pn">)</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 40)" onmouseover="showTip(event, 'fs8', 40)" class="id">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 41)" onmouseover="showTip(event, 'fs9', 41)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs26', 42)" onmouseover="showTip(event, 'fs26', 42)" class="id">Lambda</span><span class="pn">(</span><span onmouseout="hideTip(event, 'fs22', 43)" onmouseover="showTip(event, 'fs22', 43)" class="id">v</span><span class="pn">,</span> <span onmouseout="hideTip(event, 'fs9', 44)" onmouseover="showTip(event, 'fs9', 44)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs10', 45)" onmouseover="showTip(event, 'fs10', 45)" class="id">NewTuple</span> <span class="pn">[</span><span onmouseout="hideTip(event, 'fs9', 46)" onmouseover="showTip(event, 'fs9', 46)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs27', 47)" onmouseover="showTip(event, 'fs27', 47)" class="id">Var</span> <span onmouseout="hideTip(event, 'fs22', 48)" onmouseover="showTip(event, 'fs22', 48)" class="id">v</span><span class="pn">;</span> <span onmouseout="hideTip(event, 'fs9', 49)" onmouseover="showTip(event, 'fs9', 49)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs27', 50)" onmouseover="showTip(event, 'fs27', 50)" class="id">Var</span> <span onmouseout="hideTip(event, 'fs22', 51)" onmouseover="showTip(event, 'fs22', 51)" class="id">v</span><span class="pn">]</span><span class="pn">)</span> <span class="c">// codegen (fun x -&gt; (x,x))</span>
+    <span onmouseout="hideTip(event, 'fs8', 52)" onmouseover="showTip(event, 'fs8', 52)" class="fn">v</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs28', 53)" onmouseover="showTip(event, 'fs28', 53)" class="id">CompileUntyped</span><span class="pn">(</span><span class="pn">)</span> <span class="o">:?&gt;</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs25', 54)" onmouseover="showTip(event, 'fs25', 54)" class="vt">int</span> <span class="k">-&gt;</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs25', 55)" onmouseover="showTip(event, 'fs25', 55)" class="vt">int</span> <span class="pn">*</span> <span onmouseout="hideTip(event, 'fs25', 56)" onmouseover="showTip(event, 'fs25', 56)" class="vt">int</span><span class="pn">)</span><span class="pn">)</span>
 
-<span onmouseout="hideTip(event, 'fs16', 48)" onmouseover="showTip(event, 'fs16', 48)" class="fn">tupler</span> <span class="n">78</span>  <span class="c">// (78, 78)</span>
+<span onmouseout="hideTip(event, 'fs21', 57)" onmouseover="showTip(event, 'fs21', 57)" class="fn">tupler</span> <span class="n">78</span>  <span class="c">// (78, 78)</span>
 </code></pre></td>
 </tr>
 </table>
@@ -135,40 +134,40 @@ To force compilation, use "Compile".</p>
 <span class="l">18: </span>
 <span class="l">19: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 49)" onmouseover="showTip(event, 'fs23', 49)" class="fn">invokeFunctionDynamic</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs24', 50)" onmouseover="showTip(event, 'fs24', 50)" class="id">f</span><span class="pn">:</span> <span onmouseout="hideTip(event, 'fs25', 51)" onmouseover="showTip(event, 'fs25', 51)" class="rt">obj</span><span class="pn">)</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs26', 52)" onmouseover="showTip(event, 'fs26', 52)" class="id">x</span><span class="pn">:</span><span onmouseout="hideTip(event, 'fs25', 53)" onmouseover="showTip(event, 'fs25', 53)" class="rt">obj</span><span class="pn">)</span> <span class="o">=</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 58)" onmouseover="showTip(event, 'fs29', 58)" class="fn">invokeFunctionDynamic</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs30', 59)" onmouseover="showTip(event, 'fs30', 59)" class="id">f</span><span class="pn">:</span> <span onmouseout="hideTip(event, 'fs31', 60)" onmouseover="showTip(event, 'fs31', 60)" class="rt">obj</span><span class="pn">)</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs32', 61)" onmouseover="showTip(event, 'fs32', 61)" class="id">x</span><span class="pn">:</span><span onmouseout="hideTip(event, 'fs31', 62)" onmouseover="showTip(event, 'fs31', 62)" class="rt">obj</span><span class="pn">)</span> <span class="o">=</span> 
     <span class="c">// Invoke an F# function dynamically</span>
-    <span onmouseout="hideTip(event, 'fs24', 54)" onmouseover="showTip(event, 'fs24', 54)" class="fn">f</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs27', 55)" onmouseover="showTip(event, 'fs27', 55)" class="id">GetType</span><span class="pn">(</span><span class="pn">)</span><span class="pn">.</span><span class="id">InvokeMember</span><span class="pn">(</span><span class="s">&quot;Invoke&quot;</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs28', 56)" onmouseover="showTip(event, 'fs28', 56)" class="id">System</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs29', 57)" onmouseover="showTip(event, 'fs29', 57)" class="id">Reflection</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs30', 58)" onmouseover="showTip(event, 'fs30', 58)" class="vt">BindingFlags</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs31', 59)" onmouseover="showTip(event, 'fs31', 59)" class="id">InvokeMethod</span><span class="pn">,</span><span class="k">null</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs24', 60)" onmouseover="showTip(event, 'fs24', 60)" class="id">f</span><span class="pn">,</span><span class="pn">[|</span> <span onmouseout="hideTip(event, 'fs32', 61)" onmouseover="showTip(event, 'fs32', 61)" class="fn">box</span> <span onmouseout="hideTip(event, 'fs26', 62)" onmouseover="showTip(event, 'fs26', 62)" class="id">x</span> <span class="pn">|]</span><span class="pn">)</span>
+    <span onmouseout="hideTip(event, 'fs30', 63)" onmouseover="showTip(event, 'fs30', 63)" class="fn">f</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs33', 64)" onmouseover="showTip(event, 'fs33', 64)" class="id">GetType</span><span class="pn">(</span><span class="pn">)</span><span class="pn">.</span><span class="id">InvokeMember</span><span class="pn">(</span><span class="s">&quot;Invoke&quot;</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs34', 65)" onmouseover="showTip(event, 'fs34', 65)" class="id">System</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs35', 66)" onmouseover="showTip(event, 'fs35', 66)" class="id">Reflection</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs36', 67)" onmouseover="showTip(event, 'fs36', 67)" class="vt">BindingFlags</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs37', 68)" onmouseover="showTip(event, 'fs37', 68)" class="id">InvokeMethod</span><span class="pn">,</span><span class="k">null</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs30', 69)" onmouseover="showTip(event, 'fs30', 69)" class="id">f</span><span class="pn">,</span><span class="pn">[|</span> <span onmouseout="hideTip(event, 'fs38', 70)" onmouseover="showTip(event, 'fs38', 70)" class="fn">box</span> <span onmouseout="hideTip(event, 'fs32', 71)" onmouseover="showTip(event, 'fs32', 71)" class="id">x</span> <span class="pn">|]</span><span class="pn">)</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs33', 63)" onmouseover="showTip(event, 'fs33', 63)" class="fn">makeTupler</span> <span onmouseout="hideTip(event, 'fs6', 64)" onmouseover="showTip(event, 'fs6', 64)" class="id">n</span> <span class="o">=</span> 
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs34', 65)" onmouseover="showTip(event, 'fs34', 65)" class="id">xVar</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 66)" onmouseover="showTip(event, 'fs18', 66)" class="rt">Var</span><span class="pn">(</span><span class="s">&quot;x&quot;</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs19', 67)" onmouseover="showTip(event, 'fs19', 67)" class="k">typeof</span><span class="pn">&lt;</span><span onmouseout="hideTip(event, 'fs20', 68)" onmouseover="showTip(event, 'fs20', 68)" class="vt">int</span><span class="pn">&gt;</span><span class="pn">)</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs35', 69)" onmouseover="showTip(event, 'fs35', 69)" class="id">lambdaExpr</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 70)" onmouseover="showTip(event, 'fs8', 70)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs21', 71)" onmouseover="showTip(event, 'fs21', 71)" class="id">Lambda</span><span class="pn">(</span><span onmouseout="hideTip(event, 'fs34', 72)" onmouseover="showTip(event, 'fs34', 72)" class="id">xVar</span><span class="pn">,</span> <span onmouseout="hideTip(event, 'fs8', 73)" onmouseover="showTip(event, 'fs8', 73)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs9', 74)" onmouseover="showTip(event, 'fs9', 74)" class="id">NewTuple</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs10', 75)" onmouseover="showTip(event, 'fs10', 75)" class="m">List</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs11', 76)" onmouseover="showTip(event, 'fs11', 76)" class="id">replicate</span> <span onmouseout="hideTip(event, 'fs6', 77)" onmouseover="showTip(event, 'fs6', 77)" class="id">n</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs8', 78)" onmouseover="showTip(event, 'fs8', 78)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs22', 79)" onmouseover="showTip(event, 'fs22', 79)" class="id">Var</span> <span onmouseout="hideTip(event, 'fs34', 80)" onmouseover="showTip(event, 'fs34', 80)" class="id">xVar</span><span class="pn">)</span><span class="pn">)</span><span class="pn">)</span> <span class="c">// codegen (fun x -&gt; (x,...,x))</span>
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs36', 81)" onmouseover="showTip(event, 'fs36', 81)" class="id">compiledLambda</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs35', 82)" onmouseover="showTip(event, 'fs35', 82)" class="fn">lambdaExpr</span><span class="pn">.</span><span class="id">CompileUntyped</span><span class="pn">(</span><span class="pn">)</span> 
-    <span class="k">fun</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs37', 83)" onmouseover="showTip(event, 'fs37', 83)" class="id">v</span><span class="pn">:</span><span onmouseout="hideTip(event, 'fs20', 84)" onmouseover="showTip(event, 'fs20', 84)" class="vt">int</span><span class="pn">)</span> <span class="k">-&gt;</span> 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs39', 72)" onmouseover="showTip(event, 'fs39', 72)" class="fn">makeTupler</span> <span onmouseout="hideTip(event, 'fs7', 73)" onmouseover="showTip(event, 'fs7', 73)" class="id">n</span> <span class="o">=</span> 
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 74)" onmouseover="showTip(event, 'fs40', 74)" class="id">xVar</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs23', 75)" onmouseover="showTip(event, 'fs23', 75)" class="rt">Var</span><span class="pn">(</span><span class="s">&quot;x&quot;</span><span class="pn">,</span><span onmouseout="hideTip(event, 'fs24', 76)" onmouseover="showTip(event, 'fs24', 76)" class="k">typeof</span><span class="pn">&lt;</span><span onmouseout="hideTip(event, 'fs25', 77)" onmouseover="showTip(event, 'fs25', 77)" class="vt">int</span><span class="pn">&gt;</span><span class="pn">)</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 78)" onmouseover="showTip(event, 'fs41', 78)" class="id">lambdaExpr</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 79)" onmouseover="showTip(event, 'fs9', 79)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs26', 80)" onmouseover="showTip(event, 'fs26', 80)" class="id">Lambda</span><span class="pn">(</span><span onmouseout="hideTip(event, 'fs40', 81)" onmouseover="showTip(event, 'fs40', 81)" class="id">xVar</span><span class="pn">,</span> <span onmouseout="hideTip(event, 'fs9', 82)" onmouseover="showTip(event, 'fs9', 82)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs10', 83)" onmouseover="showTip(event, 'fs10', 83)" class="id">NewTuple</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs11', 84)" onmouseover="showTip(event, 'fs11', 84)" class="m">List</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs12', 85)" onmouseover="showTip(event, 'fs12', 85)" class="id">replicate</span> <span onmouseout="hideTip(event, 'fs7', 86)" onmouseover="showTip(event, 'fs7', 86)" class="id">n</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs9', 87)" onmouseover="showTip(event, 'fs9', 87)" class="rt">Expr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs27', 88)" onmouseover="showTip(event, 'fs27', 88)" class="id">Var</span> <span onmouseout="hideTip(event, 'fs40', 89)" onmouseover="showTip(event, 'fs40', 89)" class="id">xVar</span><span class="pn">)</span><span class="pn">)</span><span class="pn">)</span> <span class="c">// codegen (fun x -&gt; (x,...,x))</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs42', 90)" onmouseover="showTip(event, 'fs42', 90)" class="id">compiledLambda</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs41', 91)" onmouseover="showTip(event, 'fs41', 91)" class="fn">lambdaExpr</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs28', 92)" onmouseover="showTip(event, 'fs28', 92)" class="id">CompileUntyped</span><span class="pn">(</span><span class="pn">)</span> 
+    <span class="k">fun</span> <span class="pn">(</span><span onmouseout="hideTip(event, 'fs43', 93)" onmouseover="showTip(event, 'fs43', 93)" class="id">v</span><span class="pn">:</span><span onmouseout="hideTip(event, 'fs25', 94)" onmouseover="showTip(event, 'fs25', 94)" class="vt">int</span><span class="pn">)</span> <span class="k">-&gt;</span> 
         <span class="c">// Invoke the function dynamically</span>
-        <span onmouseout="hideTip(event, 'fs23', 85)" onmouseover="showTip(event, 'fs23', 85)" class="fn">invokeFunctionDynamic</span> <span onmouseout="hideTip(event, 'fs36', 86)" onmouseover="showTip(event, 'fs36', 86)" class="id">compiledLambda</span> <span onmouseout="hideTip(event, 'fs37', 87)" onmouseover="showTip(event, 'fs37', 87)" class="id">v</span>
+        <span onmouseout="hideTip(event, 'fs29', 95)" onmouseover="showTip(event, 'fs29', 95)" class="fn">invokeFunctionDynamic</span> <span onmouseout="hideTip(event, 'fs42', 96)" onmouseover="showTip(event, 'fs42', 96)" class="id">compiledLambda</span> <span onmouseout="hideTip(event, 'fs43', 97)" onmouseover="showTip(event, 'fs43', 97)" class="id">v</span>
 
 <span class="c">// tupler4 and tupler7 are compiled functions which can be invoked with different arguments</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs38', 88)" onmouseover="showTip(event, 'fs38', 88)" class="fn">tupler4</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs33', 89)" onmouseover="showTip(event, 'fs33', 89)" class="fn">makeTupler</span> <span class="n">4</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs39', 90)" onmouseover="showTip(event, 'fs39', 90)" class="fn">tupler7</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs33', 91)" onmouseover="showTip(event, 'fs33', 91)" class="fn">makeTupler</span> <span class="n">7</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs44', 98)" onmouseover="showTip(event, 'fs44', 98)" class="fn">tupler4</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs39', 99)" onmouseover="showTip(event, 'fs39', 99)" class="fn">makeTupler</span> <span class="n">4</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs45', 100)" onmouseover="showTip(event, 'fs45', 100)" class="fn">tupler7</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs39', 101)" onmouseover="showTip(event, 'fs39', 101)" class="fn">makeTupler</span> <span class="n">7</span>
 
-<span onmouseout="hideTip(event, 'fs38', 92)" onmouseover="showTip(event, 'fs38', 92)" class="fn">tupler4</span> <span class="n">76</span> <span class="c">// (76, 76, 76, 76)</span>
-<span onmouseout="hideTip(event, 'fs38', 93)" onmouseover="showTip(event, 'fs38', 93)" class="fn">tupler4</span> <span class="n">63</span> <span class="c">// (63, 63, 63, 63)</span>
-<span onmouseout="hideTip(event, 'fs39', 94)" onmouseover="showTip(event, 'fs39', 94)" class="fn">tupler7</span> <span class="n">65</span> <span class="c">// (65, 65, 65, 65, 65, 65, 65)</span>
+<span onmouseout="hideTip(event, 'fs44', 102)" onmouseover="showTip(event, 'fs44', 102)" class="fn">tupler4</span> <span class="n">76</span> <span class="c">// (76, 76, 76, 76)</span>
+<span onmouseout="hideTip(event, 'fs44', 103)" onmouseover="showTip(event, 'fs44', 103)" class="fn">tupler4</span> <span class="n">63</span> <span class="c">// (63, 63, 63, 63)</span>
+<span onmouseout="hideTip(event, 'fs45', 104)" onmouseover="showTip(event, 'fs45', 104)" class="fn">tupler7</span> <span class="n">65</span> <span class="c">// (65, 65, 65, 65, 65, 65, 65)</span>
 </code></pre></td>
 </tr>
 </table>
-<h2>Convert to LINQ expressions</h2>
+<h2><a name="Convert-to-LINQ-expressions" class="anchor" href="#Convert-to-LINQ-expressions">Convert to LINQ expressions</a></h2>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
 <span class="l">5: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 95)" onmouseover="showTip(event, 'fs40', 95)" class="id">onePlusTwoExpression</span> <span class="o">=</span> <span class="pn">&lt;@</span> <span class="n">1</span> <span class="o">+</span> <span class="n">2</span> <span class="pn">@&gt;</span>  <span class="c">//  2</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 105)" onmouseover="showTip(event, 'fs46', 105)" class="id">onePlusTwoExpression</span> <span class="o">=</span> <span class="pn">&lt;@</span> <span class="n">1</span> <span class="o">+</span> <span class="n">2</span> <span class="pn">@&gt;</span>  <span class="c">//  2</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 96)" onmouseover="showTip(event, 'fs41', 96)" class="id">expressionTree</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs40', 97)" onmouseover="showTip(event, 'fs40', 97)" class="id">onePlusTwoExpression</span><span class="pn">.</span><span class="id">ToLinqExpressionUntyped</span><span class="pn">(</span><span class="pn">)</span> <span class="c">// an expression tree</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 106)" onmouseover="showTip(event, 'fs47', 106)" class="id">expressionTree</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs46', 107)" onmouseover="showTip(event, 'fs46', 107)" class="fn">onePlusTwoExpression</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs48', 108)" onmouseover="showTip(event, 'fs48', 108)" class="id">ToLinqExpressionUntyped</span><span class="pn">(</span><span class="pn">)</span> <span class="c">// an expression tree</span>
 
-<span onmouseout="hideTip(event, 'fs41', 98)" onmouseover="showTip(event, 'fs41', 98)" class="fn">expressionTree</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs42', 99)" onmouseover="showTip(event, 'fs42', 99)" class="id">ToString</span><span class="pn">(</span><span class="pn">)</span> <span class="c">// &quot;(1 + 2)&quot;</span>
+<span onmouseout="hideTip(event, 'fs47', 109)" onmouseover="showTip(event, 'fs47', 109)" class="fn">expressionTree</span><span class="pn">.</span><span onmouseout="hideTip(event, 'fs49', 110)" onmouseover="showTip(event, 'fs49', 110)" class="id">ToString</span><span class="pn">(</span><span class="pn">)</span> <span class="c">// &quot;(1 + 2)&quot;</span>
 </code></pre></td>
 </tr>
 </table>
@@ -176,45 +175,52 @@ To force compilation, use "Compile".</p>
 <div class="tip" id="fs1">Multiple items<br />namespace FSharp<br /><br />--------------------<br />namespace Microsoft.FSharp</div>
 <div class="tip" id="fs2">Multiple items<br />namespace FSharp.Quotations<br /><br />--------------------<br />namespace Microsoft.FSharp.Quotations</div>
 <div class="tip" id="fs3">namespace FSharp.Quotations.Evaluator</div>
-<div class="tip" id="fs4"></div>
-<div class="tip" id="fs5">val evalTuple : n:int -&gt; obj</div>
-<div class="tip" id="fs6">val n : int</div>
-<div class="tip" id="fs7">val v : Expr</div>
-<div class="tip" id="fs8">Multiple items<br />type Expr =<br />&#160;&#160;override Equals : obj:obj -&gt; bool<br />&#160;&#160;member GetFreeVars : unit -&gt; seq&lt;Var&gt;<br />&#160;&#160;member Substitute : substitution:(Var -&gt; Expr option) -&gt; Expr<br />&#160;&#160;member ToString : full:bool -&gt; string<br />&#160;&#160;member CustomAttributes : Expr list<br />&#160;&#160;member Type : Type<br />&#160;&#160;static member AddressOf : target:Expr -&gt; Expr<br />&#160;&#160;static member AddressSet : target:Expr * value:Expr -&gt; Expr<br />&#160;&#160;static member Application : functionExpr:Expr * argument:Expr -&gt; Expr<br />&#160;&#160;static member Applications : functionExpr:Expr * arguments:Expr list list -&gt; Expr<br />&#160;&#160;...<br /><br />--------------------<br />type Expr&lt;&#39;T&gt; =<br />&#160;&#160;inherit Expr<br />&#160;&#160;member Raw : Expr</div>
-<div class="tip" id="fs9">static member Expr.NewTuple : elements:Expr list -&gt; Expr</div>
-<div class="tip" id="fs10">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;&#160;&#160;interface IReadOnlyList&lt;&#39;T&gt;<br />&#160;&#160;&#160;&#160;interface IReadOnlyCollection&lt;&#39;T&gt;<br />&#160;&#160;&#160;&#160;interface IEnumerable<br />&#160;&#160;&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;&#160;&#160;member Head : &#39;T<br />&#160;&#160;&#160;&#160;member IsEmpty : bool<br />&#160;&#160;&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;&#160;&#160;member Length : int<br />&#160;&#160;&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;&#160;&#160;...</div>
-<div class="tip" id="fs11">val replicate : count:int -&gt; initial:&#39;T -&gt; &#39;T list</div>
-<div class="tip" id="fs12">static member Expr.Value : value:&#39;T -&gt; Expr<br />static member Expr.Value : value:obj * expressionType:System.Type -&gt; Expr</div>
-<div class="tip" id="fs13">val addPlusOne : (int -&gt; int -&gt; obj)</div>
-<div class="tip" id="fs14">val nine : obj</div>
-<div class="tip" id="fs15">val onePlusOneExpression : Expr&lt;int&gt;</div>
-<div class="tip" id="fs16">val tupler : (int -&gt; int * int)</div>
-<div class="tip" id="fs17">val v : Var</div>
-<div class="tip" id="fs18">Multiple items<br />type Var =<br />&#160;&#160;interface IComparable<br />&#160;&#160;new : name:string * typ:Type * ?isMutable:bool -&gt; Var<br />&#160;&#160;member IsMutable : bool<br />&#160;&#160;member Name : string<br />&#160;&#160;member Type : Type<br />&#160;&#160;static member Global : name:string * typ:Type -&gt; Var<br /><br />--------------------<br />new : name:string * typ:System.Type * ?isMutable:bool -&gt; Var</div>
-<div class="tip" id="fs19">val typeof&lt;&#39;T&gt; : System.Type</div>
-<div class="tip" id="fs20">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />--------------------<br />type int = int32<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int</div>
-<div class="tip" id="fs21">static member Expr.Lambda : parameter:Var * body:Expr -&gt; Expr</div>
-<div class="tip" id="fs22">static member Expr.Var : variable:Var -&gt; Expr</div>
-<div class="tip" id="fs23">val invokeFunctionDynamic : f:obj -&gt; x:obj -&gt; obj</div>
-<div class="tip" id="fs24">val f : obj</div>
-<div class="tip" id="fs25">type obj = System.Object</div>
-<div class="tip" id="fs26">val x : obj</div>
-<div class="tip" id="fs27">System.Object.GetType() : System.Type</div>
-<div class="tip" id="fs28">namespace System</div>
-<div class="tip" id="fs29">namespace System.Reflection</div>
-<div class="tip" id="fs30">type BindingFlags =<br />&#160;&#160;| Default = 0<br />&#160;&#160;| IgnoreCase = 1<br />&#160;&#160;| DeclaredOnly = 2<br />&#160;&#160;| Instance = 4<br />&#160;&#160;| Static = 8<br />&#160;&#160;| Public = 16<br />&#160;&#160;| NonPublic = 32<br />&#160;&#160;| FlattenHierarchy = 64<br />&#160;&#160;| InvokeMethod = 256<br />&#160;&#160;| CreateInstance = 512<br />&#160;&#160;...</div>
-<div class="tip" id="fs31">field System.Reflection.BindingFlags.InvokeMethod: System.Reflection.BindingFlags = 256</div>
-<div class="tip" id="fs32">val box : value:&#39;T -&gt; obj</div>
-<div class="tip" id="fs33">val makeTupler : n:int -&gt; (int -&gt; obj)</div>
-<div class="tip" id="fs34">val xVar : Var</div>
-<div class="tip" id="fs35">val lambdaExpr : Expr</div>
-<div class="tip" id="fs36">val compiledLambda : obj</div>
-<div class="tip" id="fs37">val v : int</div>
-<div class="tip" id="fs38">val tupler4 : (int -&gt; obj)</div>
-<div class="tip" id="fs39">val tupler7 : (int -&gt; obj)</div>
-<div class="tip" id="fs40">val onePlusTwoExpression : Expr&lt;int&gt;</div>
-<div class="tip" id="fs41">val expressionTree : obj</div>
-<div class="tip" id="fs42">System.Object.ToString() : string</div>
+<div class="tip" id="fs4">type QuotationEvaluator =<br />&#160;&#160;static member CompileUntyped : Expr -&gt; obj<br />&#160;&#160;static member Evaluate : Expr&lt;&#39;T&gt; -&gt; &#39;T<br />&#160;&#160;static member EvaluateUntyped : Expr -&gt; obj<br />&#160;&#160;static member private EvaluateUntypedUsingQueryApproximations : Expr -&gt; obj<br />&#160;&#160;static member ToLinqExpression : Expr -&gt; Expression</div>
+<div class="tip" id="fs5">static member QuotationEvaluator.Evaluate : Expr&lt;&#39;T&gt; -&gt; &#39;T</div>
+<div class="tip" id="fs6">val evalTuple : n:int -&gt; obj</div>
+<div class="tip" id="fs7">val n : int</div>
+<div class="tip" id="fs8">val v : Expr</div>
+<div class="tip" id="fs9">Multiple items<br />type Expr =<br />&#160;&#160;override Equals : obj:obj -&gt; bool<br />&#160;&#160;member GetFreeVars : unit -&gt; seq&lt;Var&gt;<br />&#160;&#160;member Substitute : substitution:(Var -&gt; Expr option) -&gt; Expr<br />&#160;&#160;member ToString : full:bool -&gt; string<br />&#160;&#160;member CustomAttributes : Expr list<br />&#160;&#160;member Type : Type<br />&#160;&#160;static member AddressOf : target:Expr -&gt; Expr<br />&#160;&#160;static member AddressSet : target:Expr * value:Expr -&gt; Expr<br />&#160;&#160;static member Application : functionExpr:Expr * argument:Expr -&gt; Expr<br />&#160;&#160;static member Applications : functionExpr:Expr * arguments:Expr list list -&gt; Expr<br />&#160;&#160;...<br /><br />--------------------<br />type Expr&lt;&#39;T&gt; =<br />&#160;&#160;inherit Expr<br />&#160;&#160;member Raw : Expr</div>
+<div class="tip" id="fs10">static member Expr.NewTuple : elements:Expr list -&gt; Expr</div>
+<div class="tip" id="fs11">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;&#160;&#160;interface IReadOnlyList&lt;&#39;T&gt;<br />&#160;&#160;&#160;&#160;interface IReadOnlyCollection&lt;&#39;T&gt;<br />&#160;&#160;&#160;&#160;interface IEnumerable<br />&#160;&#160;&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;&#160;&#160;member Head : &#39;T<br />&#160;&#160;&#160;&#160;member IsEmpty : bool<br />&#160;&#160;&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;&#160;&#160;member Length : int<br />&#160;&#160;&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;&#160;&#160;...</div>
+<div class="tip" id="fs12">val replicate : count:int -&gt; initial:&#39;T -&gt; &#39;T list</div>
+<div class="tip" id="fs13">static member Expr.Value : value:&#39;T -&gt; Expr<br />static member Expr.Value : value:obj * expressionType:System.Type -&gt; Expr</div>
+<div class="tip" id="fs14">member Expr.EvaluateUntyped : unit -&gt; obj</div>
+<div class="tip" id="fs15">val addPlusOne : (int -&gt; int -&gt; int)</div>
+<div class="tip" id="fs16">val x : int</div>
+<div class="tip" id="fs17">val y : int</div>
+<div class="tip" id="fs18">val nine : int</div>
+<div class="tip" id="fs19">val onePlusOneExpression : Expr&lt;int&gt;</div>
+<div class="tip" id="fs20">member Expr.Evaluate : unit -&gt; &#39;T</div>
+<div class="tip" id="fs21">val tupler : (int -&gt; int * int)</div>
+<div class="tip" id="fs22">val v : Var</div>
+<div class="tip" id="fs23">Multiple items<br />type Var =<br />&#160;&#160;interface IComparable<br />&#160;&#160;new : name:string * typ:Type * ?isMutable:bool -&gt; Var<br />&#160;&#160;member IsMutable : bool<br />&#160;&#160;member Name : string<br />&#160;&#160;member Type : Type<br />&#160;&#160;static member Global : name:string * typ:Type -&gt; Var<br /><br />--------------------<br />new : name:string * typ:System.Type * ?isMutable:bool -&gt; Var</div>
+<div class="tip" id="fs24">val typeof&lt;&#39;T&gt; : System.Type</div>
+<div class="tip" id="fs25">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />--------------------<br />type int = int32<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int</div>
+<div class="tip" id="fs26">static member Expr.Lambda : parameter:Var * body:Expr -&gt; Expr</div>
+<div class="tip" id="fs27">static member Expr.Var : variable:Var -&gt; Expr</div>
+<div class="tip" id="fs28">member Expr.CompileUntyped : unit -&gt; obj</div>
+<div class="tip" id="fs29">val invokeFunctionDynamic : f:obj -&gt; x:obj -&gt; obj</div>
+<div class="tip" id="fs30">val f : obj</div>
+<div class="tip" id="fs31">type obj = System.Object</div>
+<div class="tip" id="fs32">val x : obj</div>
+<div class="tip" id="fs33">System.Object.GetType() : System.Type</div>
+<div class="tip" id="fs34">namespace System</div>
+<div class="tip" id="fs35">namespace System.Reflection</div>
+<div class="tip" id="fs36">type BindingFlags =<br />&#160;&#160;| Default = 0<br />&#160;&#160;| IgnoreCase = 1<br />&#160;&#160;| DeclaredOnly = 2<br />&#160;&#160;| Instance = 4<br />&#160;&#160;| Static = 8<br />&#160;&#160;| Public = 16<br />&#160;&#160;| NonPublic = 32<br />&#160;&#160;| FlattenHierarchy = 64<br />&#160;&#160;| InvokeMethod = 256<br />&#160;&#160;| CreateInstance = 512<br />&#160;&#160;...</div>
+<div class="tip" id="fs37">field System.Reflection.BindingFlags.InvokeMethod: System.Reflection.BindingFlags = 256</div>
+<div class="tip" id="fs38">val box : value:&#39;T -&gt; obj</div>
+<div class="tip" id="fs39">val makeTupler : n:int -&gt; (int -&gt; obj)</div>
+<div class="tip" id="fs40">val xVar : Var</div>
+<div class="tip" id="fs41">val lambdaExpr : Expr</div>
+<div class="tip" id="fs42">val compiledLambda : obj</div>
+<div class="tip" id="fs43">val v : int</div>
+<div class="tip" id="fs44">val tupler4 : (int -&gt; obj)</div>
+<div class="tip" id="fs45">val tupler7 : (int -&gt; obj)</div>
+<div class="tip" id="fs46">val onePlusTwoExpression : Expr&lt;int&gt;</div>
+<div class="tip" id="fs47">val expressionTree : System.Linq.Expressions.Expression</div>
+<div class="tip" id="fs48">member Expr.ToLinqExpressionUntyped : unit -&gt; System.Linq.Expressions.Expression</div>
+<div class="tip" id="fs49">System.Linq.Expressions.Expression.ToString() : string</div>
 
         </div>
         <div class="span3">
