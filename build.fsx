@@ -99,16 +99,8 @@ Target.create "NuGet.Push" (fun _ ->
 // Generate the documentation
 
 Target.create "GenerateDocs" (fun _ ->
-    // ugh, still need to use mono and legacy fsi for FSharp.Formatting
-    let path = __SOURCE_DIRECTORY__ @@ "packages/docs/FSharp.Compiler.Tools/tools/fsi.exe"
-    let workingDir = "docs/tools"
-    let args = "--define:RELEASE generate.fsx"
-    let command, args = 
-        if Environment.isWindows then path, args
-        else "mono", sprintf "%s %s" path args
-
-    if Shell.Exec(command, args, workingDir) <> 0 then
-        failwith "failed to generate docs"
+    let res = DotNet.exec id "fsi" "--define:RELEASE docs/tools/generate.fsx"
+    if not res.OK then failwith "failed to generate docs"
 )
 
 // --------------------------------------------------------------------------------------
@@ -144,21 +136,21 @@ Target.create "Default" ignore
 Target.create "Bundle" ignore
 Target.create "Release" ignore
 
-// "Clean"
-//   ==> "Build"
-//   ==> "RunTests"
-//   ==> "Default"
+"Clean"
+  ==> "Build"
+  ==> "RunTests"
+  ==> "Default"
 
-// "Default"
-//   ==> "GenerateDocs"
-//   ==> "NuGet.Pack"
-//   ==> "NuGet.ValidateSourceLink"
-//   ==> "Bundle"
+"Default"
+  ==> "GenerateDocs"
+  ==> "NuGet.Pack"
+  ==> "NuGet.ValidateSourceLink"
+  ==> "Bundle"
 
-// "Bundle"
-//   ==> "ReleaseDocs"
-//   ==> "NuGet.Push"
-//   ==> "ReleaseTag"
-//   ==> "Release"
+"Bundle"
+  ==> "ReleaseDocs"
+  ==> "NuGet.Push"
+  ==> "ReleaseTag"
+  ==> "Release"
 
 Target.runOrDefault "Default"

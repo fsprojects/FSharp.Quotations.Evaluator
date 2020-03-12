@@ -7,7 +7,7 @@ nuget Microsoft.SourceLink.GitHub ~> 1.0 copy_local: true
 
 group Tests
   source https://api.nuget.org/v3/index.json
-  framework: netcoreapp3.0, net472
+  framework: netcoreapp3.1, net472
   storage: none
 
   nuget FSharp.Core >= 4.7
@@ -17,19 +17,15 @@ group Tests
 
 group Build
   source https://api.nuget.org/v3/index.json
+  generate_load_scripts: true
+  framework: netstandard2.0
   storage: none
 
-  nuget Fake.Core.UserInput	    ~> 5.18.0
-  nuget Fake.Core.ReleaseNotes  ~> 5.18.0
-  nuget Fake.Core.Target        ~> 5.18.0
-  nuget Fake.IO.FileSystem      ~> 5.18.0
-  nuget Fake.DotNet.Cli	        ~> 5.18.0
-  nuget Fake.Tools.Git          ~> 5.18.0
+  nuget Fake.Core.UserInput     ~> 5.19.0
+  nuget Fake.Core.ReleaseNotes  ~> 5.19.0
+  nuget Fake.Core.Target        ~> 5.19.0
+  nuget Fake.IO.FileSystem      ~> 5.19.0
+  nuget Fake.DotNet.Cli         ~> 5.19.0
+  nuget Fake.Tools.Git          ~> 5.19.0
 
-group Docs
-  source https://api.nuget.org/v3/index.json
-  framework: net472
-
-  nuget FAKE ~> 4.0
-  nuget FSharp.Formatting ~> 3.1
-  nuget FSharp.Compiler.Tools ~> 10.2.3
+  nuget FSharp.Formatting ~> 4.0 prerelease storage: packages

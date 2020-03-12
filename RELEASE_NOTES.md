@@ -1,3 +1,6 @@
+### 2.1.0 - Bug fix
+* Fix "Argument types do not match" on nested if statement.
+
 ### 2.0.0 - Support NetStandard2.0 only.
 * Deprecate net45 target.
 
