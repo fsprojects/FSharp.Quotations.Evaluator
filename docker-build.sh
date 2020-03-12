@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-if [ -z $1 ] ; then
-	TARGET="Bundle"
-else
-	TARGET=$1
-fi
-
 IMAGE_LABEL="fqe:$RANDOM"
 
 # docker build
@@ -15,4 +9,4 @@ docker build -t $IMAGE_LABEL .
 docker run -t --rm \
            -e NUGET_KEY=$NUGET_KEY \
 		   -e TARGET=$TARGET \
-		   $IMAGE_LABEL
+		   ./build.sh "$@"

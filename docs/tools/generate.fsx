@@ -2,6 +2,16 @@
 // Builds the documentation from `.fsx` and `.md` files in the 'docs/content' directory
 // (the generated documentation is stored in the 'docs/output' directory)
 // --------------------------------------------------------------------------------------
+#load "../../.paket/load/netstandard2.0/Build/build.group.fsx"
+
+open System
+open System.IO
+open Fake.IO
+open Fake.IO.FileSystemOperators
+open Fake.IO.Globbing.Operators
+open FSharp.Formatting.Razor
+
+Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
 // Binaries that have XML documentation (in a corresponding generated XML file)
 let referenceProjects = [ "../../src/FSharp.Quotations.Evaluator" ]
@@ -21,20 +31,6 @@ let info =
 // --------------------------------------------------------------------------------------
 // For typical project, no changes are needed below
 // --------------------------------------------------------------------------------------
-
-#I "../../packages/docs/FSharp.Compiler.Service/lib/net45"
-#I "../../packages/docs/FSharp.Formatting/lib/net461"
-#r "../../packages/docs/FAKE/tools/FakeLib.dll"
-#r "RazorEngine.dll"
-#r "FSharp.Markdown.dll"
-#r "FSharp.Literate.dll"
-#r "FSharp.CodeFormat.dll"
-#r "FSharp.MetadataFormat.dll"
-#r "FSharp.Formatting.Common.dll"
-#r "FSharp.Formatting.Razor.dll"
-open Fake
-open System.IO
-open FSharp.Formatting.Razor
 
 // When called from 'build.fsx', use the public project URL as <root>
 // otherwise, use the current 'output' directory.
@@ -60,10 +56,9 @@ let layoutRoots =
 
 // Copy static files and CSS + JS from F# Formatting
 let copyFiles () =
-  CopyRecursive files output true |> Log "Copying file: "
-  ensureDirectory (output @@ "content")
-  CopyRecursive (formatting @@ "styles") (output @@ "content") true 
-    |> Log "Copying styles and scripts: "
+    Fake.IO.DirectoryInfo.copyRecursiveTo true (DirectoryInfo output) (DirectoryInfo files) |> ignore
+    Fake.IO.Directory.ensure (output @@ "content")
+    Fake.IO.DirectoryInfo.copyRecursiveTo true (DirectoryInfo (output @@ "content")) (DirectoryInfo (formatting @@ "styles")) |> ignore
 
 let getReferenceAssembliesForProject (proj : string) =
     let projName = Path.GetFileName proj
@@ -71,7 +66,7 @@ let getReferenceAssembliesForProject (proj : string) =
 
 // Build API reference from XML comments
 let buildReference () =
-    CleanDir (output @@ "reference")
+    Shell.cleanDir (output @@ "reference")
     let binaries = referenceProjects |> List.map getReferenceAssembliesForProject
     RazorMetadataFormat.Generate
         ( binaries, output @@ "reference", layoutRoots, 
@@ -87,9 +82,11 @@ let buildDocumentation () =
     let sub = if dir.Length > content.Length then dir.Substring(content.Length + 1) else "."
     RazorLiterate.ProcessDirectory
       ( dir, docTemplate, output @@ sub, replacements = ("root", root)::info,
-        layoutRoots = layoutRoots )
+        layoutRoots = layoutRoots, generateAnchors = true )
 
 // Generate
+Shell.cleanDir output
+Shell.mkdir output
 copyFiles()
 buildDocumentation()
 buildReference()

@@ -111,5 +111,3 @@ let onePlusTwoExpression = <@ 1 + 2 @>  //  2
 let expressionTree = onePlusTwoExpression.ToLinqExpressionUntyped() // an expression tree
 
 expressionTree.ToString() // "(1 + 2)"
-
-
